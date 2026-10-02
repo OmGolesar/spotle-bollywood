@@ -13,6 +13,27 @@ export function istDateKey(reference: Date = new Date()): string {
   return `${y}-${m}-${d}`;
 }
 
+export function msUntilNextIstMidnight(reference: Date = new Date()): number {
+  const ist = istNow(reference);
+  const nextMidnightIstUtcMs = Date.UTC(
+    ist.getUTCFullYear(),
+    ist.getUTCMonth(),
+    ist.getUTCDate() + 1
+  );
+  const nowAsIstUtcMs = ist.getTime();
+  return nextMidnightIstUtcMs - nowAsIstUtcMs;
+}
+
+export function formatCountdown(ms: number): string {
+  const clamped = Math.max(0, ms);
+  const totalSec = Math.floor(clamped / 1000);
+  const h = Math.floor(totalSec / 3600);
+  const m = Math.floor((totalSec % 3600) / 60);
+  const s = totalSec % 60;
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return `${pad(h)}:${pad(m)}:${pad(s)}`;
+}
+
 export function istDisplayDate(reference: Date = new Date()): string {
   const ist = istNow(reference);
   return ist.toLocaleDateString("en-IN", {
