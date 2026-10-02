@@ -13,7 +13,7 @@ function hash(s: string): number {
   return h;
 }
 
-const MOVIES: Movie[] = [
+export const MOCK_MOVIES: Movie[] = [
   {
     id: "dilwale-dulhania-le-jayenge",
     title: "Dilwale Dulhania Le Jayenge",
@@ -176,7 +176,7 @@ const MOVIES: Movie[] = [
   },
 ];
 
-const POOLS: Record<Difficulty, string[]> = {
+export const MOCK_POOLS: Record<Difficulty, string[]> = {
   easy: ["3-idiots", "zindagi-na-milegi-dobara", "gully-boy", "lagaan"],
   medium: [
     "3-idiots",
@@ -198,22 +198,22 @@ const POOLS: Record<Difficulty, string[]> = {
   ],
 };
 
-const MYSTERY_PER_DIFFICULTY: Record<Difficulty, string> = {
+export const MOCK_MYSTERY_PER_DIFFICULTY: Record<Difficulty, string> = {
   easy: "3-idiots",
   medium: "dilwale-dulhania-le-jayenge",
   hard: "jaane-bhi-do-yaaro",
 };
 
 export function moviesForDifficulty(d: Difficulty): Movie[] {
-  const ids = new Set(POOLS[d]);
-  return MOVIES.filter((m) => ids.has(m.id)).sort((a, b) =>
+  const ids = new Set(MOCK_POOLS[d]);
+  return MOCK_MOVIES.filter((m) => ids.has(m.id)).sort((a, b) =>
     a.title.localeCompare(b.title)
   );
 }
 
 export function mysteryFor(d: Difficulty): Movie {
-  const id = MYSTERY_PER_DIFFICULTY[d];
-  const m = MOVIES.find((x) => x.id === id);
+  const id = MOCK_MYSTERY_PER_DIFFICULTY[d];
+  const m = MOCK_MOVIES.find((x) => x.id === id);
   if (!m) throw new Error(`No mystery for ${d}`);
   return m;
 }
