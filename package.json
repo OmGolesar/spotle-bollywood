@@ -14,7 +14,8 @@
     "migrate": "tsx scripts/migrate.ts",
     "tmdb:import": "tsx scripts/importTmdb.ts",
     "movies:load": "tsx scripts/loadMovies.ts",
-    "edges:compute": "tsx scripts/computeEdges.ts"
+    "edges:compute": "tsx scripts/computeEdges.ts",
+    "cleanup:mock": "tsx scripts/cleanupMockDuplicates.ts"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.7",

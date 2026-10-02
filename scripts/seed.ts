@@ -1,26 +1,27 @@
 /**
- * Idempotent seed for the Spotle Bollywood dev/preview DB.
+ * Dev-only helper: ensures today's three difficulty puzzles are
+ * scheduled against the top-ranked films already in the catalog.
  *
- *   Reads the Chunk-2 mock catalog, upserts movies + pools, schedules
- *   today's puzzle for all three difficulties, and warms the edge tables.
+ * As of Chunk 6b the catalog itself is sourced from TMDB:
+ *   npm run tmdb:import
+ *   npm run movies:load
+ *   npm run edges:compute
+ *
+ * This script no longer inserts movies. It only touches daily_puzzles,
+ * picking the top film from each pool by vote-count-equivalent rank.
+ * Safe to run anytime; existing scheduled puzzles are left alone.
  *
  * Usage:
- *   npm run seed           # requires .env.local with SUPABASE_* keys
+ *   npm run seed             # fills missing slots for today only
+ *   npm run seed -- --force  # overwrites today's slots even if scheduled
  */
 import { config as loadEnv } from "dotenv";
 loadEnv({ path: ".env.local" });
 loadEnv();
 
-import { createHash } from "node:crypto";
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
-import {
-  MOCK_MOVIES,
-  MOCK_POOLS,
-  MOCK_MYSTERY_PER_DIFFICULTY,
-} from "../src/lib/mock.js";
 import { DIFFICULTIES, type Difficulty } from "../src/lib/difficulty.js";
 import { istDateKey } from "../src/lib/dateIst.js";
-import type { Movie } from "../src/lib/types.js";
 
 function env(name: string): string {
   const v = process.env[name];
@@ -28,113 +29,65 @@ function env(name: string): string {
   return v;
 }
 
-/** Deterministic UUID (v5-style) from a slug so re-seeding is idempotent. */
-function uuidFromSlug(slug: string): string {
-  const h = createHash("sha1").update(`spotle:${slug}`).digest("hex");
-  return [
-    h.slice(0, 8),
-    h.slice(8, 12),
-    "5" + h.slice(13, 16),
-    "8" + h.slice(17, 20),
-    h.slice(20, 32),
-  ].join("-");
+type PoolJoin = { movie_id: string; movies: { title: string; year: number } };
+
+async function pickTopForPool(
+  db: SupabaseClient,
+  difficulty: Difficulty
+): Promise<PoolJoin | null> {
+  const { data, error } = await db
+    .from("movie_pools")
+    .select("movie_id, movies!inner(title, year, tmdb_id)")
+    .eq("difficulty", difficulty)
+    .order("added_at", { ascending: true })
+    .limit(50);
+  if (error) throw new Error(`pool ${difficulty}: ${error.message}`);
+  const rows = (data ?? []) as unknown as PoolJoin[];
+  // We don't have a vote_count view here; the loader inserted in rank order,
+  // so first-added is top-ranked. Fall back gracefully if the pool is empty.
+  return rows[0] ?? null;
 }
 
 async function main() {
-  const db = createClient(
-    env("NEXT_PUBLIC_SUPABASE_URL"),
-    env("SUPABASE_SERVICE_ROLE_KEY"),
-    { auth: { persistSession: false } }
-  );
-
-  const movieRows = MOCK_MOVIES.map((m) => toMovieRow(m));
-
-  console.log(`Upserting ${movieRows.length} movies…`);
-  const movieUpsert = await db
-    .from("movies")
-    .upsert(movieRows, { onConflict: "id" });
-  if (movieUpsert.error) throw new Error(movieUpsert.error.message);
-
-  console.log("Upserting movie_pools…");
-  const poolRows: { movie_id: string; difficulty: Difficulty }[] = [];
-  for (const diff of DIFFICULTIES) {
-    for (const slug of MOCK_POOLS[diff]) {
-      poolRows.push({ movie_id: uuidFromSlug(slug), difficulty: diff });
-    }
-  }
-  const poolUpsert = await db
-    .from("movie_pools")
-    .upsert(poolRows, { onConflict: "movie_id,difficulty" });
-  if (poolUpsert.error) throw new Error(poolUpsert.error.message);
-
-  console.log("Scheduling today's puzzles…");
-  const today = istDateKey();
-  const puzzleRows = DIFFICULTIES.map((d) => ({
-    puzzle_date: today,
-    difficulty: d,
-    movie_id: uuidFromSlug(MOCK_MYSTERY_PER_DIFFICULTY[d]),
-    status: "live" as const,
-  }));
-  const puzzleUpsert = await db
-    .from("daily_puzzles")
-    .upsert(puzzleRows, { onConflict: "puzzle_date,difficulty" });
-  if (puzzleUpsert.error) throw new Error(puzzleUpsert.error.message);
-
-  console.log("Rebuilding edge tables…");
-  await rebuildEdges(db, "director_edges", ["director_a", "director_b"], (m) => m.director);
-  await rebuildEdges(db, "music_director_edges", ["md_a", "md_b"], (m) => m.musicDirectors);
-
-  console.log(`\nSeed complete. Today (IST) is ${today}.`);
-  for (const d of DIFFICULTIES) {
-    console.log(`  ${d}: ${MOCK_MYSTERY_PER_DIFFICULTY[d]}`);
-  }
-}
-
-function toMovieRow(m: Movie) {
-  return {
-    id: uuidFromSlug(m.id),
-    tmdb_id: null,
-    title: m.title,
-    title_alternates: [],
-    year: m.year,
-    director: m.director,
-    cast_top3: m.castTop3,
-    music_directors: m.musicDirectors,
-    banner: m.banner,
-    banner_parent: m.bannerParent,
-    genres: m.genres,
-    box_office_cr: m.boxOfficeCr,
-    imdb_score: m.imdbScore,
-    poster_url: m.posterUrl,
-    trivia: m.trivia,
-    where_to_watch_url: m.whereToWatchUrl,
-    hint_easy: m.hintEasy,
-    hint_medium: m.hintMedium,
-    hint_hard: m.hintHard,
-    data_quality: "verified" as const,
-  };
-}
-
-async function rebuildEdges(
-  db: SupabaseClient,
-  table: string,
-  cols: [string, string],
-  pick: (m: Movie) => string[]
-) {
-  const pairs = new Set<string>();
-  for (const m of MOCK_MOVIES) {
-    const names = pick(m);
-    for (const a of names) for (const b of names) if (a !== b) pairs.add(`${a}\x1f${b}`);
-  }
-  const rows = Array.from(pairs).map((p) => {
-    const [a, b] = p.split("\x1f");
-    return { [cols[0]]: a, [cols[1]]: b } as Record<string, string>;
+  const force = process.argv.includes("--force");
+  const db = createClient(env("NEXT_PUBLIC_SUPABASE_URL"), env("SUPABASE_SERVICE_ROLE_KEY"), {
+    auth: { persistSession: false },
   });
-  await db.from(table).delete().not(cols[0], "is", null);
-  if (rows.length > 0) {
-    const ins = await db.from(table).insert(rows);
-    if (ins.error) throw new Error(`${table}: ${ins.error.message}`);
+
+  const today = istDateKey();
+  console.log(`Scheduling today (${today}) across ${DIFFICULTIES.length} difficulties… (force=${force})\n`);
+
+  for (const d of DIFFICULTIES) {
+    const existing = await db
+      .from("daily_puzzles")
+      .select("movie_id, movies!inner(title, year)")
+      .eq("puzzle_date", today)
+      .eq("difficulty", d)
+      .maybeSingle();
+
+    if (existing.data && !force) {
+      const m = existing.data.movies as unknown as { title: string; year: number };
+      console.log(`  ${d}: already scheduled → ${m.title} (${m.year})`);
+      continue;
+    }
+
+    const top = await pickTopForPool(db, d);
+    if (!top) {
+      console.log(`  ${d}: pool is empty — skipping (run tmdb:import + movies:load first)`);
+      continue;
+    }
+
+    const up = await db
+      .from("daily_puzzles")
+      .upsert(
+        { puzzle_date: today, difficulty: d, movie_id: top.movie_id, status: "live" },
+        { onConflict: "puzzle_date,difficulty" }
+      );
+    if (up.error) throw new Error(`upsert ${d}: ${up.error.message}`);
+    console.log(`  ${d}: scheduled ${top.movies.title} (${top.movies.year})`);
   }
+
+  console.log("\nDone.");
 }
 
 main().catch((err) => {
