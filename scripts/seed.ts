@@ -7,7 +7,10 @@
  * Usage:
  *   npm run seed           # requires .env.local with SUPABASE_* keys
  */
-import "dotenv/config";
+import { config as loadEnv } from "dotenv";
+loadEnv({ path: ".env.local" });
+loadEnv();
+
 import { createHash } from "node:crypto";
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import {
