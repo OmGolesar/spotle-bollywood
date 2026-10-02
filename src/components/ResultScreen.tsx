@@ -7,22 +7,38 @@ import type { Difficulty } from "@/lib/difficulty";
 import { DIFFICULTIES, DIFFICULTY_META } from "@/lib/difficulty";
 import { istDisplayDate } from "@/lib/dateIst";
 import { buildShareText, emojiGrid, share } from "@/lib/share";
-import type { GuessRow, Movie, PuzzleOutcome } from "@/lib/types";
+import type { PuzzleOutcome, TileState } from "@/lib/types";
 import { TOTAL_GUESSES } from "@/lib/types";
 import { Countdown } from "./Countdown";
+
+export type ResultAnswer = {
+  id: string;
+  title: string;
+  year: number;
+  director: string[];
+  castTop3: string[];
+  trivia: string;
+  whereToWatchUrl: string | null;
+  posterUrl: string;
+};
+
+type GuessRowClient = {
+  movie: { id: string; title: string; year: number };
+  tiles: TileState[];
+};
 
 type Props = {
   difficulty: Difficulty;
   outcome: Extract<PuzzleOutcome, "won" | "lost">;
-  mystery: Movie;
-  guesses: GuessRow[];
+  answer: ResultAnswer;
+  guesses: GuessRowClient[];
   streakAfter: number;
 };
 
 export function ResultScreen({
   difficulty,
   outcome,
-  mystery,
+  answer: mystery,
   guesses,
   streakAfter,
 }: Props) {

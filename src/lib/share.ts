@@ -1,6 +1,6 @@
 import type { Difficulty } from "./difficulty";
 import { DIFFICULTY_META } from "./difficulty";
-import type { GuessRow, PuzzleOutcome } from "./types";
+import type { PuzzleOutcome, TileState } from "./types";
 import { TOTAL_GUESSES } from "./types";
 
 const EMOJI: Record<"green" | "yellow" | "gray", string> = {
@@ -9,7 +9,9 @@ const EMOJI: Record<"green" | "yellow" | "gray", string> = {
   gray: "⬛",
 };
 
-export function emojiGrid(guesses: GuessRow[]): string {
+export type ShareableGuess = { tiles: TileState[] };
+
+export function emojiGrid(guesses: ShareableGuess[]): string {
   return guesses.map((g) => g.tiles.map((t) => EMOJI[t.color]).join("")).join("\n");
 }
 
@@ -29,7 +31,7 @@ export function shareTitle(
 export function buildShareText(opts: {
   difficulty: Difficulty;
   outcome: PuzzleOutcome;
-  guesses: GuessRow[];
+  guesses: ShareableGuess[];
   dateLabel: string;
   siteUrl?: string;
 }): string {

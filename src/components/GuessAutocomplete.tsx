@@ -2,39 +2,62 @@
 
 import { useEffect, useId, useMemo, useRef, useState } from "react";
 import type { Difficulty } from "@/lib/difficulty";
-import type { Movie } from "@/lib/types";
-import { searchCatalog } from "@/lib/mock";
+
+export type AutocompleteOption = {
+  id: string;
+  title: string;
+  year: number;
+  posterThumb?: string;
+};
 
 type Props = {
   difficulty: Difficulty;
   disabled?: boolean;
   disabledIds?: Set<string>;
-  onPick: (movie: Movie) => void;
+  onPick: (movie: AutocompleteOption) => void;
 };
 
 export function GuessAutocomplete({ difficulty, disabled, disabledIds, onPick }: Props) {
   const [query, setQuery] = useState("");
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState(0);
-  const [debounced, setDebounced] = useState("");
+  const [results, setResults] = useState<AutocompleteOption[]>([]);
+  const [loading, setLoading] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+  const abortRef = useRef<AbortController | null>(null);
   const listId = useId();
 
   useEffect(() => {
-    const t = setTimeout(() => setDebounced(query), 120);
+    const q = query.trim();
+    if (q.length === 0) {
+      setResults([]);
+      return;
+    }
+    const t = setTimeout(() => {
+      abortRef.current?.abort();
+      const ctrl = new AbortController();
+      abortRef.current = ctrl;
+      setLoading(true);
+      fetch(`/api/catalog?difficulty=${difficulty}&q=${encodeURIComponent(q)}`, {
+        signal: ctrl.signal,
+        cache: "no-store",
+      })
+        .then((r) => (r.ok ? r.json() : Promise.reject(new Error(`HTTP ${r.status}`))))
+        .then((body: { results: AutocompleteOption[] }) => {
+          setResults(body.results);
+          setActive(0);
+        })
+        .catch((err) => {
+          if (err?.name !== "AbortError") setResults([]);
+        })
+        .finally(() => setLoading(false));
+    }, 150);
     return () => clearTimeout(t);
-  }, [query]);
+  }, [query, difficulty]);
 
-  const results = useMemo<Movie[]>(() => {
-    const r = searchCatalog(difficulty, debounced);
-    return r;
-  }, [difficulty, debounced]);
+  const filtered = useMemo(() => results, [results]);
 
-  useEffect(() => {
-    setActive(0);
-  }, [debounced]);
-
-  function pick(m: Movie) {
+  function pick(m: AutocompleteOption) {
     if (disabledIds?.has(m.id)) return;
     onPick(m);
     setQuery("");
@@ -49,20 +72,20 @@ export function GuessAutocomplete({ difficulty, disabled, disabledIds, onPick }:
     }
     if (e.key === "ArrowDown") {
       e.preventDefault();
-      setActive((i) => Math.min(i + 1, Math.max(0, results.length - 1)));
+      setActive((i) => Math.min(i + 1, Math.max(0, filtered.length - 1)));
     } else if (e.key === "ArrowUp") {
       e.preventDefault();
       setActive((i) => Math.max(i - 1, 0));
     } else if (e.key === "Enter") {
       e.preventDefault();
-      const m = results[active];
+      const m = filtered[active];
       if (m) pick(m);
     } else if (e.key === "Escape") {
       setOpen(false);
     }
   }
 
-  const showList = open && results.length > 0 && !disabled;
+  const showList = open && filtered.length > 0 && !disabled;
 
   return (
     <div className="relative w-full">
@@ -78,6 +101,7 @@ export function GuessAutocomplete({ difficulty, disabled, disabledIds, onPick }:
         aria-controls={`${listId}-list`}
         aria-activedescendant={showList ? `${listId}-opt-${active}` : undefined}
         aria-autocomplete="list"
+        aria-busy={loading}
         value={query}
         placeholder={disabled ? "Game over" : "Type a Bollywood film…"}
         disabled={disabled}
@@ -101,7 +125,7 @@ export function GuessAutocomplete({ difficulty, disabled, disabledIds, onPick }:
           role="listbox"
           className="absolute bottom-full z-40 mb-2 max-h-64 w-full overflow-auto rounded-xl border border-border bg-surface py-1 shadow-xl"
         >
-          {results.map((m, i) => {
+          {filtered.map((m, i) => {
             const used = disabledIds?.has(m.id) ?? false;
             return (
               <li

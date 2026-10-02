@@ -1,18 +1,52 @@
 import { SiteHeader } from "@/components/SiteHeader";
 import { ModeCard } from "@/components/ModeCard";
 import { HowToPlaySheet } from "@/components/HowToPlaySheet";
-import { DIFFICULTIES } from "@/lib/difficulty";
-import { istDisplayDate } from "@/lib/dateIst";
+import { DIFFICULTIES, type Difficulty } from "@/lib/difficulty";
+import { istDateKey, istDisplayDate } from "@/lib/dateIst";
+import { hasSupabaseConfigured } from "@/lib/supabase/env";
+import { readStreaks } from "@/lib/server/puzzle";
+import { readPlayerId } from "@/lib/playerCookie";
 
-type StreakState = { streak: number; playedToday: boolean };
-const PLACEHOLDER_STREAKS: Record<string, StreakState> = {
-  easy: { streak: 0, playedToday: false },
-  medium: { streak: 0, playedToday: false },
-  hard: { streak: 0, playedToday: false },
-};
+export const dynamic = "force-dynamic";
 
-export default function Home() {
+async function loadStreakState(): Promise<Record<Difficulty, { streak: number; playedToday: boolean }>> {
+  const empty = {
+    easy: { streak: 0, playedToday: false },
+    medium: { streak: 0, playedToday: false },
+    hard: { streak: 0, playedToday: false },
+  } satisfies Record<Difficulty, { streak: number; playedToday: boolean }>;
+
+  if (!hasSupabaseConfigured()) return empty;
+
+  const playerId = await readPlayerId();
+  if (!playerId) return empty;
+
+  try {
+    const streaks = await readStreaks(playerId);
+    const today = istDateKey();
+    return {
+      easy: {
+        streak: streaks.easy.current_streak,
+        playedToday: streaks.easy.last_played_date === today,
+      },
+      medium: {
+        streak: streaks.medium.current_streak,
+        playedToday: streaks.medium.last_played_date === today,
+      },
+      hard: {
+        streak: streaks.hard.current_streak,
+        playedToday: streaks.hard.last_played_date === today,
+      },
+    };
+  } catch (e) {
+    console.error("home: readStreaks failed", e);
+    return empty;
+  }
+}
+
+export default async function Home() {
   const todayLabel = istDisplayDate();
+  const streakState = await loadStreakState();
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -38,7 +72,7 @@ export default function Home() {
           className="grid gap-4 sm:grid-cols-3"
         >
           {DIFFICULTIES.map((d) => {
-            const s = PLACEHOLDER_STREAKS[d];
+            const s = streakState[d];
             return (
               <ModeCard
                 key={d}
