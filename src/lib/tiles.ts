@@ -1,8 +1,31 @@
 import type { Movie, TileState, TileKey } from "./types";
 
+export type EdgeIndex = {
+  directors: Map<string, Set<string>>;
+  music: Map<string, Set<string>>;
+};
+
+export const EMPTY_EDGE_INDEX: EdgeIndex = {
+  directors: new Map(),
+  music: new Map(),
+};
+
 function intersects<T>(a: T[], b: T[]): boolean {
   const set = new Set(a);
   for (const item of b) if (set.has(item)) return true;
+  return false;
+}
+
+function edgeConnects(
+  edges: Map<string, Set<string>>,
+  xs: string[],
+  ys: string[]
+): boolean {
+  for (const x of xs) {
+    const neighbors = edges.get(x);
+    if (!neighbors) continue;
+    for (const y of ys) if (neighbors.has(y)) return true;
+  }
   return false;
 }
 
@@ -16,36 +39,41 @@ function arrow(from: number, to: number): "up" | "down" | null {
   return from < to ? "up" : "down";
 }
 
-export function compareMovies(guess: Movie, mystery: Movie): TileState[] {
+function toCents(n: number): number {
+  return Math.round(n * 100);
+}
+
+export function compareMovies(
+  guess: Movie,
+  mystery: Movie,
+  edges: EdgeIndex = EMPTY_EDGE_INDEX
+): TileState[] {
   const tiles: TileState[] = [];
 
+  const directorGreen = intersects(guess.director, mystery.director);
+  const directorYellow =
+    !directorGreen && edgeConnects(edges.directors, guess.director, mystery.director);
   tiles.push({
     key: "director",
     label: "Director",
-    color: intersects(guess.director, mystery.director) ? "green" : "gray",
+    color: directorGreen ? "green" : directorYellow ? "yellow" : "gray",
     value: fmtNumList(guess.director),
   });
 
-  const cast: TileState = {
-    key: "cast",
-    label: "Lead cast",
-    color: "gray",
-    value: fmtNumList(guess.castTop3),
-  };
-  let anyMatchPosition = false;
-  let anyMatchDifferentPosition = false;
+  let castGreen = false;
+  let castYellow = false;
   for (let i = 0; i < guess.castTop3.length; i++) {
     const name = guess.castTop3[i];
     const pos = mystery.castTop3.indexOf(name);
-    if (pos === i) anyMatchPosition = true;
-    else if (pos !== -1) anyMatchDifferentPosition = true;
+    if (pos === i) castGreen = true;
+    else if (pos !== -1) castYellow = true;
   }
-  cast.color = anyMatchPosition
-    ? "green"
-    : anyMatchDifferentPosition
-    ? "yellow"
-    : "gray";
-  tiles.push(cast);
+  tiles.push({
+    key: "cast",
+    label: "Lead cast",
+    color: castGreen ? "green" : castYellow ? "yellow" : "gray",
+    value: fmtNumList(guess.castTop3),
+  });
 
   const dy = mystery.year - guess.year;
   tiles.push({
@@ -63,20 +91,29 @@ export function compareMovies(guess: Movie, mystery: Movie): TileState[] {
     value:
       guess.boxOfficeCr != null ? `₹${guess.boxOfficeCr.toFixed(0)} cr` : "—",
   };
-  if (guess.boxOfficeCr != null && mystery.boxOfficeCr != null && mystery.boxOfficeCr > 0) {
-    const rel = Math.abs(guess.boxOfficeCr - mystery.boxOfficeCr) / mystery.boxOfficeCr;
-    if (rel <= 0.1) bo.color = "green";
-    else if (rel <= 0.5) {
+  if (
+    guess.boxOfficeCr != null &&
+    mystery.boxOfficeCr != null &&
+    mystery.boxOfficeCr > 0
+  ) {
+    const diffCents = Math.abs(toCents(guess.boxOfficeCr) - toCents(mystery.boxOfficeCr));
+    const mysteryCents = toCents(mystery.boxOfficeCr);
+    if (diffCents * 10 <= mysteryCents) bo.color = "green";
+    else if (diffCents * 2 <= mysteryCents) {
       bo.color = "yellow";
       bo.arrow = guess.boxOfficeCr < mystery.boxOfficeCr ? "up" : "down";
     }
   }
   tiles.push(bo);
 
+  const musicGreen = intersects(guess.musicDirectors, mystery.musicDirectors);
+  const musicYellow =
+    !musicGreen &&
+    edgeConnects(edges.music, guess.musicDirectors, mystery.musicDirectors);
   tiles.push({
     key: "music",
     label: "Music",
-    color: intersects(guess.musicDirectors, mystery.musicDirectors) ? "green" : "gray",
+    color: musicGreen ? "green" : musicYellow ? "yellow" : "gray",
     value: fmtNumList(guess.musicDirectors),
   });
 
@@ -95,10 +132,12 @@ export function compareMovies(guess: Movie, mystery: Movie): TileState[] {
     value: guess.banner,
   });
 
-  const genreOverlap = intersects(guess.genres, mystery.genres);
+  const guessGenreSet = new Set(guess.genres);
+  const mysteryGenreSet = new Set(mystery.genres);
+  const genreOverlap = guess.genres.some((g) => mysteryGenreSet.has(g));
   const genreEqual =
-    guess.genres.length === mystery.genres.length &&
-    guess.genres.every((g) => mystery.genres.includes(g));
+    guessGenreSet.size === mysteryGenreSet.size &&
+    guess.genres.every((g) => mysteryGenreSet.has(g));
   tiles.push({
     key: "genre",
     label: "Genre",
@@ -113,9 +152,11 @@ export function compareMovies(guess: Movie, mystery: Movie): TileState[] {
     value: guess.imdbScore != null ? guess.imdbScore.toFixed(1) : "—",
   };
   if (guess.imdbScore != null && mystery.imdbScore != null) {
-    const d = Math.abs(guess.imdbScore - mystery.imdbScore);
-    if (d <= 0.3) imdb.color = "green";
-    else if (d <= 1.0) {
+    const diffTenths = Math.abs(
+      Math.round(guess.imdbScore * 10) - Math.round(mystery.imdbScore * 10)
+    );
+    if (diffTenths <= 3) imdb.color = "green";
+    else if (diffTenths <= 10) {
       imdb.color = "yellow";
       imdb.arrow = arrow(guess.imdbScore, mystery.imdbScore);
     }

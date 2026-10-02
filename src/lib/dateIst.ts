@@ -1,8 +1,7 @@
 const IST_OFFSET_MIN = 330;
 
 export function istNow(reference: Date = new Date()): Date {
-  const utcMs = reference.getTime() + reference.getTimezoneOffset() * 60_000;
-  return new Date(utcMs + IST_OFFSET_MIN * 60_000);
+  return new Date(reference.getTime() + IST_OFFSET_MIN * 60_000);
 }
 
 export function istDateKey(reference: Date = new Date()): string {
