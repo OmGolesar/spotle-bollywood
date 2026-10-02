@@ -62,7 +62,7 @@ The player wins when they name the correct film; loses after 10 wrong guesses. E
 | Director | directors intersect | guess's director has co-directed a different film with mystery's director | otherwise |
 | Lead cast (top 3) | ≥1 cast member in same billing position | cast member present but different position | no overlap |
 | Year | exact | within 5 years, with ↑/↓ arrow | otherwise |
-| Box office (₹ cr) | within 10% | within 50%, with ↑/↓ arrow | otherwise, or either value null |
+| Box office (₹ cr) | `\|guess − mystery\| / mystery ≤ 0.10` | `\|guess − mystery\| / mystery ≤ 0.50`, with ↑/↓ arrow pointing toward mystery | otherwise, or either value null |
 | Music director(s) | arrays intersect | co-composed with mystery's MD on another film | otherwise |
 | Banner | same banner | same `banner_parent` (sister label) | otherwise |
 | Genre | genre sets equal | ≥1 overlap | zero overlap |
