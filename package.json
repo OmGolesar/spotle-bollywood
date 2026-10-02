@@ -15,7 +15,8 @@
     "tmdb:import": "tsx scripts/importTmdb.ts",
     "movies:load": "tsx scripts/loadMovies.ts",
     "edges:compute": "tsx scripts/computeEdges.ts",
-    "cleanup:mock": "tsx scripts/cleanupMockDuplicates.ts"
+    "cleanup:mock": "tsx scripts/cleanupMockDuplicates.ts",
+    "enrich:films": "tsx scripts/enrichMovies.ts"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.7",
@@ -26,6 +27,7 @@
     "server-only": "^0.0.1"
   },
   "devDependencies": {
+    "@anthropic-ai/sdk": "^0.131.0",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/pg": "^8.23.1",
