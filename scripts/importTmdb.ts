@@ -92,14 +92,29 @@ type Detail = {
   credits: Credits;
 };
 
-async function tmdb<T>(path: string, apiKey: string): Promise<T> {
+async function tmdb<T>(path: string, apiKey: string, attempt = 0): Promise<T> {
   const url = `${TMDB_BASE}${path}${path.includes("?") ? "&" : "?"}api_key=${apiKey}`;
-  const res = await fetch(url);
-  if (!res.ok) {
-    const body = await res.text().catch(() => "");
-    throw new Error(`TMDB ${res.status} ${res.statusText} for ${path} :: ${body.slice(0, 160)}`);
+  try {
+    const res = await fetch(url, { keepalive: false });
+    if (!res.ok) {
+      if (res.status === 429 && attempt < 5) {
+        const wait = Number(res.headers.get("retry-after") ?? "2") * 1000;
+        await sleep(wait);
+        return tmdb(path, apiKey, attempt + 1);
+      }
+      const body = await res.text().catch(() => "");
+      throw new Error(`TMDB ${res.status} ${res.statusText} for ${path} :: ${body.slice(0, 160)}`);
+    }
+    return (await res.json()) as T;
+  } catch (err) {
+    const code = (err as { cause?: { code?: string } })?.cause?.code;
+    if (attempt < 4 && (code === "ECONNRESET" || code === "UND_ERR_SOCKET" || code === "ETIMEDOUT")) {
+      const backoff = 500 * Math.pow(2, attempt);
+      await sleep(backoff);
+      return tmdb(path, apiKey, attempt + 1);
+    }
+    throw err;
   }
-  return (await res.json()) as T;
 }
 
 function sleep(ms: number): Promise<void> {
