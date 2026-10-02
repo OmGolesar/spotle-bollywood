@@ -37,6 +37,9 @@ yarn-error.log*
 # vercel
 .vercel
 
+# content pipeline staging — can be large and non-deterministic
+/scripts/staging/
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts

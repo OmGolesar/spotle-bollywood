@@ -11,7 +11,10 @@
     "test:watch": "vitest",
     "test:cov": "vitest run --coverage",
     "seed": "tsx scripts/seed.ts",
-    "migrate": "tsx scripts/migrate.ts"
+    "migrate": "tsx scripts/migrate.ts",
+    "tmdb:import": "tsx scripts/importTmdb.ts",
+    "movies:load": "tsx scripts/loadMovies.ts",
+    "edges:compute": "tsx scripts/computeEdges.ts"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.7",

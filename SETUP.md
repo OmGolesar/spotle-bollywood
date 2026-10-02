@@ -58,6 +58,50 @@ docs/
     specs/          # v1 design spec
 ```
 
+## Content pipeline
+
+The game needs a catalog of real films. The pipeline is three steps.
+
+### 1. Get a TMDB API key
+Register at https://www.themoviedb.org/signup → **Settings → API** → request a
+dev key. It's free and arrives in about a minute. Add it to `.env.local`:
+```
+TMDB_API_KEY=...
+```
+
+### 2. Import films from TMDB
+```bash
+npm run tmdb:import -- --max=500
+```
+Hits TMDB's `discover` endpoint for Hindi-language films sorted by vote count,
+then fetches credits for each. Resumable — if the script is interrupted, re-run
+and it picks up from the last film. Output lands in
+`scripts/staging/tmdb.json` (gitignored). Flags:
+- `--max=N` — stop after N films (default 200)
+- `--min-votes=N` — skip films with fewer TMDB votes (default 20)
+- `--year-from=YYYY` — only consider releases on/after this year (default 1950)
+- `--fresh` — ignore any existing staging file and start over
+
+### 3. Load into Supabase
+```bash
+npm run movies:load -- --easy=500 --medium=1500
+```
+Reads the staging file, upserts `movies`, and assigns films to the three
+difficulty pools (cumulative: Hard = all, Medium = top-M, Easy = top-E by vote
+count). Idempotent — re-running reconciles pool membership safely.
+
+### 4. Rebuild edge tables
+```bash
+npm run edges:compute
+```
+Rebuilds `director_edges` and `music_director_edges` so the tile-compare
+yellow states work for co-directors / co-composers. Run after any catalog
+change. Will be scheduled as a nightly Vercel Cron job in production.
+
+> Films come in with `data_quality='tmdb_only'` — missing `box_office_cr`,
+> `trivia`, hint text, `where_to_watch_url`, and `banner_parent`. Curators
+> fill these in via the admin UI (`/admin`) over time.
+
 ## Security invariants (from spec §4.2)
 
 - The anon Supabase role **cannot** `SELECT movie_id FROM daily_puzzles`.
