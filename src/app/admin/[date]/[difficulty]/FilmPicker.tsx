@@ -68,12 +68,20 @@ export function FilmPicker({ pool, editHref }: Props) {
                 {p.year} · {QUALITY_LABEL[p.dataQuality]}
               </span>
             </div>
-            <Link
-              href={`${editHref}?pick=${p.id}`}
-              className="inline-flex h-9 shrink-0 items-center justify-center rounded-full border border-border bg-surface px-3 text-xs font-medium hover:bg-surface-muted"
-            >
-              Preview
-            </Link>
+            <div className="flex shrink-0 items-center gap-2">
+              <Link
+                href={`/admin/films/${p.id}`}
+                className="text-xs text-muted hover:text-foreground"
+              >
+                edit
+              </Link>
+              <Link
+                href={`${editHref}?pick=${p.id}`}
+                className="inline-flex h-9 shrink-0 items-center justify-center rounded-full border border-border bg-surface px-3 text-xs font-medium hover:bg-surface-muted"
+              >
+                Preview
+              </Link>
+            </div>
           </li>
         ))}
       </ol>
