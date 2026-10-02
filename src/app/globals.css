@@ -1,0 +1,78 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+  --background: #fafaf7;
+  --foreground: #1a1a1a;
+  --surface: #ffffff;
+  --surface-muted: #f4f1ea;
+  --border: #e7e3da;
+  --muted: #6b6b6b;
+
+  --accent: #f4a24c;
+  --accent-ink: #1a1a1a;
+  --hard-accent: #c9a961;
+
+  --tile-green: #5ba85a;
+  --tile-yellow: #d4a24c;
+  --tile-gray: #4a4a4a;
+}
+
+.dark {
+  --background: #0f0f10;
+  --foreground: #ededed;
+  --surface: #18181b;
+  --surface-muted: #202023;
+  --border: #2a2a2e;
+  --muted: #a1a1aa;
+
+  --accent: #f4a24c;
+  --accent-ink: #1a1a1a;
+  --hard-accent: #d9bb75;
+
+  --tile-green: #5ba85a;
+  --tile-yellow: #d4a24c;
+  --tile-gray: #5a5a5a;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-surface: var(--surface);
+  --color-surface-muted: var(--surface-muted);
+  --color-border: var(--border);
+  --color-muted: var(--muted);
+  --color-accent: var(--accent);
+  --color-accent-ink: var(--accent-ink);
+  --color-hard-accent: var(--hard-accent);
+  --color-tile-green: var(--tile-green);
+  --color-tile-yellow: var(--tile-yellow);
+  --color-tile-gray: var(--tile-gray);
+
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-fraunces), ui-serif, Georgia, serif;
+}
+
+html,
+body {
+  background: var(--background);
+  color: var(--foreground);
+}
+
+body {
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
