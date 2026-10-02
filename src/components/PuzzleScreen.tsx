@@ -11,6 +11,7 @@ import { HINT_UNLOCKS, MAX_HINTS, TOTAL_GUESSES } from "@/lib/types";
 import { GuessAutocomplete } from "./GuessAutocomplete";
 import { TileGrid } from "./TileGrid";
 import { HintSheet } from "./HintSheet";
+import { ResultScreen } from "./ResultScreen";
 
 type Props = { difficulty: Difficulty };
 
@@ -123,19 +124,6 @@ export function PuzzleScreen({ difficulty }: Props) {
           />
         </div>
 
-        {outcome !== "in_progress" && (
-          <div className="mt-4 text-center">
-            <p className="text-sm font-medium uppercase tracking-wider text-muted">
-              {outcome === "won" ? "Solved" : "Answer"}
-            </p>
-            <p className="font-display text-xl font-semibold text-foreground">
-              {mystery.title}{" "}
-              <span className="font-sans text-base font-medium text-muted">
-                ({mystery.year})
-              </span>
-            </p>
-          </div>
-        )}
       </section>
 
       {/* Guess input */}
@@ -194,6 +182,16 @@ export function PuzzleScreen({ difficulty }: Props) {
         availableHint={nextHintUnlocked ? hintText : null}
         onReveal={revealNextHint}
       />
+
+      {outcome !== "in_progress" && (
+        <ResultScreen
+          difficulty={difficulty}
+          outcome={outcome}
+          mystery={mystery}
+          guesses={guesses}
+          streakAfter={outcome === "won" ? 1 : 0}
+        />
+      )}
     </div>
   );
 }
