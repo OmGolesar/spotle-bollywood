@@ -68,7 +68,9 @@ export default async function EditDay({
             </p>
             {current ? (
               <p className="font-display text-xl font-semibold text-foreground">
-                {current.title}
+                <Link href={`/admin/films/${current.movieId}`} className="hover:text-accent">
+                  {current.title}
+                </Link>
                 <span className="ml-2 text-sm font-normal text-muted">
                   ({current.year}) · {current.status}
                 </span>

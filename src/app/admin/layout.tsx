@@ -14,20 +14,35 @@ export default async function AdminLayout({ children }: { children: React.ReactN
     <div className="flex min-h-screen flex-col">
       <header className="border-b border-border bg-surface">
         <div className="mx-auto flex max-w-5xl items-center justify-between gap-4 px-5 py-3 sm:px-8">
-          <Link
-            href="/admin"
-            className="flex items-baseline gap-2 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent"
-          >
-            <span className="font-display text-lg font-semibold tracking-tight text-foreground">
-              Spotle
-            </span>
-            <span
-              className="font-display text-lg font-semibold tracking-tight"
-              style={{ color: "var(--accent)" }}
+          <div className="flex items-baseline gap-6">
+            <Link
+              href="/admin"
+              className="flex items-baseline gap-2 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent"
             >
-              Admin
-            </span>
-          </Link>
+              <span className="font-display text-lg font-semibold tracking-tight text-foreground">
+                Spotle
+              </span>
+              <span
+                className="font-display text-lg font-semibold tracking-tight"
+                style={{ color: "var(--accent)" }}
+              >
+                Admin
+              </span>
+            </Link>
+            {email && (
+              <nav
+                aria-label="Admin sections"
+                className="hidden items-center gap-4 text-sm text-muted sm:flex"
+              >
+                <Link href="/admin" className="hover:text-foreground">
+                  Schedule
+                </Link>
+                <Link href="/admin/films" className="hover:text-foreground">
+                  Films
+                </Link>
+              </nav>
+            )}
+          </div>
           <div className="flex items-center gap-3">
             {email && (
               <>
