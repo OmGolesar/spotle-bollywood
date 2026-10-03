@@ -37,8 +37,8 @@ test.describe("Home", () => {
   }) => {
     await page.goto("/");
     await expect(page.getByText(/^How it works$/i)).toBeVisible();
-    await expect(page.getByRole("heading", { level: 3, name: /Type any Bollywood film/i })).toBeVisible();
-    await expect(page.getByRole("heading", { level: 3, name: /Read the tiles/i })).toBeVisible();
+    await expect(page.getByRole("heading", { level: 3, name: /Pick any Hindi film/i })).toBeVisible();
+    await expect(page.getByRole("heading", { level: 3, name: /Read the clues/i })).toBeVisible();
     await expect(page.getByRole("heading", { level: 3, name: /Zero in on the answer/i })).toBeVisible();
     await expect(page.getByText(/What the eight tiles mean/i)).toBeVisible();
     await expect(page.getByText(/Questions from the audience/i)).toBeVisible();

@@ -58,11 +58,12 @@ export function HowItWorks() {
         <article className="flex flex-col gap-5 rounded-2xl border border-border bg-surface p-5 sm:p-6">
           <StepHeader
             index="01"
-            title="Type any Bollywood film"
+            title="Pick any Hindi film"
             description={
               <>
-                Search our pool of 500+ Hindi films and pick a title from the dropdown.
-                Each guess reveals eight comparison tiles.
+                Search the catalogue and pick a title from the dropdown — Easy covers 500
+                modern blockbusters, Medium 1,500 well-known hits, Hard the full 3,000+
+                including parallel and cult cinema. Each guess reveals eight comparison tiles.
               </>
             }
           />
@@ -72,12 +73,15 @@ export function HowItWorks() {
         <article className="flex flex-col gap-5 rounded-2xl border border-border bg-surface p-5 sm:p-6">
           <StepHeader
             index="02"
-            title="Read the tiles"
+            title="Read the clues"
             description={
               <>
                 Each tile shows how close your guess is.{" "}
-                <span className="rounded px-1.5 py-0.5 text-xs font-semibold text-white" style={{ background: "var(--tile-green)" }}>Green</span> is exact,{" "}
-                <span className="rounded px-1.5 py-0.5 text-xs font-semibold text-black" style={{ background: "var(--tile-yellow)" }}>gold</span> is close, grey is no match. Arrows hint higher or lower.
+                <span className="rounded px-1.5 py-0.5 text-xs font-semibold text-white" style={{ background: "var(--tile-green)" }}>Green</span>
+                {" "}is exact,{" "}
+                <span className="rounded px-1.5 py-0.5 text-xs font-semibold text-black" style={{ background: "var(--tile-yellow)" }}>gold</span>
+                {" "}is close, grey is no match. Arrows on year, box office and IMDb say
+                whether the answer is higher or lower.
               </>
             }
           />
@@ -92,8 +96,9 @@ export function HowItWorks() {
             title="Zero in on the answer"
             description={
               <>
-                Narrow it down with the clues. You have ten guesses and two hints — tagline,
-                filmography or cast — to crack today&rsquo;s mystery film.
+                Use what each tile tells you to narrow down the next guess. Ten tries, total
+                — and two hints unlocked after guesses 3 and 6 if you&rsquo;re stuck. Guess
+                the mystery film and you win.
               </>
             }
           />

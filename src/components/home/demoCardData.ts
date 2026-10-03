@@ -1,23 +1,25 @@
 import type { TileState } from "@/lib/types";
 import type { GuessedMovieBrief } from "@/components/GuessCard";
 
-const TMDB = "https://image.tmdb.org/t/p/w500";
+// Real TMDB paths pulled from the live movies table (via the TMDB
+// import pipeline). Dangal is used as the "partial match" row: some
+// tiles are green, some gold, some grey — the educational mix. 3
+// Idiots is used as the "all green" win-state row.
 
-// Educational demo — these aren't today's answers, just a visual example.
-// Partial-match row: Dangal (2016) — shows a mix of green / yellow / gray.
+// Partial-match demo row ----------------------------------------------------
 export const DEMO_PARTIAL_MOVIE: GuessedMovieBrief = {
   id: "demo-partial",
   title: "Dangal",
   year: 2016,
-  posterUrl: `${TMDB}/lymfdW5Imk5qH4hXyvv8pMoVfPx.jpg`,
-  genres: ["Drama", "Sport", "Biography"],
+  posterUrl: "https://image.tmdb.org/t/p/w500/cJRPOLEexI7qp2DKtFfCh7YaaUG.jpg",
+  genres: ["Drama", "Family", "Comedy"],
   director: ["Nitesh Tiwari"],
   castTop3: ["Aamir Khan", "Fatima Sana Shaikh", "Sanya Malhotra"],
   peopleImages: {
-    "Nitesh Tiwari": "/j80zq3yoAiKdbPt8rGxkRxWuERM.jpg",
-    "Aamir Khan": "/8CsLBYm3W15RpjzVxLhCXfU9CM.jpg",
-    "Fatima Sana Shaikh": "/tnmL0CfBXwIAlrZzVVk0GSYQcm2.jpg",
-    "Sanya Malhotra": "/qV8EpXkWBYMEJTvGPwBqA4ArJYt.jpg",
+    "Nitesh Tiwari": "/h80yPI8rDKlUk29dWFFl6Is8J0P.jpg",
+    "Aamir Khan": "/6uiZSwi2kvd1jZ7X7Xz9W9VGuV4.jpg",
+    "Fatima Sana Shaikh": "/eVOziSvi6PLL5vkROHO1sbsKUFW.jpg",
+    "Sanya Malhotra": "/sQ0VIqGLecfpwYayO05Z7NC32yN.jpg",
   },
 };
 
@@ -25,27 +27,27 @@ export const DEMO_PARTIAL_TILES: TileState[] = [
   { key: "director", label: "Director", color: "gray", value: "Nitesh Tiwari" },
   { key: "cast", label: "Lead cast", color: "yellow", value: "Aamir Khan, Fatima Sana Shaikh, Sanya Malhotra" },
   { key: "year", label: "Year", color: "yellow", arrow: "down", value: "2016" },
-  { key: "boxOffice", label: "Box office", color: "yellow", arrow: "down", value: "₹800 cr" },
-  { key: "music", label: "Music", color: "gray", value: "Pritam" },
+  { key: "boxOffice", label: "Box office", color: "yellow", arrow: "down", value: "₹387 cr" },
+  { key: "music", label: "Music", color: "gray", value: "Pritam Chakraborty" },
   { key: "banner", label: "Banner", color: "yellow", value: "Aamir Khan Productions" },
-  { key: "genre", label: "Genre", color: "yellow", value: "Drama, Sport" },
-  { key: "imdb", label: "IMDb", color: "yellow", arrow: "up", value: "8.3" },
+  { key: "genre", label: "Genre", color: "yellow", value: "Drama, Family" },
+  { key: "imdb", label: "IMDb", color: "yellow", arrow: "up", value: "7.9" },
 ];
 
-// Winning-row demo: 3 Idiots (2009) — everything green.
+// All-green win-state demo row ---------------------------------------------
 export const DEMO_WIN_MOVIE: GuessedMovieBrief = {
   id: "demo-win",
   title: "3 Idiots",
   year: 2009,
-  posterUrl: `${TMDB}/66A9MqXOyVFCssoloscw79z8Tew.jpg`,
-  genres: ["Comedy", "Drama"],
+  posterUrl: "https://image.tmdb.org/t/p/w500/66A9MqXOyVFCssoloscw79z8Tew.jpg",
+  genres: ["Drama", "Comedy"],
   director: ["Rajkumar Hirani"],
   castTop3: ["Aamir Khan", "R. Madhavan", "Sharman Joshi"],
   peopleImages: {
-    "Rajkumar Hirani": "/dzMaqy6YxBHj6LxrdYwTVf12rNY.jpg",
-    "Aamir Khan": "/8CsLBYm3W15RpjzVxLhCXfU9CM.jpg",
-    "R. Madhavan": "/gfbkEzeOhcl27TNVoBVvM0t8OWX.jpg",
-    "Sharman Joshi": "/5wPkFJ8t6jVfhRvFyG3hM1z8ePy.jpg",
+    "Rajkumar Hirani": "/wNnmF3mzG7kyaTYuFr5uMpHIJSw.jpg",
+    "Aamir Khan": "/6uiZSwi2kvd1jZ7X7Xz9W9VGuV4.jpg",
+    "R. Madhavan": "/gaDrAdXxIrbBRCd9cX8YvJDEuLb.jpg",
+    "Sharman Joshi": "/mQr8ynFFVq08qgQ4aSNl5B0ko8v.jpg",
   },
 };
 
@@ -55,7 +57,7 @@ export const DEMO_WIN_TILES: TileState[] = [
   { key: "year", label: "Year", color: "green", value: "2009" },
   { key: "boxOffice", label: "Box office", color: "green", value: "₹460 cr" },
   { key: "music", label: "Music", color: "green", value: "Shantanu Moitra" },
-  { key: "banner", label: "Banner", color: "green", value: "Vinod Chopra Films" },
-  { key: "genre", label: "Genre", color: "green", value: "Comedy, Drama" },
-  { key: "imdb", label: "IMDb", color: "green", value: "8.4" },
+  { key: "banner", label: "Banner", color: "green", value: "Vidhu Vinod Chopra" },
+  { key: "genre", label: "Genre", color: "green", value: "Drama, Comedy" },
+  { key: "imdb", label: "IMDb", color: "green", value: "8.0" },
 ];
