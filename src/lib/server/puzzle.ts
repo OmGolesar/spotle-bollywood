@@ -128,10 +128,21 @@ export async function hydrateTiles(
     });
 }
 
+export type GuessedMovieBrief = {
+  id: string;
+  title: string;
+  year: number;
+  posterUrl: string;
+  genres: string[];
+  director: string[];
+  castTop3: string[];
+};
+
 export type SubmitGuessResult =
   | {
       status: "ok";
       tiles: TileState[];
+      movie: GuessedMovieBrief;
       correct: boolean;
       outcome: PlayRow["outcome"];
       guessesRemaining: number;
@@ -216,12 +227,50 @@ export async function submitGuess(
   return {
     status: "ok",
     tiles,
+    movie: {
+      id: guess.id,
+      title: guess.title,
+      year: guess.year,
+      posterUrl: guess.posterUrl,
+      genres: guess.genres,
+      director: guess.director,
+      castTop3: guess.castTop3,
+    },
     correct,
     outcome: newOutcome,
     guessesRemaining: TOTAL_GUESSES - nextGuesses.length,
     posterBlurPx: blurFor(nextGuesses.length, newOutcome),
     hintState,
   };
+}
+
+export async function giveUp(
+  playerId: string,
+  difficulty: Difficulty
+): Promise<
+  | { status: "ok" }
+  | { status: "already_finished" }
+  | { status: "no_puzzle" }
+> {
+  const db = supabaseAdmin();
+  const today = istDateKey();
+  const resolved = await resolveTodayPuzzle(difficulty);
+  if (!resolved) return { status: "no_puzzle" };
+
+  const play = await loadOrCreatePlay(playerId, difficulty, today);
+  if (play.outcome !== "in_progress") return { status: "already_finished" };
+
+  const update = await db
+    .from("plays")
+    .update({
+      outcome: "lost",
+      completed_at: new Date().toISOString(),
+    })
+    .eq("id", play.id);
+  if (update.error) throw new Error(`giveUp update failed: ${update.error.message}`);
+
+  await updateStreakFor(playerId, difficulty, today, "lost");
+  return { status: "ok" };
 }
 
 async function updateStreakFor(

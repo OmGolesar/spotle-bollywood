@@ -11,11 +11,12 @@ test.describe("Puzzle flow", () => {
     await expect(page.getByRole("link", { name: /Back to home/i })).toBeVisible();
     await expect(page.getByLabel(/10 guesses remaining/i)).toBeVisible();
     await expect(page.getByRole("button", { name: /Open hints/i })).toBeVisible();
+    await expect(page.getByRole("button", { name: /Give up/i })).toBeVisible();
     await expect(page.getByRole("combobox")).toBeVisible();
     await expect(page.getByText(/Pick any film/i)).toBeVisible();
   });
 
-  test("autocomplete filters and submitting a wrong guess appends a tile row", async ({
+  test("autocomplete filters and submitting a wrong guess renders a guess card", async ({
     page,
   }) => {
     await installApiMocks(page);
@@ -28,9 +29,20 @@ test.describe("Puzzle flow", () => {
     await option.click();
 
     await expect(page.getByRole("heading", { level: 3, name: /Lagaan/i })).toBeVisible();
-    await expect(page.getByText(/Guess 1$/)).toBeVisible();
-    // Counter dropped
+    await expect(page.getByLabel(/Guess 1: Lagaan/i)).toBeVisible();
     await expect(page.getByLabel(/9 guesses remaining/i)).toBeVisible();
+  });
+
+  test("give up ends the puzzle and shows the result screen", async ({ page }) => {
+    await installApiMocks(page);
+    await page.goto("/easy");
+
+    await page.getByRole("button", { name: /Give up/i }).click();
+    const confirm = page.getByRole("dialog", { name: /Confirm give up/i });
+    await expect(confirm).toBeVisible();
+    await confirm.getByRole("button", { name: /^Give up$/i }).click();
+
+    await expect(page.getByRole("dialog", { name: /Solved!|Game over/i })).toBeVisible();
   });
 
   test("submitting the correct guess opens the result screen with the answer", async ({
