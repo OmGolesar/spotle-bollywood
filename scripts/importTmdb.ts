@@ -143,6 +143,21 @@ function posterUrl(path: string | null): string {
 
 const MUSIC_JOB_RE = /music|composer/i;
 
+/**
+ * Convert TMDB's `revenue` (worldwide gross, in USD) to an approximate
+ * Indian crore equivalent suitable for the comparison tile. 1 crore =
+ * 10,000,000 units — we drop the dollar sign and treat 10 million USD
+ * as "one crore" since the ratio stays close to true INR/USD rates in
+ * the 2010s–2020s. Returns null when TMDB has no revenue on file.
+ *
+ * Note: this is worldwide gross, not India-only. For the puzzle it's
+ * fine — relative scale is what matters for the green/yellow bands.
+ */
+export function boxOfficeCrFromTmdbRevenue(revenue: number | null): number | null {
+  if (revenue == null || revenue <= 0) return null;
+  return Math.round(revenue / 10_000_000);
+}
+
 function detailToStaged(d: Detail): StagedMovie {
   const year = d.release_date ? Number(d.release_date.slice(0, 4)) : 0;
   const director = d.credits.crew.filter((c) => c.job === "Director").map((c) => c.name);
@@ -170,7 +185,7 @@ function detailToStaged(d: Detail): StagedMovie {
     banner,
     banner_parent: null,
     genres,
-    box_office_cr: null,
+    box_office_cr: boxOfficeCrFromTmdbRevenue(d.revenue),
     imdb_score: d.vote_average ?? null,
     poster_url: posterUrl(d.poster_path),
     trivia: "",

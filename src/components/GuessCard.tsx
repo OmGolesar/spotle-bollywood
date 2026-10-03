@@ -237,7 +237,6 @@ export function GuessCard({ movie, tiles, guessIndex, animate = false }: Props) 
             <AttrBox tile={imdb} />
             <AttrBox tile={banner} />
             <AttrBox tile={music} />
-            <AttrBox tile={{ ...(genre ?? { key: "genre", label: "Genre", value: "—", color: "gray" }) }} />
           </div>
         </div>
       </div>

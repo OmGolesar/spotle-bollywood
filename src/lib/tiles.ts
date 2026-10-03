@@ -152,11 +152,16 @@ export function compareMovies(
     value: guess.imdbScore != null ? guess.imdbScore.toFixed(1) : "—",
   };
   if (guess.imdbScore != null && mystery.imdbScore != null) {
+    // Compare at display precision (one decimal). Green = both films
+    // display the same rating; yellow = within 0.5 with an arrow;
+    // gray otherwise. The previous threshold (within 0.3 = green) let
+    // 6.9 and 7.1 both show green against a 7.0 answer, which read as
+    // 'both correct' to players — same guess, two different ratings.
     const diffTenths = Math.abs(
       Math.round(guess.imdbScore * 10) - Math.round(mystery.imdbScore * 10)
     );
-    if (diffTenths <= 3) imdb.color = "green";
-    else if (diffTenths <= 10) {
+    if (diffTenths === 0) imdb.color = "green";
+    else if (diffTenths <= 5) {
       imdb.color = "yellow";
       imdb.arrow = arrow(guess.imdbScore, mystery.imdbScore);
     }

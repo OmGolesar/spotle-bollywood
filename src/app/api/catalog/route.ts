@@ -6,8 +6,6 @@ export const dynamic = "force-dynamic";
 
 const MAX_RESULTS = 8;
 
-type MovieJoin = { id: string; title: string; year: number; poster_url: string };
-
 export async function GET(req: Request) {
   const guard = requireBackend();
   if (guard) return guard;
@@ -17,12 +15,15 @@ export async function GET(req: Request) {
   const q = (url.searchParams.get("q") ?? "").trim();
   if (q.length < 1) return NextResponse.json({ results: [] });
 
+  // The search pool is the FULL catalogue regardless of difficulty — a
+  // player on Easy can still type an obscure film they half-remember.
+  // Difficulty only controls which films are chosen as the mystery.
   const db = supabaseAdmin();
   const { data, error } = await db
-    .from("movie_pools")
-    .select("movies!inner(id, title, year, poster_url)")
-    .eq("difficulty", difficulty)
-    .ilike("movies.title", `%${q}%`)
+    .from("movies")
+    .select("id, title, year, poster_url")
+    .ilike("title", `%${q}%`)
+    .order("year", { ascending: false })
     .limit(MAX_RESULTS);
 
   if (error) {
@@ -30,19 +31,12 @@ export async function GET(req: Request) {
     return NextResponse.json({ results: [] });
   }
 
-  const results = (data ?? [])
-    .map((r) => {
-      const m = r.movies as unknown as MovieJoin | MovieJoin[] | null;
-      const movie = Array.isArray(m) ? m[0] : m;
-      if (!movie) return null;
-      return {
-        id: movie.id,
-        title: movie.title,
-        year: movie.year,
-        posterThumb: movie.poster_url,
-      };
-    })
-    .filter((x): x is NonNullable<typeof x> => x != null);
+  const results = (data ?? []).map((movie) => ({
+    id: movie.id as string,
+    title: movie.title as string,
+    year: movie.year as number,
+    posterThumb: movie.poster_url as string,
+  }));
 
   return NextResponse.json({ results });
 }
