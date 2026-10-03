@@ -9,11 +9,11 @@ const FAQS: { q: string; a: React.ReactNode }[] = [
   },
   {
     q: "What films can show up?",
-    a: "500 of the most watched Hindi films on TMDB in Easy mode, 1,500 in Medium, and the full 3,000+ catalogue in Hard — including parallel, cult and regional-breakout cinema.",
+    a: "You can guess any film in our 3,000+ Hindi film catalogue regardless of difficulty. Difficulty controls which film is picked as today's mystery — Easy picks modern blockbusters, Medium well-known hits across decades, Hard adds parallel, cult and deep-cut cinema.",
   },
   {
     q: "Why isn't my film showing up in the search?",
-    a: "Only films in that difficulty's pool can be guessed. If a film you're searching for isn't appearing, it's either outside the top-rated set or hasn't been indexed yet. Hard mode has the widest catalogue.",
+    a: "The catalogue is 3,000+ films but not exhaustive — some older or less-reviewed films are missing. If a title you expected isn't appearing, drop me a line via the footer and I'll check whether it should be added.",
   },
   {
     q: "Can I play yesterday's puzzle?",
@@ -25,7 +25,11 @@ const FAQS: { q: string; a: React.ReactNode }[] = [
   },
   {
     q: "What counts as a close match?",
-    a: "Close (yellow) depends on the attribute. Year is within 5 years, box office within 50%, IMDb within 1.0. For director and music, close means two people in the same frequent-collaborator cluster.",
+    a: "Close (yellow) depends on the attribute. Year is within 5 years. Box office is within 50% of the answer's gross. IMDb is within 0.5 points — green means both films display the exact same rating. Director and music turn yellow when the two people are frequent collaborators (same cluster across films).",
+  },
+  {
+    q: "What does the box-office figure represent?",
+    a: "Worldwide gross from TMDB, converted to an approximate crore equivalent for the display. It's not the same as India-only collections — this metric is used so the game can score large and small releases on the same scale.",
   },
   {
     q: "What are the three difficulty modes?",

@@ -166,17 +166,11 @@ export async function submitGuess(
   const resolved = await resolveTodayPuzzle(difficulty);
   if (!resolved) return { status: "no_puzzle" };
 
-  const pool = await db
-    .from("movie_pools")
-    .select("movie_id")
-    .eq("movie_id", guessMovieId)
-    .eq("difficulty", difficulty)
-    .maybeSingle();
-  if (!pool.data) return { status: "not_in_pool" };
-
   const play = await loadOrCreatePlay(playerId, difficulty, today);
   if (play.outcome !== "in_progress") return { status: "already_finished" };
 
+  // Any movie in the catalogue is a valid guess, regardless of difficulty.
+  // Difficulty controls the mystery pool, not the search pool.
   const guessRow = await db
     .from("movies")
     .select("*")

@@ -239,36 +239,38 @@ describe("compareMovies — genre tile", () => {
 });
 
 describe("compareMovies — IMDb tile", () => {
-  it("green within 0.3 points", () => {
-    const t = tileByKey(compareMovies(movie({ imdbScore: 8.0 }), movie({ imdbScore: 8.3 }), noEdges), "imdb");
+  it("green only when the displayed tenths are equal", () => {
+    const t = tileByKey(compareMovies(movie({ imdbScore: 7.9 }), movie({ imdbScore: 7.9 }), noEdges), "imdb");
     expect(t.color).toBe("green");
+    expect(t.arrow).toBeUndefined();
   });
 
-  it("yellow within 1.0 points with arrow", () => {
-    const t = tileByKey(compareMovies(movie({ imdbScore: 7.0 }), movie({ imdbScore: 7.8 }), noEdges), "imdb");
+  it("0.1 away is yellow with an arrow (not green)", () => {
+    const higher = tileByKey(compareMovies(movie({ imdbScore: 6.9 }), movie({ imdbScore: 7.0 }), noEdges), "imdb");
+    expect(higher.color).toBe("yellow");
+    expect(higher.arrow).toBe("up");
+    const lower = tileByKey(compareMovies(movie({ imdbScore: 7.1 }), movie({ imdbScore: 7.0 }), noEdges), "imdb");
+    expect(lower.color).toBe("yellow");
+    expect(lower.arrow).toBe("down");
+  });
+
+  it("yellow at the 0.5 edge with an arrow", () => {
+    const t = tileByKey(compareMovies(movie({ imdbScore: 7.0 }), movie({ imdbScore: 7.5 }), noEdges), "imdb");
     expect(t.color).toBe("yellow");
     expect(t.arrow).toBe("up");
   });
 
-  it("gray beyond 1.0 points", () => {
-    const t = tileByKey(compareMovies(movie({ imdbScore: 5.0 }), movie({ imdbScore: 8.0 }), noEdges), "imdb");
+  it("gray beyond 0.5 points", () => {
+    const t = tileByKey(compareMovies(movie({ imdbScore: 7.0 }), movie({ imdbScore: 7.8 }), noEdges), "imdb");
     expect(t.color).toBe("gray");
+    const far = tileByKey(compareMovies(movie({ imdbScore: 5.0 }), movie({ imdbScore: 8.0 }), noEdges), "imdb");
+    expect(far.color).toBe("gray");
   });
 
   it("gray when either side is null and displays '—'", () => {
     const t = tileByKey(compareMovies(movie({ imdbScore: null }), movie({ imdbScore: 8.0 }), noEdges), "imdb");
     expect(t.color).toBe("gray");
     expect(t.value).toBe("—");
-  });
-
-  it("boundary: 0.3 diff is green", () => {
-    const t = tileByKey(compareMovies(movie({ imdbScore: 7.0 }), movie({ imdbScore: 7.3 }), noEdges), "imdb");
-    expect(t.color).toBe("green");
-  });
-
-  it("boundary: 1.0 diff is yellow", () => {
-    const t = tileByKey(compareMovies(movie({ imdbScore: 7.0 }), movie({ imdbScore: 8.0 }), noEdges), "imdb");
-    expect(t.color).toBe("yellow");
   });
 });
 
