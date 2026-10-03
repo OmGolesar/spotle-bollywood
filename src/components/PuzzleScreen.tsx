@@ -57,6 +57,7 @@ export function PuzzleScreen({ difficulty }: Props) {
   const [giveUpBusy, setGiveUpBusy] = useState(false);
   const [confirmGiveUp, setConfirmGiveUp] = useState(false);
   const [answer, setAnswer] = useState<ResultAnswer | null>(null);
+  const [resultOpen, setResultOpen] = useState(false);
   const [streakAfter, setStreakAfter] = useState<number>(0);
   const latestGuessIdxRef = useRef<number>(-1);
 
@@ -338,6 +339,41 @@ export function PuzzleScreen({ difficulty }: Props) {
         )}
       </section>
 
+      {outcome !== "in_progress" && answer && (
+        <section className="mx-auto mt-4 w-full max-w-3xl px-4 sm:px-8">
+          <div
+            className="flex flex-col gap-3 rounded-2xl border px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-5"
+            style={{
+              borderColor:
+                outcome === "won" ? "var(--tile-green)" : "var(--border)",
+              background:
+                outcome === "won"
+                  ? "color-mix(in oklab, var(--tile-green) 10%, var(--surface))"
+                  : "var(--surface)",
+            }}
+          >
+            <div className="flex flex-col gap-0.5">
+              <p className="font-display text-lg font-semibold text-foreground">
+                {outcome === "won"
+                  ? `Solved in ${guesses.length} ${guesses.length === 1 ? "guess" : "guesses"}`
+                  : "Out of guesses"}
+              </p>
+              <p className="text-sm text-muted">
+                Today&rsquo;s film: <span className="font-medium text-foreground">{answer.title}</span>
+                {" "}({answer.year}). Review your guesses below.
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => setResultOpen(true)}
+              className="inline-flex h-11 shrink-0 items-center justify-center rounded-full bg-accent px-5 text-sm font-semibold text-accent-ink hover:brightness-105"
+            >
+              View summary →
+            </button>
+          </div>
+        </section>
+      )}
+
       <section
         aria-label="Previous guesses"
         className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-3 px-4 pb-10 pt-5 sm:px-8"
@@ -407,13 +443,14 @@ export function PuzzleScreen({ difficulty }: Props) {
         </div>
       )}
 
-      {outcome !== "in_progress" && answer && (
+      {outcome !== "in_progress" && answer && resultOpen && (
         <ResultScreen
           difficulty={difficulty}
           outcome={outcome as "won" | "lost"}
           answer={answer}
           guesses={guesses}
           streakAfter={streakAfter}
+          onClose={() => setResultOpen(false)}
         />
       )}
     </div>

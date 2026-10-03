@@ -38,6 +38,13 @@ export type TileState = {
   color: TileColor;
   arrow?: TileArrow;
   value: string;
+  /**
+   * Per-person match colors, only populated for cast/director tiles.
+   * Same length and order as the corresponding movie.castTop3 /
+   * movie.director arrays. Lets the client show per-avatar rings
+   * (SRK can be green even when another cast member is gray).
+   */
+  chipColors?: TileColor[];
 };
 
 export type GuessRow = {

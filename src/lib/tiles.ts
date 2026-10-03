@@ -50,29 +50,44 @@ export function compareMovies(
 ): TileState[] {
   const tiles: TileState[] = [];
 
-  const directorGreen = intersects(guess.director, mystery.director);
-  const directorYellow =
-    !directorGreen && edgeConnects(edges.directors, guess.director, mystery.director);
+  const mysteryDirectorSet = new Set(mystery.director);
+  const directorEdges = edges.directors;
+  const directorChipColors = guess.director.map((d): "green" | "yellow" | "gray" => {
+    if (mysteryDirectorSet.has(d)) return "green";
+    const neighbours = directorEdges.get(d);
+    if (neighbours && mystery.director.some((md) => neighbours.has(md))) return "yellow";
+    return "gray";
+  });
+  const directorOverall: "green" | "yellow" | "gray" = directorChipColors.includes("green")
+    ? "green"
+    : directorChipColors.includes("yellow")
+      ? "yellow"
+      : "gray";
   tiles.push({
     key: "director",
     label: "Director",
-    color: directorGreen ? "green" : directorYellow ? "yellow" : "gray",
+    color: directorOverall,
     value: fmtNumList(guess.director),
+    chipColors: directorChipColors,
   });
 
-  let castGreen = false;
-  let castYellow = false;
-  for (let i = 0; i < guess.castTop3.length; i++) {
-    const name = guess.castTop3[i];
+  const castChipColors = guess.castTop3.map((name, i): "green" | "yellow" | "gray" => {
     const pos = mystery.castTop3.indexOf(name);
-    if (pos === i) castGreen = true;
-    else if (pos !== -1) castYellow = true;
-  }
+    if (pos === i) return "green";
+    if (pos !== -1) return "yellow";
+    return "gray";
+  });
+  const castOverall: "green" | "yellow" | "gray" = castChipColors.includes("green")
+    ? "green"
+    : castChipColors.includes("yellow")
+      ? "yellow"
+      : "gray";
   tiles.push({
     key: "cast",
     label: "Lead cast",
-    color: castGreen ? "green" : castYellow ? "yellow" : "gray",
+    color: castOverall,
     value: fmtNumList(guess.castTop3),
+    chipColors: castChipColors,
   });
 
   const dy = mystery.year - guess.year;

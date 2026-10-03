@@ -33,6 +33,7 @@ type Props = {
   answer: ResultAnswer;
   guesses: GuessRowClient[];
   streakAfter: number;
+  onClose?: () => void;
 };
 
 export function ResultScreen({
@@ -41,6 +42,7 @@ export function ResultScreen({
   answer: mystery,
   guesses,
   streakAfter,
+  onClose,
 }: Props) {
   const meta = DIFFICULTY_META[difficulty];
   const isHard = difficulty === "hard";
@@ -72,6 +74,16 @@ export function ResultScreen({
       className="fixed inset-0 z-40 overflow-y-auto bg-background"
     >
       <div className="mx-auto flex min-h-full w-full max-w-xl flex-col gap-6 px-5 py-6 sm:px-8 sm:py-10">
+        {onClose && (
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label="Close summary"
+            className="absolute right-4 top-4 inline-flex h-10 w-10 items-center justify-center rounded-full border border-border bg-surface text-muted hover:bg-surface-muted hover:text-foreground sm:right-6 sm:top-6"
+          >
+            <span aria-hidden="true" className="text-lg">✕</span>
+          </button>
+        )}
         {/* Header */}
         <header className="flex flex-col items-center gap-1 text-center">
           <p
