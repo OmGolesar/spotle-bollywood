@@ -39,9 +39,9 @@ function PersonChip({
   const url = profileUrl(imagePath);
   const ring =
     highlight === "green"
-      ? "ring-2 ring-[var(--tile-yellow)]"
+      ? "ring-2 ring-[var(--tile-green)]"
       : highlight === "yellow"
-        ? "ring-1 ring-[color-mix(in_oklab,var(--tile-yellow)_60%,transparent)]"
+        ? "ring-2 ring-[var(--tile-yellow)]"
         : "ring-1 ring-border";
 
   return (
@@ -74,7 +74,7 @@ function PersonChip({
 type Props = {
   movie: GuessedMovieBrief;
   tiles: TileState[];
-  guessIndex: number;
+  guessIndex?: number;
   animate?: boolean;
 };
 
@@ -95,9 +95,9 @@ function AttrBox({ tile }: { tile: TileState | undefined }) {
   const correct = tile.color === "green";
   const close = tile.color === "yellow";
   const bg = correct
-    ? "bg-[var(--tile-yellow)] text-black"
+    ? "bg-[var(--tile-green)] text-white"
     : close
-      ? "bg-[color-mix(in_oklab,var(--tile-yellow)_28%,var(--surface-muted))] text-foreground"
+      ? "bg-[var(--tile-yellow)] text-black"
       : "bg-surface-muted text-foreground";
 
   return (
@@ -144,9 +144,9 @@ function PeopleRow({
   const correct = color === "green";
   const close = color === "yellow";
   const borderCls = correct
-    ? "border-[var(--tile-yellow)]"
+    ? "border-[var(--tile-green)]"
     : close
-      ? "border-[color-mix(in_oklab,var(--tile-yellow)_40%,var(--border))]"
+      ? "border-[var(--tile-yellow)]"
       : "border-border";
 
   if (names.length === 0) return null;
@@ -186,7 +186,9 @@ export function GuessCard({ movie, tiles, guessIndex, animate = false }: Props) 
     <article
       className="guess-card-anim rounded-2xl border border-border bg-surface p-3 shadow-sm sm:p-4"
       style={animate ? undefined : { animation: "none" }}
-      aria-label={`Guess ${guessIndex + 1}: ${movie.title}`}
+      aria-label={
+        guessIndex != null ? `Guess ${guessIndex + 1}: ${movie.title}` : movie.title
+      }
     >
       <div className="flex gap-3 sm:gap-4">
         <div className="relative aspect-[2/3] w-24 shrink-0 overflow-hidden rounded-lg border border-border bg-surface-muted sm:w-28">
@@ -210,9 +212,11 @@ export function GuessCard({ movie, tiles, guessIndex, animate = false }: Props) 
                 ({movie.year})
               </span>
             </h3>
-            <span className="shrink-0 text-xs tabular-nums text-muted">
-              Guess {guessIndex + 1}
-            </span>
+            {guessIndex != null && (
+              <span className="shrink-0 text-xs tabular-nums text-muted">
+                Guess {guessIndex + 1}
+              </span>
+            )}
           </div>
 
           {movie.genres.length > 0 && (
