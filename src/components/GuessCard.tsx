@@ -37,12 +37,20 @@ function PersonChip({
   highlight: "green" | "yellow" | "gray";
 }) {
   const url = profileUrl(imagePath);
+  const isMiss = highlight === "gray";
   const ring =
     highlight === "green"
       ? "ring-2 ring-[var(--tile-green)]"
       : highlight === "yellow"
         ? "ring-2 ring-[var(--tile-yellow)]"
         : "ring-1 ring-border";
+  const nameColor =
+    highlight === "green"
+      ? "text-[var(--tile-green)] font-semibold"
+      : highlight === "yellow"
+        ? "text-[var(--tile-yellow)] font-semibold"
+        : "text-muted";
+  const imageFilter = isMiss ? "grayscale(1) opacity(0.6)" : undefined;
 
   return (
     <div className="flex min-w-0 flex-col items-center gap-1">
@@ -57,14 +65,20 @@ function PersonChip({
             sizes="56px"
             unoptimized
             className="object-cover"
+            style={{ filter: imageFilter }}
           />
         ) : (
-          <span className="flex h-full w-full items-center justify-center text-xs font-semibold text-muted">
+          <span
+            className="flex h-full w-full items-center justify-center text-xs font-semibold text-muted"
+            style={{ opacity: isMiss ? 0.6 : 1 }}
+          >
             {initials(name)}
           </span>
         )}
       </div>
-      <span className="max-w-[6rem] truncate text-center text-[11px] leading-tight text-foreground sm:max-w-[7rem]">
+      <span
+        className={`max-w-[6rem] truncate text-center text-[11px] leading-tight sm:max-w-[7rem] ${nameColor}`}
+      >
         {name}
       </span>
     </div>
