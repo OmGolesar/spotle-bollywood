@@ -114,7 +114,27 @@ export default async function Home() {
         </section>
       </main>
 
-      <footer className="mx-auto flex w-full max-w-3xl flex-col items-center gap-2 border-t border-border px-5 py-8 text-xs text-muted sm:px-8">
+      <footer className="mx-auto flex w-full max-w-3xl flex-col items-center gap-2 border-t border-border px-5 py-8 text-center text-xs text-muted sm:px-8">
+        <p>
+          A game by{" "}
+          <a
+            href="https://www.linkedin.com/in/om-golesar-173ab12aa/"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Om Golesar on LinkedIn"
+            className="text-muted no-underline hover:text-foreground"
+          >
+            Om Golesar
+          </a>
+          . Questions? Reach me at{" "}
+          <a
+            href="mailto:omgolesar99@gmail.com"
+            className="text-muted no-underline hover:text-foreground"
+          >
+            omgolesar99@gmail.com
+          </a>
+          .
+        </p>
         <p>Movie data from TMDB. v1 preview.</p>
         <p>
           <a href="/admin" className="underline underline-offset-4 decoration-border hover:text-foreground">
