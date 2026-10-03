@@ -17,7 +17,10 @@
     "edges:compute": "tsx scripts/computeEdges.ts",
     "cleanup:mock": "tsx scripts/cleanupMockDuplicates.ts",
     "enrich:films": "tsx scripts/enrichMovies.ts",
-    "tmdb:taglines": "tsx scripts/backfillTaglines.ts"
+    "tmdb:taglines": "tsx scripts/backfillTaglines.ts",
+    "e2e": "playwright test",
+    "e2e:ui": "playwright test --ui",
+    "e2e:headed": "playwright test --headed"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.7",
@@ -29,6 +32,7 @@
   },
   "devDependencies": {
     "@anthropic-ai/sdk": "^0.131.0",
+    "@playwright/test": "^1.63.0",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/pg": "^8.23.1",
