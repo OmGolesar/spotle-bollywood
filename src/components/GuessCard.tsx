@@ -102,16 +102,16 @@ function AttrBox({ tile }: { tile: TileState | undefined }) {
 
   return (
     <div
-      className={`flex min-h-[64px] flex-col items-center justify-center gap-1 rounded-lg px-2 py-2 text-center ${bg}`}
+      className={`flex min-h-[64px] min-w-0 flex-col items-center justify-center gap-1 overflow-hidden rounded-lg px-2 py-2 text-center ${bg}`}
       aria-label={`${tile.label}: ${tile.value}${tile.arrow ? (tile.arrow === "up" ? " higher" : " lower") : ""}`}
     >
       <span className="text-[10px] font-semibold uppercase tracking-wider opacity-70">
         {tile.label}
       </span>
-      <span className="flex items-baseline justify-center text-sm font-semibold leading-tight">
-        <span className="truncate max-w-[7.5rem] sm:max-w-[9rem]">{tile.value}</span>
+      <div className="flex w-full items-baseline justify-center gap-1 text-sm font-semibold leading-tight">
+        <span className="min-w-0 truncate">{tile.value}</span>
         {tile.arrow && <ArrowGlyph dir={tile.arrow} />}
-      </span>
+      </div>
     </div>
   );
 }
