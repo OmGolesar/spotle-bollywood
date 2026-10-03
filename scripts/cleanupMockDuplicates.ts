@@ -41,20 +41,36 @@ async function main() {
   const rows = (all ?? []) as Row[];
   console.log(`Scanning ${rows.length} films…`);
 
+  // Produce a set of normalized "match keys" per film so near-matches
+  // across the mock/TMDB divide collapse together (e.g. the mock
+  // "Lagaan" (2001) and the TMDB "Lagaan: Once Upon a Time in India" (2001)).
+  function keysFor(r: Row): string[] {
+    const t = r.title.toLowerCase().trim();
+    const forms = new Set<string>([t]);
+    const colon = t.indexOf(":");
+    if (colon > 0) forms.add(t.slice(0, colon).trim());
+    const paren = t.indexOf("(");
+    if (paren > 0) forms.add(t.slice(0, paren).trim());
+    return [...forms].map((f) => `${f}|${r.year}`);
+  }
+
   const byKey = new Map<string, Row[]>();
   for (const r of rows) {
-    const key = `${r.title.toLowerCase()}|${r.year}`;
-    if (!byKey.has(key)) byKey.set(key, []);
-    byKey.get(key)!.push(r);
+    for (const key of keysFor(r)) {
+      if (!byKey.has(key)) byKey.set(key, []);
+      byKey.get(key)!.push(r);
+    }
   }
 
   const toReplace = new Map<string, string>(); // mock id -> tmdb id
 
   for (const group of byKey.values()) {
-    if (group.length < 2) continue;
-    const tmdb = group.find((r) => r.tmdb_id != null);
+    const seen = new Set<string>();
+    const dedupGroup = group.filter((r) => (seen.has(r.id) ? false : (seen.add(r.id), true)));
+    if (dedupGroup.length < 2) continue;
+    const tmdb = dedupGroup.find((r) => r.tmdb_id != null);
     if (!tmdb) continue;
-    for (const r of group) {
+    for (const r of dedupGroup) {
       if (r.id !== tmdb.id && r.tmdb_id == null) {
         toReplace.set(r.id, tmdb.id);
       }

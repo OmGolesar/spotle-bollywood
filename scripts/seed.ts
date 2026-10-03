@@ -29,23 +29,41 @@ function env(name: string): string {
   return v;
 }
 
-type PoolJoin = { movie_id: string; movies: { title: string; year: number } };
+type PoolJoin = {
+  movie_id: string;
+  movies: { title: string; year: number; tmdb_id: number | null; imdb_score: number | null };
+};
 
 async function pickTopForPool(
   db: SupabaseClient,
-  difficulty: Difficulty
+  difficulty: Difficulty,
+  skip: Set<string>
 ): Promise<PoolJoin | null> {
   const { data, error } = await db
     .from("movie_pools")
-    .select("movie_id, movies!inner(title, year, tmdb_id)")
+    .select("movie_id, movies!inner(title, year, tmdb_id, imdb_score)")
     .eq("difficulty", difficulty)
-    .order("added_at", { ascending: true })
-    .limit(50);
+    .limit(500);
   if (error) throw new Error(`pool ${difficulty}: ${error.message}`);
   const rows = (data ?? []) as unknown as PoolJoin[];
-  // We don't have a vote_count view here; the loader inserted in rank order,
-  // so first-added is top-ranked. Fall back gracefully if the pool is empty.
-  return rows[0] ?? null;
+  if (rows.length === 0) return null;
+
+  // Rank preference, highest first:
+  //   1. films sourced from TMDB (have a real poster + metadata)
+  //   2. then by imdb_score desc (null-rated films sink)
+  //   3. then by year desc (newer wins ties)
+  const ranked = rows
+    .filter((r) => !skip.has(r.movie_id))
+    .sort((a, b) => {
+      const aTmdb = a.movies.tmdb_id != null ? 1 : 0;
+      const bTmdb = b.movies.tmdb_id != null ? 1 : 0;
+      if (aTmdb !== bTmdb) return bTmdb - aTmdb;
+      const aScore = a.movies.imdb_score ?? -1;
+      const bScore = b.movies.imdb_score ?? -1;
+      if (aScore !== bScore) return bScore - aScore;
+      return b.movies.year - a.movies.year;
+    });
+  return ranked[0] ?? null;
 }
 
 async function main() {
@@ -57,6 +75,7 @@ async function main() {
   const today = istDateKey();
   console.log(`Scheduling today (${today}) across ${DIFFICULTIES.length} difficulties… (force=${force})\n`);
 
+  const used = new Set<string>();
   for (const d of DIFFICULTIES) {
     const existing = await db
       .from("daily_puzzles")
@@ -68,14 +87,16 @@ async function main() {
     if (existing.data && !force) {
       const m = existing.data.movies as unknown as { title: string; year: number };
       console.log(`  ${d}: already scheduled → ${m.title} (${m.year})`);
+      used.add(existing.data.movie_id as string);
       continue;
     }
 
-    const top = await pickTopForPool(db, d);
+    const top = await pickTopForPool(db, d, used);
     if (!top) {
       console.log(`  ${d}: pool is empty — skipping (run tmdb:import + movies:load first)`);
       continue;
     }
+    used.add(top.movie_id);
 
     const up = await db
       .from("daily_puzzles")
