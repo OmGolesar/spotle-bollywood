@@ -134,11 +134,13 @@ function PeopleRow({
   label,
   names,
   color,
+  chipColors,
   peopleImages,
 }: {
   label: string;
   names: string[];
   color: TileState["color"];
+  chipColors?: TileState["color"][];
   peopleImages: Record<string, string>;
 }) {
   const correct = color === "green";
@@ -157,12 +159,12 @@ function PeopleRow({
         {label}
       </div>
       <div className="mt-2 flex flex-wrap gap-2.5">
-        {names.map((n) => (
+        {names.map((n, i) => (
           <PersonChip
             key={n}
             name={n}
             imagePath={peopleImages[n]}
-            highlight={color}
+            highlight={chipColors?.[i] ?? color}
           />
         ))}
       </div>
@@ -246,12 +248,14 @@ export function GuessCard({ movie, tiles, guessIndex, animate = false }: Props) 
           label="Director"
           names={movie.director}
           color={director?.color ?? "gray"}
+          chipColors={director?.chipColors}
           peopleImages={movie.peopleImages}
         />
         <PeopleRow
           label="Lead cast"
           names={movie.castTop3}
           color={cast?.color ?? "gray"}
+          chipColors={cast?.chipColors}
           peopleImages={movie.peopleImages}
         />
       </div>

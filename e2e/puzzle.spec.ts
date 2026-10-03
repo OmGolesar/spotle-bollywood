@@ -33,7 +33,7 @@ test.describe("Puzzle flow", () => {
     await expect(page.getByLabel(/9 guesses remaining/i)).toBeVisible();
   });
 
-  test("give up ends the puzzle and shows the result screen", async ({ page }) => {
+  test("give up ends the puzzle and shows a dismissible result banner", async ({ page }) => {
     await installApiMocks(page);
     await page.goto("/easy");
 
@@ -42,10 +42,18 @@ test.describe("Puzzle flow", () => {
     await expect(confirm).toBeVisible();
     await confirm.getByRole("button", { name: /^Give up$/i }).click();
 
-    await expect(page.getByRole("dialog", { name: /Solved!|Game over/i })).toBeVisible();
+    // The result banner appears inline — not an auto-popped dialog.
+    await expect(page.getByText(/Out of guesses/i)).toBeVisible();
+    await page.getByRole("button", { name: /View summary/i }).click();
+    const dialog = page.getByRole("dialog", { name: /Solved!|Game over/i });
+    await expect(dialog).toBeVisible();
+    // Close returns the player to the game page.
+    await dialog.getByRole("button", { name: /Close summary/i }).click();
+    await expect(dialog).not.toBeVisible();
+    await expect(page.getByText(/Out of guesses/i)).toBeVisible();
   });
 
-  test("submitting the correct guess opens the result screen with the answer", async ({
+  test("submitting the correct guess shows a success banner the player can open", async ({
     page,
   }) => {
     await installApiMocks(page, { correctMovieId: "mock-b" });
@@ -54,6 +62,10 @@ test.describe("Puzzle flow", () => {
     const input = page.getByRole("combobox");
     await input.fill("3");
     await page.getByRole("option", { name: /3 Idiots/i }).first().click();
+
+    // Game page stays visible with a success banner (no auto-popped dialog).
+    await expect(page.getByText(/Solved in 1 guess/i)).toBeVisible();
+    await page.getByRole("button", { name: /View summary/i }).click();
 
     const dialog = page.getByRole("dialog", { name: /Solved!/i });
     await expect(dialog).toBeVisible();
