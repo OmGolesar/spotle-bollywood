@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useEffect, useId, useMemo, useRef, useState } from "react";
 import type { Difficulty } from "@/lib/difficulty";
 
@@ -93,49 +94,57 @@ export function GuessAutocomplete({ difficulty, disabled, disabledIds, onPick }:
       <label htmlFor={`${listId}-input`} className="sr-only">
         Guess a Bollywood film
       </label>
-      <input
-        id={`${listId}-input`}
-        ref={inputRef}
-        type="text"
-        role="combobox"
-        aria-expanded={showList}
-        aria-controls={`${listId}-list`}
-        aria-activedescendant={showList ? `${listId}-opt-${active}` : undefined}
-        aria-autocomplete="list"
-        aria-busy={loading}
-        value={query}
-        placeholder={disabled ? "Game over" : "Type a Bollywood film…"}
-        disabled={disabled}
-        onChange={(e) => {
-          setQuery(e.target.value);
-          setOpen(true);
-        }}
-        onFocus={() => {
-          if (blurTimerRef.current) {
-            clearTimeout(blurTimerRef.current);
-            blurTimerRef.current = null;
-          }
-          setOpen(true);
-        }}
-        onBlur={() => {
-          blurTimerRef.current = setTimeout(() => {
-            setOpen(false);
-            blurTimerRef.current = null;
-          }, 120);
-        }}
-        onKeyDown={onKeyDown}
-        className="h-12 w-full rounded-xl border border-border bg-surface px-4 text-base text-foreground shadow-sm placeholder:text-muted focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/40 disabled:opacity-60"
-        autoComplete="off"
-        autoCapitalize="none"
-        autoCorrect="off"
-        spellCheck={false}
-      />
+      <div className="relative">
+        <input
+          id={`${listId}-input`}
+          ref={inputRef}
+          type="text"
+          role="combobox"
+          aria-expanded={showList}
+          aria-controls={`${listId}-list`}
+          aria-activedescendant={showList ? `${listId}-opt-${active}` : undefined}
+          aria-autocomplete="list"
+          aria-busy={loading}
+          value={query}
+          placeholder={disabled ? "Game over" : "Search for a film…"}
+          disabled={disabled}
+          onChange={(e) => {
+            setQuery(e.target.value);
+            setOpen(true);
+          }}
+          onFocus={() => {
+            if (blurTimerRef.current) {
+              clearTimeout(blurTimerRef.current);
+              blurTimerRef.current = null;
+            }
+            setOpen(true);
+          }}
+          onBlur={() => {
+            blurTimerRef.current = setTimeout(() => {
+              setOpen(false);
+              blurTimerRef.current = null;
+            }, 120);
+          }}
+          onKeyDown={onKeyDown}
+          className="h-14 w-full rounded-xl border border-border bg-surface pl-12 pr-4 text-base text-foreground shadow-sm placeholder:text-muted focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/40 disabled:opacity-60"
+          autoComplete="off"
+          autoCapitalize="none"
+          autoCorrect="off"
+          spellCheck={false}
+        />
+        <span
+          aria-hidden="true"
+          className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-muted"
+        >
+          🔍
+        </span>
+      </div>
 
       {showList && (
         <ul
           id={`${listId}-list`}
           role="listbox"
-          className="absolute bottom-full z-40 mb-2 max-h-64 w-full overflow-auto rounded-xl border border-border bg-surface py-1 shadow-xl"
+          className="absolute top-full z-40 mt-2 max-h-80 w-full overflow-auto rounded-xl border border-border bg-surface py-1 shadow-xl"
         >
           {filtered.map((m, i) => {
             const used = disabledIds?.has(m.id) ?? false;
@@ -151,14 +160,26 @@ export function GuessAutocomplete({ difficulty, disabled, disabledIds, onPick }:
                   pick(m);
                 }}
                 onMouseEnter={() => setActive(i)}
-                className={`flex min-h-11 cursor-pointer items-center justify-between gap-3 px-3 py-2 text-sm ${
+                className={`flex min-h-14 cursor-pointer items-center gap-3 px-3 py-2 text-sm ${
                   active === i ? "bg-surface-muted" : ""
                 } ${used ? "text-muted line-through" : "text-foreground"}`}
               >
-                <span className="truncate">{m.title}</span>
-                <span className="shrink-0 text-xs tabular-nums text-muted">
-                  {m.year}
-                </span>
+                <div className="relative h-14 w-10 shrink-0 overflow-hidden rounded-md border border-border bg-surface-muted">
+                  {m.posterThumb ? (
+                    <Image
+                      src={m.posterThumb}
+                      alt=""
+                      fill
+                      sizes="40px"
+                      unoptimized
+                      className="object-cover"
+                    />
+                  ) : null}
+                </div>
+                <div className="min-w-0 flex-1">
+                  <div className="truncate font-medium">{m.title}</div>
+                  <div className="text-xs tabular-nums text-muted">{m.year}</div>
+                </div>
               </li>
             );
           })}

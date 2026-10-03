@@ -55,6 +55,13 @@ const DEFAULT_CATALOG: MockCatalogEntry[] = [
   { id: "mock-c", title: "Dangal", year: 2016, posterThumb: DEFAULT_POSTER },
 ];
 
+const MOCK_GUESS_MOVIE = {
+  posterUrl: DEFAULT_POSTER,
+  genres: ["Drama"],
+  director: ["Someone Else"],
+  castTop3: ["A", "B", "C"],
+};
+
 export async function installApiMocks(page: Page, scenario: Scenario = {}) {
   const catalog = scenario.catalog ?? DEFAULT_CATALOG;
   const correctId = scenario.correctMovieId ?? "mock-b";
@@ -115,18 +122,33 @@ export async function installApiMocks(page: Page, scenario: Scenario = {}) {
       usesRemaining: Math.max(0, usesUnlocked - revealedCount),
       nextUnlockAtGuess: [3, 6].find((g) => guessesMade.length < g) ?? null,
     };
+    const picked = catalog.find((m) => m.id === body.guessMovieId);
     await route.fulfill({
       status: 200,
       contentType: "application/json",
       body: JSON.stringify({
         status: "ok",
         tiles: correct ? DEFAULT_WIN_TILES : DEFAULT_TILES,
+        movie: {
+          id: body.guessMovieId,
+          title: picked?.title ?? "Unknown",
+          year: picked?.year ?? 2000,
+          ...MOCK_GUESS_MOVIE,
+        },
         correct,
         outcome: correct ? "won" : "in_progress",
         guessesRemaining: 10 - guessesMade.length,
         posterBlurPx: correct ? 0 : 32 - guessesMade.length * 3,
         hintState,
       }),
+    });
+  });
+
+  await page.route("**/api/giveup", async (route: Route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({ status: "ok" }),
     });
   });
 

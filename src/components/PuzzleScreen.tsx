@@ -8,14 +8,14 @@ import type { PuzzleOutcome, TileState } from "@/lib/types";
 import { MAX_HINTS, TOTAL_GUESSES } from "@/lib/types";
 import type { HintCategory } from "@/lib/hintCategories";
 import { GuessAutocomplete, type AutocompleteOption } from "./GuessAutocomplete";
-import { TileGrid } from "./TileGrid";
+import { GuessCard, type GuessedMovieBrief } from "./GuessCard";
 import { HintSheet, type HintStateClient } from "./HintSheet";
 import { ResultScreen, type ResultAnswer } from "./ResultScreen";
 
 type Props = { difficulty: Difficulty };
 
 type GuessRowClient = {
-  movie: { id: string; title: string; year: number };
+  movie: GuessedMovieBrief;
   tiles: TileState[];
 };
 
@@ -35,6 +35,7 @@ type PuzzleStateResp = {
 type GuessOkResp = {
   status: "ok";
   tiles: TileState[];
+  movie: GuessedMovieBrief;
   correct: boolean;
   outcome: PuzzleOutcome;
   guessesRemaining: number;
@@ -53,6 +54,8 @@ export function PuzzleScreen({ difficulty }: Props) {
   const [hintState, setHintState] = useState<HintStateClient | null>(null);
   const [hintBusy, setHintBusy] = useState<HintCategory | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [giveUpBusy, setGiveUpBusy] = useState(false);
+  const [confirmGiveUp, setConfirmGiveUp] = useState(false);
   const [answer, setAnswer] = useState<ResultAnswer | null>(null);
   const [streakAfter, setStreakAfter] = useState<number>(0);
   const latestGuessIdxRef = useRef<number>(-1);
@@ -107,6 +110,9 @@ export function PuzzleScreen({ difficulty }: Props) {
   const guessesUsed = guesses.length;
   const guessesRemaining = TOTAL_GUESSES - guessesUsed;
   const outcome = state?.outcome ?? "in_progress";
+  const nextHintAt = hintState?.nextUnlockAtGuess ?? null;
+  const hintsLeft = (hintState?.usesRemaining ?? 0);
+  const hintsRevealed = hintState?.items.filter((i) => i.revealed).length ?? 0;
 
   async function handlePick(opt: AutocompleteOption) {
     if (!state || submitting || outcome !== "in_progress") return;
@@ -125,7 +131,7 @@ export function PuzzleScreen({ difficulty }: Props) {
       const g = (await res.json()) as GuessOkResp;
       const nextGuesses: GuessRowClient[] = [
         ...guesses,
-        { movie: { id: opt.id, title: opt.title, year: opt.year }, tiles: g.tiles },
+        { movie: g.movie, tiles: g.tiles },
       ];
       setGuesses(nextGuesses);
       latestGuessIdxRef.current = nextGuesses.length - 1;
@@ -153,6 +159,24 @@ export function PuzzleScreen({ difficulty }: Props) {
       setHintState(body.state);
     } finally {
       setHintBusy(null);
+    }
+  }
+
+  async function handleGiveUp() {
+    if (giveUpBusy || !state) return;
+    setGiveUpBusy(true);
+    try {
+      const res = await fetch("/api/giveup", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ difficulty }),
+      });
+      if (!res.ok) return;
+      setState({ ...state, outcome: "lost", posterBlurPx: 0 });
+      await loadFinish();
+    } finally {
+      setGiveUpBusy(false);
+      setConfirmGiveUp(false);
     }
   }
 
@@ -218,41 +242,66 @@ export function PuzzleScreen({ difficulty }: Props) {
 
   const blur = state.posterBlurPx;
   const disabledIds = new Set(guesses.map((g) => g.movie.id));
+  const stillPlaying = outcome === "in_progress";
+
+  const hintBtnLabel = (() => {
+    if (hintsLeft > 0) return `${hintsLeft} hint${hintsLeft === 1 ? "" : "s"} ready`;
+    if (nextHintAt != null) return `Hint in ${nextHintAt - guessesUsed}`;
+    if (hintsRevealed >= MAX_HINTS) return "Hints used";
+    return "Hints";
+  })();
 
   return (
-    <div className="flex min-h-[100dvh] flex-col">
+    <div className="flex min-h-[100dvh] flex-col bg-background">
       <header className="sticky top-0 z-30 border-b border-border bg-background/90 backdrop-blur">
-        <div className="mx-auto flex max-w-3xl items-center justify-between gap-4 px-4 py-3 sm:px-8">
-          <a
-            href="/"
-            aria-label="Back to home"
-            className="inline-flex h-10 items-center gap-2 rounded-full px-2 text-sm font-medium text-muted hover:text-foreground"
-          >
-            <span aria-hidden="true">←</span>
-            <span className="font-display text-base font-semibold text-foreground">
-              {meta.label}
-            </span>
-          </a>
-
-          <div className="flex items-center gap-4">
-            <span
-              className="text-sm font-medium tabular-nums"
-              aria-label={`${guessesRemaining} guesses remaining`}
-            >
-              <span className="text-foreground">{guessesRemaining}</span>
-              <span className="text-muted"> / {TOTAL_GUESSES}</span>
-            </span>
+        <div className="mx-auto grid max-w-3xl grid-cols-3 items-center gap-2 px-3 py-3 sm:px-6">
+          <div className="flex items-center">
             <button
               type="button"
               onClick={() => setHintsOpen(true)}
               aria-label="Open hints"
-              className="relative inline-flex h-10 items-center gap-1.5 rounded-full border border-border bg-surface px-3 text-sm font-medium hover:bg-surface-muted"
+              disabled={!stillPlaying}
+              className="inline-flex h-10 items-center gap-1.5 rounded-full border border-border bg-surface px-3 text-sm font-medium hover:bg-surface-muted disabled:opacity-50"
             >
               <span aria-hidden="true">💡</span>
-              <span>Hints</span>
-              <span className="rounded-full bg-surface-muted px-1.5 text-xs tabular-nums text-muted">
-                {(hintState?.items.filter((i) => i.revealed).length ?? 0)}/{MAX_HINTS}
-              </span>
+              <span className="hidden sm:inline">{hintBtnLabel}</span>
+              <span className="sm:hidden">Hints</span>
+              {hintsLeft > 0 && (
+                <span className="rounded-full bg-accent px-1.5 text-[10px] font-bold text-accent-ink">
+                  {hintsLeft}
+                </span>
+              )}
+            </button>
+          </div>
+
+          <div className="text-center">
+            <a
+              href="/"
+              aria-label="Back to home"
+              className="inline-flex items-center gap-1 text-xs font-medium text-muted hover:text-foreground"
+            >
+              <span aria-hidden="true">←</span>
+              <span>{meta.label}</span>
+            </a>
+            <div
+              className="text-sm font-semibold tabular-nums"
+              aria-label={`${guessesRemaining} guesses remaining`}
+            >
+              Guess <span className="text-accent">{Math.min(guessesUsed + (stillPlaying ? 1 : 0), TOTAL_GUESSES)}</span>{" "}
+              <span className="text-muted">of {TOTAL_GUESSES}</span>
+            </div>
+          </div>
+
+          <div className="flex justify-end">
+            <button
+              type="button"
+              onClick={() => setConfirmGiveUp(true)}
+              disabled={!stillPlaying || giveUpBusy}
+              aria-label="Give up"
+              className="inline-flex h-10 items-center gap-1.5 rounded-full border border-border bg-surface px-3 text-sm font-medium text-muted hover:bg-surface-muted hover:text-foreground disabled:opacity-50"
+            >
+              <span aria-hidden="true">⚑</span>
+              <span className="hidden sm:inline">Give up</span>
             </button>
           </div>
         </div>
@@ -260,14 +309,14 @@ export function PuzzleScreen({ difficulty }: Props) {
 
       <section className="mx-auto flex w-full max-w-3xl flex-col items-center px-4 pt-4 sm:px-8">
         <div
-          className="relative mx-auto aspect-[2/3] w-40 overflow-hidden rounded-xl border border-border bg-surface-muted sm:w-56"
+          className="relative mx-auto aspect-[2/3] w-32 overflow-hidden rounded-xl border border-border bg-surface-muted sm:w-44"
           style={{ transition: "filter 400ms ease-out" }}
         >
           <Image
             src={state.posterUrl}
-            alt={outcome === "in_progress" ? "Mystery poster, blurred" : "Today's poster"}
+            alt={stillPlaying ? "Mystery poster, blurred" : "Today's poster"}
             fill
-            sizes="(min-width: 640px) 224px, 160px"
+            sizes="(min-width: 640px) 176px, 128px"
             style={{ filter: `blur(${blur}px)`, transition: "filter 400ms ease-out" }}
             unoptimized
             priority
@@ -275,48 +324,41 @@ export function PuzzleScreen({ difficulty }: Props) {
         </div>
       </section>
 
-      <section className="sticky bottom-0 z-20 mx-auto mt-5 w-full max-w-3xl border-t border-border bg-background/95 px-4 py-3 backdrop-blur sm:static sm:border-0 sm:bg-transparent sm:px-8 sm:pt-6">
+      <section className="mx-auto mt-4 w-full max-w-3xl px-4 sm:px-8">
         <GuessAutocomplete
           difficulty={difficulty}
-          disabled={outcome !== "in_progress" || submitting}
+          disabled={!stillPlaying || submitting}
           disabledIds={disabledIds}
           onPick={handlePick}
         />
-        {outcome === "in_progress" && guessesUsed === 0 && (
+        {stillPlaying && guessesUsed === 0 && (
           <p className="mt-2 text-xs text-muted">
-            Pick any film. Each guess reveals tiles and un-blurs the poster.
+            Pick any film. Each guess reveals comparison tiles and un-blurs the poster.
           </p>
         )}
       </section>
 
       <section
         aria-label="Previous guesses"
-        className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-4 px-4 pb-10 pt-6 sm:px-8"
+        className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-3 px-4 pb-10 pt-5 sm:px-8"
       >
         {[...guesses].reverse().map((g, revIdx) => {
           const originalIdx = guesses.length - 1 - revIdx;
           const isLatest = originalIdx === latestGuessIdxRef.current;
           return (
-            <article key={originalIdx} className="flex flex-col gap-2">
-              <div className="flex items-baseline justify-between gap-3">
-                <h3 className="font-display text-base font-semibold text-foreground">
-                  {g.movie.title}
-                  <span className="ml-2 text-xs font-medium text-muted">
-                    ({g.movie.year})
-                  </span>
-                </h3>
-                <span className="text-xs tabular-nums text-muted">
-                  Guess {originalIdx + 1}
-                </span>
-              </div>
-              <TileGrid tiles={g.tiles} animate={isLatest} />
-            </article>
+            <GuessCard
+              key={originalIdx}
+              movie={g.movie}
+              tiles={g.tiles}
+              guessIndex={originalIdx}
+              animate={isLatest}
+            />
           );
         })}
 
         {guesses.length === 0 && (
           <div className="flex min-h-[120px] items-center justify-center rounded-xl border border-dashed border-border text-sm text-muted">
-            Your guesses and tiles will appear here.
+            Your guesses will appear here.
           </div>
         )}
       </section>
@@ -328,6 +370,42 @@ export function PuzzleScreen({ difficulty }: Props) {
         onPick={handleHintPick}
         busyCategory={hintBusy}
       />
+
+      {confirmGiveUp && stillPlaying && (
+        <div
+          role="dialog"
+          aria-label="Confirm give up"
+          className="fixed inset-0 z-40 flex items-end justify-center bg-black/40 px-4 sm:items-center"
+          onClick={() => setConfirmGiveUp(false)}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="w-full max-w-sm rounded-2xl border border-border bg-surface p-5 shadow-xl"
+          >
+            <h2 className="font-display text-lg font-semibold">Give up this puzzle?</h2>
+            <p className="mt-1 text-sm text-muted">
+              You&rsquo;ll see today&rsquo;s answer and your streak will reset.
+            </p>
+            <div className="mt-4 flex gap-2">
+              <button
+                type="button"
+                onClick={() => setConfirmGiveUp(false)}
+                className="inline-flex h-11 flex-1 items-center justify-center rounded-full border border-border bg-surface px-5 text-sm font-medium hover:bg-surface-muted"
+              >
+                Keep guessing
+              </button>
+              <button
+                type="button"
+                onClick={handleGiveUp}
+                disabled={giveUpBusy}
+                className="inline-flex h-11 flex-1 items-center justify-center rounded-full bg-foreground px-5 text-sm font-semibold text-background disabled:opacity-60"
+              >
+                {giveUpBusy ? "Giving up…" : "Give up"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {outcome !== "in_progress" && answer && (
         <ResultScreen

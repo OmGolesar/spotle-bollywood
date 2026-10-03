@@ -47,7 +47,15 @@ export async function GET(req: Request) {
     posterBlurPx: blurFor(play.guesses.length, play.outcome),
     outcome: play.outcome,
     existingGuesses: existingGuesses.map((g) => ({
-      movie: { id: g.movie.id, title: g.movie.title, year: g.movie.year },
+      movie: {
+        id: g.movie.id,
+        title: g.movie.title,
+        year: g.movie.year,
+        posterUrl: g.movie.posterUrl,
+        genres: g.movie.genres,
+        director: g.movie.director,
+        castTop3: g.movie.castTop3,
+      },
       tiles: g.tiles,
     })),
   });
