@@ -42,13 +42,11 @@ export async function saveFilm(formData: FormData) {
 
   const update = {
     trivia: trim(formData.get("trivia")),
+    tagline: trim(formData.get("tagline")),
     where_to_watch_url: whereToWatch,
     banner_parent: nullableTrim(formData.get("banner_parent")),
     box_office_cr: parseNumber(formData.get("box_office_cr")),
     imdb_score: parseNumber(formData.get("imdb_score")),
-    hint_easy: trim(formData.get("hint_easy")),
-    hint_medium: trim(formData.get("hint_medium")),
-    hint_hard: trim(formData.get("hint_hard")),
     data_quality: quality,
   };
 

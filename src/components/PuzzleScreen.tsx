@@ -5,10 +5,11 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import type { Difficulty } from "@/lib/difficulty";
 import { DIFFICULTY_META } from "@/lib/difficulty";
 import type { PuzzleOutcome, TileState } from "@/lib/types";
-import { HINT_UNLOCKS, MAX_HINTS, TOTAL_GUESSES } from "@/lib/types";
+import { MAX_HINTS, TOTAL_GUESSES } from "@/lib/types";
+import type { HintCategory } from "@/lib/hintCategories";
 import { GuessAutocomplete, type AutocompleteOption } from "./GuessAutocomplete";
 import { TileGrid } from "./TileGrid";
-import { HintSheet } from "./HintSheet";
+import { HintSheet, type HintStateClient } from "./HintSheet";
 import { ResultScreen, type ResultAnswer } from "./ResultScreen";
 
 type Props = { difficulty: Difficulty };
@@ -24,6 +25,7 @@ type PuzzleStateResp = {
   hintsAvailable: number;
   hintsUsed: number;
   hintUnlocks: number[];
+  hintState: HintStateClient | null;
   posterUrl: string;
   posterBlurPx: number;
   outcome: PuzzleOutcome;
@@ -37,6 +39,7 @@ type GuessOkResp = {
   outcome: PuzzleOutcome;
   guessesRemaining: number;
   posterBlurPx: number;
+  hintState: HintStateClient;
 };
 
 export function PuzzleScreen({ difficulty }: Props) {
@@ -47,7 +50,8 @@ export function PuzzleScreen({ difficulty }: Props) {
   const [state, setState] = useState<PuzzleStateResp | null>(null);
   const [guesses, setGuesses] = useState<GuessRowClient[]>([]);
   const [hintsOpen, setHintsOpen] = useState(false);
-  const [hintsRevealed, setHintsRevealed] = useState<string[]>([]);
+  const [hintState, setHintState] = useState<HintStateClient | null>(null);
+  const [hintBusy, setHintBusy] = useState<HintCategory | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [answer, setAnswer] = useState<ResultAnswer | null>(null);
   const [streakAfter, setStreakAfter] = useState<number>(0);
@@ -72,6 +76,7 @@ export function PuzzleScreen({ difficulty }: Props) {
       const body = (await res.json()) as PuzzleStateResp;
       setState(body);
       setGuesses(body.existingGuesses);
+      setHintState(body.hintState);
       latestGuessIdxRef.current = body.existingGuesses.length - 1;
       if (body.outcome !== "in_progress") {
         await loadFinish();
@@ -103,11 +108,6 @@ export function PuzzleScreen({ difficulty }: Props) {
   const guessesRemaining = TOTAL_GUESSES - guessesUsed;
   const outcome = state?.outcome ?? "in_progress";
 
-  const nextHintUnlocked =
-    state != null &&
-    hintsRevealed.length < MAX_HINTS &&
-    guessesUsed >= (state.hintUnlocks[hintsRevealed.length] ?? HINT_UNLOCKS[hintsRevealed.length]);
-
   async function handlePick(opt: AutocompleteOption) {
     if (!state || submitting || outcome !== "in_progress") return;
     setSubmitting(true);
@@ -129,7 +129,8 @@ export function PuzzleScreen({ difficulty }: Props) {
       ];
       setGuesses(nextGuesses);
       latestGuessIdxRef.current = nextGuesses.length - 1;
-      setState({ ...state, outcome: g.outcome, posterBlurPx: g.posterBlurPx });
+      setState({ ...state, outcome: g.outcome, posterBlurPx: g.posterBlurPx, hintState: g.hintState });
+      setHintState(g.hintState);
       if (g.outcome !== "in_progress") {
         await loadFinish();
       }
@@ -138,16 +139,21 @@ export function PuzzleScreen({ difficulty }: Props) {
     }
   }
 
-  async function revealNextHint() {
-    if (!state || !nextHintUnlocked) return;
-    const res = await fetch("/api/hint", {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({ difficulty }),
-    });
-    if (!res.ok) return;
-    const body = (await res.json()) as { hintText: string };
-    setHintsRevealed((h) => [...h, body.hintText]);
+  async function handleHintPick(category: HintCategory) {
+    if (hintBusy) return;
+    setHintBusy(category);
+    try {
+      const res = await fetch("/api/hint", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ difficulty, category }),
+      });
+      if (!res.ok) return;
+      const body = (await res.json()) as { state: HintStateClient };
+      setHintState(body.state);
+    } finally {
+      setHintBusy(null);
+    }
   }
 
   if (loading) {
@@ -245,7 +251,7 @@ export function PuzzleScreen({ difficulty }: Props) {
               <span aria-hidden="true">💡</span>
               <span>Hints</span>
               <span className="rounded-full bg-surface-muted px-1.5 text-xs tabular-nums text-muted">
-                {hintsRevealed.length}/{MAX_HINTS}
+                {(hintState?.items.filter((i) => i.revealed).length ?? 0)}/{MAX_HINTS}
               </span>
             </button>
           </div>
@@ -318,10 +324,9 @@ export function PuzzleScreen({ difficulty }: Props) {
       <HintSheet
         open={hintsOpen}
         onClose={() => setHintsOpen(false)}
-        guessesUsed={guessesUsed}
-        revealed={hintsRevealed}
-        availableHint={nextHintUnlocked ? "unlocked" : null}
-        onReveal={revealNextHint}
+        state={hintState}
+        onPick={handleHintPick}
+        busyCategory={hintBusy}
       />
 
       {outcome !== "in_progress" && answer && (

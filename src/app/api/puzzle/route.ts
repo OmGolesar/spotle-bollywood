@@ -7,6 +7,7 @@ import {
   hydrateTiles,
   loadOrCreatePlay,
   resolveTodayPuzzle,
+  loadHintStateFor,
 } from "@/lib/server/puzzle";
 import { badRequest, parseDifficulty, requireBackend } from "../_shared";
 
@@ -29,7 +30,10 @@ export async function GET(req: Request) {
 
   const playerId = await getOrCreatePlayerId();
   const play = await loadOrCreatePlay(playerId, difficulty, istDateKey());
-  const existingGuesses = await hydrateTiles(play.guesses, resolved.mystery);
+  const [existingGuesses, hintState] = await Promise.all([
+    hydrateTiles(play.guesses, resolved.mystery),
+    loadHintStateFor(playerId, difficulty),
+  ]);
 
   return NextResponse.json({
     puzzleDate: resolved.puzzle.puzzle_date,
@@ -38,6 +42,7 @@ export async function GET(req: Request) {
     hintsAvailable: MAX_HINTS,
     hintsUsed: play.hints_used,
     hintUnlocks: HINT_UNLOCKS,
+    hintState,
     posterUrl: resolved.mystery.poster_url,
     posterBlurPx: blurFor(play.guesses.length, play.outcome),
     outcome: play.outcome,
