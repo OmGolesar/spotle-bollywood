@@ -85,10 +85,8 @@ export function HowItWorks() {
               </>
             }
           />
-          <div className="pt-1">
-            <GuessCard movie={DEMO_PARTIAL_MOVIE} tiles={DEMO_PARTIAL_TILES} guessIndex={0} />
-          </div>
         </article>
+        <GuessCard movie={DEMO_PARTIAL_MOVIE} tiles={DEMO_PARTIAL_TILES} />
 
         <article className="flex flex-col gap-5 rounded-2xl border border-border bg-surface p-5 sm:p-6">
           <StepHeader
@@ -97,15 +95,13 @@ export function HowItWorks() {
             description={
               <>
                 Use what each tile tells you to narrow down the next guess. Ten tries, total
-                — and two hints unlocked after guesses 3 and 6 if you&rsquo;re stuck. Guess
-                the mystery film and you win.
+                — and two hints unlocked after guesses 3 and 6 if you&rsquo;re stuck. When
+                you nail the film every tile turns green.
               </>
             }
           />
-          <div className="pt-1">
-            <GuessCard movie={DEMO_WIN_MOVIE} tiles={DEMO_WIN_TILES} guessIndex={5} />
-          </div>
         </article>
+        <GuessCard movie={DEMO_WIN_MOVIE} tiles={DEMO_WIN_TILES} />
       </div>
     </section>
   );
