@@ -20,6 +20,7 @@ export type MovieRow = {
   poster_url: string;
   trivia: string;
   where_to_watch_url: string | null;
+  tagline: string;
   hint_easy: string;
   hint_medium: string;
   hint_hard: string;
@@ -45,6 +46,7 @@ export type PlayRow = {
   difficulty: Difficulty;
   guesses: GuessLogEntry[];
   hints_used: number;
+  hints_revealed_categories: string[];
   outcome: PlayOutcome;
   won_on_guess: number | null;
   started_at: string;

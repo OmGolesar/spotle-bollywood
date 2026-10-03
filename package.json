@@ -16,7 +16,8 @@
     "movies:load": "tsx scripts/loadMovies.ts",
     "edges:compute": "tsx scripts/computeEdges.ts",
     "cleanup:mock": "tsx scripts/cleanupMockDuplicates.ts",
-    "enrich:films": "tsx scripts/enrichMovies.ts"
+    "enrich:films": "tsx scripts/enrichMovies.ts",
+    "tmdb:taglines": "tsx scripts/backfillTaglines.ts"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.7",

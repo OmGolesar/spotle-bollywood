@@ -14,6 +14,8 @@ import type { Movie, TileState } from "../types";
 import { HINT_UNLOCKS, MAX_HINTS, TOTAL_GUESSES } from "../types";
 import { applyPlayResult, emptyStreak } from "../streaks";
 import { loadEdgeIndex } from "./edges";
+import { HINT_CATEGORIES, type HintCategory } from "../hintCategories";
+import { availabilityFor, revealFor } from "./hintCategories";
 
 const INITIAL_BLUR_PX = 36;
 
@@ -134,6 +136,7 @@ export type SubmitGuessResult =
       outcome: PlayRow["outcome"];
       guessesRemaining: number;
       posterBlurPx: number;
+      hintState: HintState;
     }
   | { status: "already_finished" }
   | { status: "no_puzzle" }
@@ -207,6 +210,9 @@ export async function submitGuess(
     await updateStreakFor(playerId, difficulty, today, newOutcome);
   }
 
+  const nextPlay = update.data as PlayRow;
+  const hintState = await buildHintState(resolved.mystery, nextPlay);
+
   return {
     status: "ok",
     tiles,
@@ -214,6 +220,7 @@ export async function submitGuess(
     outcome: newOutcome,
     guessesRemaining: TOTAL_GUESSES - nextGuesses.length,
     posterBlurPx: blurFor(nextGuesses.length, newOutcome),
+    hintState,
   };
 }
 
@@ -253,15 +260,75 @@ export async function readStreaks(
   return result;
 }
 
-export async function revealHint(
+export type HintStateItem = {
+  category: HintCategory;
+  available: boolean;
+  revealed: boolean;
+  text: string | null;
+};
+
+export type HintState = {
+  usesTotal: number;
+  usesRemaining: number;
+  unlocksRemaining: number[];
+  nextUnlockAtGuess: number | null;
+  items: HintStateItem[];
+};
+
+async function buildHintState(
+  mystery: MovieRow,
+  play: PlayRow
+): Promise<HintState> {
+  const availability = await availabilityFor(mystery);
+  const revealedCats = new Set(play.hints_revealed_categories ?? []);
+  const unlocks = HINT_UNLOCKS.filter((g) => play.guesses.length < g);
+  const nextUnlock = unlocks[0] ?? null;
+  const usesUnlocked = HINT_UNLOCKS.filter((g) => play.guesses.length >= g).length;
+  const usesRemaining = Math.max(0, usesUnlocked - revealedCats.size);
+
+  const items: HintStateItem[] = [];
+  for (const cat of HINT_CATEGORIES) {
+    const avail = availability.find((a) => a.category === cat)?.available ?? false;
+    const revealed = revealedCats.has(cat);
+    let text: string | null = null;
+    if (revealed) {
+      const r = await revealFor(mystery, cat);
+      text = r?.text ?? null;
+    }
+    items.push({ category: cat, available: avail, revealed, text });
+  }
+
+  return {
+    usesTotal: MAX_HINTS,
+    usesRemaining,
+    unlocksRemaining: unlocks,
+    nextUnlockAtGuess: nextUnlock,
+    items,
+  };
+}
+
+export async function loadHintStateFor(
   playerId: string,
   difficulty: Difficulty
+): Promise<HintState | null> {
+  const resolved = await resolveTodayPuzzle(difficulty);
+  if (!resolved) return null;
+  const play = await loadOrCreatePlay(playerId, difficulty, istDateKey());
+  return buildHintState(resolved.mystery, play);
+}
+
+export async function revealHint(
+  playerId: string,
+  difficulty: Difficulty,
+  category: HintCategory
 ): Promise<
-  | { status: "ok"; hintText: string; hintsRemaining: number }
+  | { status: "ok"; reveal: { category: HintCategory; text: string }; state: HintState }
   | { status: "locked" }
   | { status: "exhausted" }
   | { status: "no_puzzle" }
   | { status: "already_finished" }
+  | { status: "already_revealed" }
+  | { status: "unavailable" }
 > {
   const today = istDateKey();
   const resolved = await resolveTodayPuzzle(difficulty);
@@ -269,29 +336,36 @@ export async function revealHint(
 
   const play = await loadOrCreatePlay(playerId, difficulty, today);
   if (play.outcome !== "in_progress") return { status: "already_finished" };
-  if (play.hints_used >= MAX_HINTS) return { status: "exhausted" };
 
-  const unlockAt = HINT_UNLOCKS[play.hints_used];
-  if (play.guesses.length < unlockAt) return { status: "locked" };
+  const revealedCats = new Set(play.hints_revealed_categories ?? []);
+  if (revealedCats.has(category)) return { status: "already_revealed" };
 
-  const text =
-    difficulty === "easy"
-      ? resolved.mystery.hint_easy
-      : difficulty === "medium"
-      ? resolved.mystery.hint_medium
-      : resolved.mystery.hint_hard;
+  const usesUnlocked = HINT_UNLOCKS.filter((g) => play.guesses.length >= g).length;
+  if (revealedCats.size >= usesUnlocked) {
+    return usesUnlocked >= MAX_HINTS ? { status: "exhausted" } : { status: "locked" };
+  }
 
+  const reveal = await revealFor(resolved.mystery, category);
+  if (!reveal) return { status: "unavailable" };
+
+  const nextCats = [...revealedCats, category];
   const db = supabaseAdmin();
-  await db
+  const { error } = await db
     .from("plays")
-    .update({ hints_used: play.hints_used + 1 })
+    .update({
+      hints_revealed_categories: nextCats,
+      hints_used: nextCats.length,
+    })
     .eq("id", play.id);
+  if (error) throw new Error(error.message);
 
-  return {
-    status: "ok",
-    hintText: text,
-    hintsRemaining: MAX_HINTS - (play.hints_used + 1),
+  const nextPlay: PlayRow = {
+    ...play,
+    hints_revealed_categories: nextCats,
+    hints_used: nextCats.length,
   };
+  const state = await buildHintState(resolved.mystery, nextPlay);
+  return { status: "ok", reveal, state };
 }
 
 export async function finish(

@@ -103,16 +103,22 @@ export default async function FilmEditor({
           />
         </Section>
 
-        <Section title="Hints by difficulty">
-          <p className="text-xs text-muted">
-            Three tiers of hint, revealed after guess 3 and guess 6 in the matching mode.
-          </p>
-          <Label htmlFor="hint_easy" hint="Direct — e.g. “Lead actor: SRK.”">Easy</Label>
-          <input id="hint_easy" name="hint_easy" type="text" defaultValue={film.hint_easy} className={inputCls} autoComplete="off" />
-          <Label htmlFor="hint_medium" hint="Partial — e.g. “Lead actor's debut was 1988.”">Medium</Label>
-          <input id="hint_medium" name="hint_medium" type="text" defaultValue={film.hint_medium} className={inputCls} autoComplete="off" />
-          <Label htmlFor="hint_hard" hint="Cryptic — e.g. “Music director also scored a Satyajit Ray film.”">Hard</Label>
-          <input id="hint_hard" name="hint_hard" type="text" defaultValue={film.hint_hard} className={inputCls} autoComplete="off" />
+        <Section title="Tagline">
+          <Label
+            htmlFor="tagline"
+            hint="The film's marketing tagline. Shown as one of the three in-game hint categories. Leave blank if there isn't one."
+          >
+            Tagline
+          </Label>
+          <input
+            id="tagline"
+            name="tagline"
+            type="text"
+            defaultValue={film.tagline ?? ""}
+            placeholder="Palat..."
+            className={inputCls}
+            autoComplete="off"
+          />
         </Section>
 
         <Section title="Numbers">

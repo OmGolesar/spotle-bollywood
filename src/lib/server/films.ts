@@ -112,6 +112,7 @@ export type EditableFilm = {
   box_office_cr: number | null;
   imdb_score: number | null;
   trivia: string;
+  tagline: string;
   where_to_watch_url: string | null;
   hint_easy: string;
   hint_medium: string;
