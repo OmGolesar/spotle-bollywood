@@ -12,7 +12,7 @@ test.describe("Home", () => {
 
     // Three mode cards, each a link to its difficulty route
     for (const diff of ["easy", "medium", "hard"] as const) {
-      const card = page.locator(`a[href='/${diff}']`);
+      const card = page.locator(`a[href='/${diff}']`).first();
       await expect(card).toBeVisible();
     }
 
@@ -30,5 +30,26 @@ test.describe("Home", () => {
   test("shows an IST date label", async ({ page }) => {
     await page.goto("/");
     await expect(page.locator("p", { hasText: "· IST" }).first()).toBeVisible();
+  });
+
+  test("renders the How it works + Attributes + FAQ sections and the Play CTA", async ({
+    page,
+  }) => {
+    await page.goto("/");
+    await expect(page.getByText(/^How it works$/i)).toBeVisible();
+    await expect(page.getByRole("heading", { level: 3, name: /Type any Bollywood film/i })).toBeVisible();
+    await expect(page.getByRole("heading", { level: 3, name: /Read the tiles/i })).toBeVisible();
+    await expect(page.getByRole("heading", { level: 3, name: /Zero in on the answer/i })).toBeVisible();
+    await expect(page.getByText(/What the eight tiles mean/i)).toBeVisible();
+    await expect(page.getByText(/Questions from the audience/i)).toBeVisible();
+    await expect(page.getByRole("link", { name: /Play today.s film/i })).toBeVisible();
+  });
+
+  test("FAQ accordion expands when clicked", async ({ page }) => {
+    await page.goto("/");
+    const summary = page.getByText(/^When does the daily film reset\?$/i);
+    await summary.scrollIntoViewIfNeeded();
+    await summary.click();
+    await expect(page.getByText(/Everyone playing on the same calendar day/i)).toBeVisible();
   });
 });

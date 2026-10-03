@@ -1,6 +1,9 @@
 import { SiteHeader } from "@/components/SiteHeader";
 import { ModeCard } from "@/components/ModeCard";
 import { HowToPlaySheet } from "@/components/HowToPlaySheet";
+import { HowItWorks } from "@/components/home/HowItWorks";
+import { GameAttributes } from "@/components/home/GameAttributes";
+import { FaqAccordion } from "@/components/home/FaqAccordion";
 import { DIFFICULTIES, type Difficulty } from "@/lib/difficulty";
 import { istDateKey, istDisplayDate } from "@/lib/dateIst";
 import { hasSupabaseConfigured } from "@/lib/supabase/env";
@@ -93,10 +96,31 @@ export default async function Home() {
           </div>
           <HowToPlaySheet />
         </section>
+
+        <HowItWorks />
+        <GameAttributes />
+        <FaqAccordion />
+
+        <section className="flex flex-col items-center gap-3 border-t border-border pt-10 text-center sm:pt-14">
+          <a
+            href="/easy"
+            className="inline-flex h-12 items-center justify-center rounded-full bg-accent px-8 text-base font-semibold text-accent-ink shadow-sm transition-transform hover:-translate-y-0.5"
+          >
+            ▶ Play today&rsquo;s film
+          </a>
+          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted">
+            Free · One film a day
+          </p>
+        </section>
       </main>
 
-      <footer className="mx-auto w-full max-w-3xl px-5 pb-8 text-xs text-muted sm:px-8">
-        Movie data from TMDB. v1 preview.
+      <footer className="mx-auto flex w-full max-w-3xl flex-col items-center gap-2 border-t border-border px-5 py-8 text-xs text-muted sm:px-8">
+        <p>Movie data from TMDB. v1 preview.</p>
+        <p>
+          <a href="/admin" className="underline underline-offset-4 decoration-border hover:text-foreground">
+            Curator access
+          </a>
+        </p>
       </footer>
     </div>
   );
