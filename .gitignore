@@ -40,6 +40,11 @@ yarn-error.log*
 # content pipeline staging — can be large and non-deterministic
 /scripts/staging/
 
+# Playwright
+/test-results/
+/playwright-report/
+/playwright/.cache/
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts

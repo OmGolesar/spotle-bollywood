@@ -25,6 +25,7 @@ export function GuessAutocomplete({ difficulty, disabled, disabledIds, onPick }:
   const [loading, setLoading] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const abortRef = useRef<AbortController | null>(null);
+  const blurTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const listId = useId();
 
   useEffect(() => {
@@ -109,8 +110,19 @@ export function GuessAutocomplete({ difficulty, disabled, disabledIds, onPick }:
           setQuery(e.target.value);
           setOpen(true);
         }}
-        onFocus={() => setOpen(true)}
-        onBlur={() => setTimeout(() => setOpen(false), 120)}
+        onFocus={() => {
+          if (blurTimerRef.current) {
+            clearTimeout(blurTimerRef.current);
+            blurTimerRef.current = null;
+          }
+          setOpen(true);
+        }}
+        onBlur={() => {
+          blurTimerRef.current = setTimeout(() => {
+            setOpen(false);
+            blurTimerRef.current = null;
+          }, 120);
+        }}
         onKeyDown={onKeyDown}
         className="h-12 w-full rounded-xl border border-border bg-surface px-4 text-base text-foreground shadow-sm placeholder:text-muted focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/40 disabled:opacity-60"
         autoComplete="off"
