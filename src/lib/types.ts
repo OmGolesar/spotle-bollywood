@@ -16,6 +16,7 @@ export type Movie = {
   hintEasy: string;
   hintMedium: string;
   hintHard: string;
+  peopleImages?: Record<string, string>;
 };
 
 export type TileColor = "green" | "yellow" | "gray";

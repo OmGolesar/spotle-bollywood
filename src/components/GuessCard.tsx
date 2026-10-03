@@ -9,7 +9,67 @@ export type GuessedMovieBrief = {
   genres: string[];
   director: string[];
   castTop3: string[];
+  peopleImages: Record<string, string>;
 };
+
+const TMDB_PROFILE_PREFIX = "https://image.tmdb.org/t/p/w185";
+
+function profileUrl(profilePath?: string): string | null {
+  if (!profilePath) return null;
+  return `${TMDB_PROFILE_PREFIX}${profilePath}`;
+}
+
+function initials(name: string): string {
+  const parts = name.trim().split(/\s+/);
+  if (parts.length === 0) return "?";
+  const first = parts[0]?.[0] ?? "";
+  const last = parts.length > 1 ? parts[parts.length - 1][0] : "";
+  return (first + last).toUpperCase() || "?";
+}
+
+function PersonChip({
+  name,
+  imagePath,
+  highlight,
+}: {
+  name: string;
+  imagePath?: string;
+  highlight: "green" | "yellow" | "gray";
+}) {
+  const url = profileUrl(imagePath);
+  const ring =
+    highlight === "green"
+      ? "ring-2 ring-[var(--tile-yellow)]"
+      : highlight === "yellow"
+        ? "ring-1 ring-[color-mix(in_oklab,var(--tile-yellow)_60%,transparent)]"
+        : "ring-1 ring-border";
+
+  return (
+    <div className="flex min-w-0 flex-col items-center gap-1">
+      <div
+        className={`relative h-12 w-12 shrink-0 overflow-hidden rounded-full bg-surface-muted sm:h-14 sm:w-14 ${ring}`}
+      >
+        {url ? (
+          <Image
+            src={url}
+            alt=""
+            fill
+            sizes="56px"
+            unoptimized
+            className="object-cover"
+          />
+        ) : (
+          <span className="flex h-full w-full items-center justify-center text-xs font-semibold text-muted">
+            {initials(name)}
+          </span>
+        )}
+      </div>
+      <span className="max-w-[6rem] truncate text-center text-[11px] leading-tight text-foreground sm:max-w-[7rem]">
+        {name}
+      </span>
+    </div>
+  );
+}
 
 type Props = {
   movie: GuessedMovieBrief;
@@ -74,29 +134,37 @@ function PeopleRow({
   label,
   names,
   color,
+  peopleImages,
 }: {
   label: string;
   names: string[];
   color: TileState["color"];
+  peopleImages: Record<string, string>;
 }) {
   const correct = color === "green";
   const close = color === "yellow";
-  const ring = correct
+  const borderCls = correct
     ? "border-[var(--tile-yellow)]"
     : close
       ? "border-[color-mix(in_oklab,var(--tile-yellow)_40%,var(--border))]"
       : "border-border";
-  const text = correct ? "text-foreground font-semibold" : "text-foreground";
 
   if (names.length === 0) return null;
 
   return (
-    <div className={`rounded-lg border ${ring} bg-surface px-3 py-2`}>
+    <div className={`rounded-lg border ${borderCls} bg-surface px-3 py-2.5`}>
       <div className="text-[10px] font-semibold uppercase tracking-wider text-muted">
         {label}
       </div>
-      <div className={`mt-0.5 text-sm leading-snug ${text}`}>
-        {names.join(", ")}
+      <div className="mt-2 flex flex-wrap gap-2.5">
+        {names.map((n) => (
+          <PersonChip
+            key={n}
+            name={n}
+            imagePath={peopleImages[n]}
+            highlight={color}
+          />
+        ))}
       </div>
     </div>
   );
@@ -175,11 +243,13 @@ export function GuessCard({ movie, tiles, guessIndex, animate = false }: Props) 
           label="Director"
           names={movie.director}
           color={director?.color ?? "gray"}
+          peopleImages={movie.peopleImages}
         />
         <PeopleRow
           label="Lead cast"
           names={movie.castTop3}
           color={cast?.color ?? "gray"}
+          peopleImages={movie.peopleImages}
         />
       </div>
     </article>

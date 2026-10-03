@@ -75,6 +75,7 @@ function toMovieRow(m: StagedMovie) {
     hint_medium: m.hint_medium,
     hint_hard: m.hint_hard,
     data_quality: m.data_quality,
+    people_images: m.people_images ?? {},
   };
 }
 

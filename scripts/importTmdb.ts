@@ -60,6 +60,7 @@ export type StagedMovie = {
   data_quality: "tmdb_only";
   vote_count: number;
   popularity: number;
+  people_images: Record<string, string>;
 };
 
 type Discover = {
@@ -73,8 +74,8 @@ type Discover = {
 type DiscoverResp = { results: Discover[]; total_pages: number };
 
 type Credits = {
-  crew: { id: number; name: string; department: string; job: string }[];
-  cast: { id: number; name: string; order: number }[];
+  crew: { id: number; name: string; department: string; job: string; profile_path: string | null }[];
+  cast: { id: number; name: string; order: number; profile_path: string | null }[];
 };
 
 type Detail = {
@@ -156,6 +157,7 @@ function detailToStaged(d: Detail): StagedMovie {
     .filter((v, i, a) => a.indexOf(v) === i);
   const banner = d.production_companies[0]?.name ?? "Unknown";
   const genres = d.genres.map((g) => g.name);
+  const people_images = buildPeopleImages(d.credits, director, cast_top3);
   return {
     tmdb_id: d.id,
     title: d.title,
@@ -179,7 +181,34 @@ function detailToStaged(d: Detail): StagedMovie {
     data_quality: "tmdb_only",
     vote_count: d.vote_count,
     popularity: d.popularity,
+    people_images,
   };
+}
+
+/**
+ * Build a name -> profile_path map for people shown on a guess card: the
+ * movie's director(s) + top-3 cast. profile_path is TMDB's `/{hash}.jpg` form
+ * — the client prefixes `https://image.tmdb.org/t/p/w185` when rendering.
+ * People without a profile_path are omitted (card falls back to initials).
+ */
+export function buildPeopleImages(
+  credits: Credits,
+  directorNames: string[],
+  castNames: string[]
+): Record<string, string> {
+  const wanted = new Set<string>([...directorNames, ...castNames]);
+  const out: Record<string, string> = {};
+  for (const c of credits.cast) {
+    if (wanted.has(c.name) && c.profile_path && !out[c.name]) {
+      out[c.name] = c.profile_path;
+    }
+  }
+  for (const c of credits.crew) {
+    if (wanted.has(c.name) && c.profile_path && !out[c.name]) {
+      out[c.name] = c.profile_path;
+    }
+  }
+  return out;
 }
 
 async function main() {

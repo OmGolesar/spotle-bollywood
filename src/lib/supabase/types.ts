@@ -25,6 +25,7 @@ export type MovieRow = {
   hint_medium: string;
   hint_hard: string;
   data_quality: DataQuality;
+  people_images: Record<string, string>;
 };
 
 export type MovieCatalogRow = Pick<
