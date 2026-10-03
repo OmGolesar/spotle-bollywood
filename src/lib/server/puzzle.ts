@@ -44,6 +44,7 @@ function rowToMovie(r: MovieRow): Movie {
     hintEasy: r.hint_easy,
     hintMedium: r.hint_medium,
     hintHard: r.hint_hard,
+    peopleImages: r.people_images ?? {},
   };
 }
 
@@ -136,6 +137,7 @@ export type GuessedMovieBrief = {
   genres: string[];
   director: string[];
   castTop3: string[];
+  peopleImages: Record<string, string>;
 };
 
 export type SubmitGuessResult =
@@ -235,6 +237,7 @@ export async function submitGuess(
       genres: guess.genres,
       director: guess.director,
       castTop3: guess.castTop3,
+      peopleImages: guess.peopleImages ?? {},
     },
     correct,
     outcome: newOutcome,

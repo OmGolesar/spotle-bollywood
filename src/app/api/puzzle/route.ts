@@ -55,6 +55,7 @@ export async function GET(req: Request) {
         genres: g.movie.genres,
         director: g.movie.director,
         castTop3: g.movie.castTop3,
+        peopleImages: g.movie.peopleImages ?? {},
       },
       tiles: g.tiles,
     })),

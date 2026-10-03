@@ -60,6 +60,7 @@ const MOCK_GUESS_MOVIE = {
   genres: ["Drama"],
   director: ["Someone Else"],
   castTop3: ["A", "B", "C"],
+  peopleImages: {} as Record<string, string>,
 };
 
 export async function installApiMocks(page: Page, scenario: Scenario = {}) {
