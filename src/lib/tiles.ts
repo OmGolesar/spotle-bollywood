@@ -149,7 +149,10 @@ export function compareMovies(
 
   const guessGenreSet = new Set(guess.genres);
   const mysteryGenreSet = new Set(mystery.genres);
-  const genreOverlap = guess.genres.some((g) => mysteryGenreSet.has(g));
+  const genreChipColors = guess.genres.map((g): "green" | "yellow" | "gray" =>
+    mysteryGenreSet.has(g) ? "green" : "gray"
+  );
+  const genreOverlap = genreChipColors.includes("green");
   const genreEqual =
     guessGenreSet.size === mysteryGenreSet.size &&
     guess.genres.every((g) => mysteryGenreSet.has(g));
@@ -158,6 +161,7 @@ export function compareMovies(
     label: "Genre",
     color: genreEqual ? "green" : genreOverlap ? "yellow" : "gray",
     value: fmtNumList(guess.genres, 2),
+    chipColors: genreChipColors,
   });
 
   const imdb: TileState = {

@@ -30,7 +30,7 @@ export const DEMO_PARTIAL_TILES: TileState[] = [
   { key: "boxOffice", label: "Box office", color: "yellow", arrow: "down", value: "₹387 cr" },
   { key: "music", label: "Music", color: "gray", value: "Pritam Chakraborty" },
   { key: "banner", label: "Banner", color: "yellow", value: "Aamir Khan Productions" },
-  { key: "genre", label: "Genre", color: "yellow", value: "Drama, Family" },
+  { key: "genre", label: "Genre", color: "yellow", value: "Drama, Family", chipColors: ["green", "gray", "green"] },
   { key: "imdb", label: "IMDb", color: "yellow", arrow: "up", value: "7.9" },
 ];
 
@@ -58,6 +58,6 @@ export const DEMO_WIN_TILES: TileState[] = [
   { key: "boxOffice", label: "Box office", color: "green", value: "₹460 cr" },
   { key: "music", label: "Music", color: "green", value: "Shantanu Moitra" },
   { key: "banner", label: "Banner", color: "green", value: "Vidhu Vinod Chopra" },
-  { key: "genre", label: "Genre", color: "green", value: "Drama, Comedy" },
+  { key: "genre", label: "Genre", color: "green", value: "Drama, Comedy", chipColors: ["green", "green"] },
   { key: "imdb", label: "IMDb", color: "green", value: "8.0" },
 ];

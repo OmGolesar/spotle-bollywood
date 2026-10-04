@@ -130,14 +130,22 @@ function AttrBox({ tile }: { tile: TileState | undefined }) {
   );
 }
 
-function GenrePill({ label, matched }: { label: string; matched: boolean }) {
+function GenrePill({
+  label,
+  color,
+}: {
+  label: string;
+  color: "green" | "yellow" | "gray";
+}) {
+  const style =
+    color === "green"
+      ? "bg-[var(--tile-green)] text-white"
+      : color === "yellow"
+        ? "bg-[var(--tile-yellow)] text-black"
+        : "border border-border bg-transparent text-muted";
   return (
     <span
-      className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold ${
-        matched
-          ? "bg-[var(--tile-green)] text-white"
-          : "bg-surface-muted text-muted"
-      }`}
+      className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold ${style}`}
     >
       {label}
     </span>
@@ -196,7 +204,7 @@ export function GuessCard({ movie, tiles, guessIndex, animate = false }: Props) 
   const director = tileByKey(tiles, "director");
   const cast = tileByKey(tiles, "cast");
 
-  const genreMatchColor = genre?.color ?? "gray";
+  const genreChipColors = genre?.chipColors;
 
   return (
     <article
@@ -237,11 +245,11 @@ export function GuessCard({ movie, tiles, guessIndex, animate = false }: Props) 
 
           {movie.genres.length > 0 && (
             <div className="mt-2 flex flex-wrap gap-1.5">
-              {movie.genres.map((g) => (
+              {movie.genres.map((g, i) => (
                 <GenrePill
                   key={g}
                   label={g}
-                  matched={genreMatchColor !== "gray"}
+                  color={genreChipColors?.[i] ?? "gray"}
                 />
               ))}
             </div>
