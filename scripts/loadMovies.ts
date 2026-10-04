@@ -77,6 +77,12 @@ function toMovieRow(m: StagedMovie) {
     data_quality: m.data_quality,
     people_images: m.people_images ?? {},
     banner_logo_path: m.banner_logo_path ?? null,
+    // On new import, Wikipedia-sourced box office is populated by
+    // scripts/refreshBoxOffice.ts (not here). Leave these null so the
+    // refresh job remains the single source of truth.
+    box_office_amount: null,
+    box_office_currency: null,
+    box_office_source: null,
   };
 }
 

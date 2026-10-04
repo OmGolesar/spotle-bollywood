@@ -10,6 +10,8 @@ export type Movie = {
   bannerLogoPath?: string | null;
   genres: string[];
   boxOfficeCr: number | null;
+  boxOfficeAmount?: number | null;
+  boxOfficeCurrency?: "INR_CR" | "USD_M" | "USD_B" | null;
   imdbScore: number | null;
   posterUrl: string;
   trivia: string;
