@@ -43,6 +43,26 @@ function toCents(n: number): number {
   return Math.round(n * 100);
 }
 
+/**
+ * Display the film's box office in whatever unit Wikipedia reported it:
+ * '₹1,968 cr', '$2.8B', '$295M'. Falls back to the normalised crore
+ * value if we only have the legacy column, and '—' when nothing is
+ * known. Numbers are compact — no decimals once over 10.
+ */
+function formatBoxOfficeNative(m: Movie): string {
+  const amount = m.boxOfficeAmount;
+  const cur = m.boxOfficeCurrency;
+  if (amount != null && cur) {
+    const n = amount < 10 ? amount : Math.round(amount);
+    const withCommas = n.toLocaleString("en-IN", { maximumFractionDigits: 1 });
+    if (cur === "INR_CR") return `₹${withCommas} cr`;
+    if (cur === "USD_M") return `$${withCommas}M`;
+    if (cur === "USD_B") return `$${withCommas}B`;
+  }
+  if (m.boxOfficeCr != null) return `₹${Math.round(m.boxOfficeCr)} cr`;
+  return "—";
+}
+
 export function compareMovies(
   guess: Movie,
   mystery: Movie,
@@ -103,8 +123,7 @@ export function compareMovies(
     key: "boxOffice",
     label: "Box office",
     color: "gray",
-    value:
-      guess.boxOfficeCr != null ? `₹${guess.boxOfficeCr.toFixed(0)} cr` : "—",
+    value: formatBoxOfficeNative(guess),
   };
   if (
     guess.boxOfficeCr != null &&

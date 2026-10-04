@@ -17,6 +17,9 @@ export type MovieRow = {
   banner_logo_path: string | null;
   genres: string[];
   box_office_cr: number | null;
+  box_office_amount: number | null;
+  box_office_currency: "INR_CR" | "USD_M" | "USD_B" | null;
+  box_office_source: "wikipedia" | "wikidata" | "tmdb" | "manual" | null;
   imdb_score: number | null;
   poster_url: string;
   trivia: string;

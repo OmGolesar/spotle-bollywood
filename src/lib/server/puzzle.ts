@@ -37,6 +37,8 @@ function rowToMovie(r: MovieRow): Movie {
     bannerParent: r.banner_parent,
     genres: r.genres,
     boxOfficeCr: r.box_office_cr,
+    boxOfficeAmount: r.box_office_amount ?? null,
+    boxOfficeCurrency: r.box_office_currency ?? null,
     imdbScore: r.imdb_score,
     posterUrl: r.poster_url,
     trivia: r.trivia,
