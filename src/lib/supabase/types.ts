@@ -14,6 +14,7 @@ export type MovieRow = {
   music_directors: string[];
   banner: string;
   banner_parent: string | null;
+  banner_logo_path: string | null;
   genres: string[];
   box_office_cr: number | null;
   imdb_score: number | null;

@@ -10,6 +10,7 @@ import type { HintCategory } from "@/lib/hintCategories";
 import { GuessAutocomplete, type AutocompleteOption } from "./GuessAutocomplete";
 import { GuessCard, type GuessedMovieBrief } from "./GuessCard";
 import { HintSheet, type HintStateClient } from "./HintSheet";
+import { PuzzleTips } from "./PuzzleTips";
 import { ResultScreen, type ResultAnswer } from "./ResultScreen";
 
 type Props = { difficulty: Difficulty };
@@ -398,6 +399,8 @@ export function PuzzleScreen({ difficulty }: Props) {
           </div>
         )}
       </section>
+
+      <PuzzleTips />
 
       <HintSheet
         open={hintsOpen}

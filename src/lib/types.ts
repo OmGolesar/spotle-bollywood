@@ -7,6 +7,7 @@ export type Movie = {
   musicDirectors: string[];
   banner: string;
   bannerParent: string | null;
+  bannerLogoPath?: string | null;
   genres: string[];
   boxOfficeCr: number | null;
   imdbScore: number | null;

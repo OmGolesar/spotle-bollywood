@@ -21,6 +21,7 @@ export const DEMO_PARTIAL_MOVIE: GuessedMovieBrief = {
     "Fatima Sana Shaikh": "/eVOziSvi6PLL5vkROHO1sbsKUFW.jpg",
     "Sanya Malhotra": "/sQ0VIqGLecfpwYayO05Z7NC32yN.jpg",
   },
+  bannerLogoPath: null,
 };
 
 export const DEMO_PARTIAL_TILES: TileState[] = [
@@ -49,6 +50,7 @@ export const DEMO_WIN_MOVIE: GuessedMovieBrief = {
     "R. Madhavan": "/gaDrAdXxIrbBRCd9cX8YvJDEuLb.jpg",
     "Sharman Joshi": "/mQr8ynFFVq08qgQ4aSNl5B0ko8v.jpg",
   },
+  bannerLogoPath: null,
 };
 
 export const DEMO_WIN_TILES: TileState[] = [

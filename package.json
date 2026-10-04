@@ -20,6 +20,7 @@
     "tmdb:taglines": "tsx scripts/backfillTaglines.ts",
     "tmdb:backfill-people": "tsx scripts/backfillPeopleImages.ts",
     "tmdb:backfill-boxoffice": "tsx scripts/backfillBoxOffice.ts",
+    "tmdb:backfill-banner-logos": "tsx scripts/backfillBannerLogos.ts",
     "e2e": "playwright test",
     "e2e:ui": "playwright test --ui",
     "e2e:headed": "playwright test --headed"

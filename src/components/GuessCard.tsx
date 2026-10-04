@@ -10,7 +10,13 @@ export type GuessedMovieBrief = {
   director: string[];
   castTop3: string[];
   peopleImages: Record<string, string>;
+  bannerLogoPath?: string | null;
 };
+
+function tmdbLogoUrl(path?: string | null): string | null {
+  if (!path) return null;
+  return `https://image.tmdb.org/t/p/w200${path}`;
+}
 
 const TMDB_PROFILE_PREFIX = "https://image.tmdb.org/t/p/w185";
 
@@ -126,6 +132,59 @@ function AttrBox({ tile }: { tile: TileState | undefined }) {
         <span className="min-w-0 truncate">{tile.value}</span>
         {tile.arrow && <ArrowGlyph dir={tile.arrow} />}
       </div>
+    </div>
+  );
+}
+
+function BannerBox({
+  tile,
+  logoUrl,
+}: {
+  tile: TileState | undefined;
+  logoUrl: string | null;
+}) {
+  if (!tile) return null;
+  const correct = tile.color === "green";
+  const close = tile.color === "yellow";
+  const bg = correct
+    ? "bg-[var(--tile-green)]"
+    : close
+      ? "bg-[var(--tile-yellow)]"
+      : "bg-surface-muted";
+  const textCls = correct || close ? "text-black" : "text-foreground";
+  const labelCls = correct ? "text-white/85" : close ? "text-black/70" : "text-muted";
+
+  return (
+    <div
+      className={`col-start-3 row-span-2 flex min-w-0 flex-col items-center justify-center gap-2 overflow-hidden rounded-lg px-2 py-3 text-center ${bg}`}
+      aria-label={`${tile.label}: ${tile.value}`}
+    >
+      <span
+        className={`text-[10px] font-semibold uppercase tracking-wider ${labelCls}`}
+      >
+        {tile.label}
+      </span>
+      {logoUrl ? (
+        <div className="flex min-h-0 flex-1 w-full items-center justify-center px-1 py-1">
+          <Image
+            src={logoUrl}
+            alt=""
+            width={120}
+            height={80}
+            unoptimized
+            className="h-auto max-h-16 w-auto max-w-full object-contain"
+            style={{
+              filter: correct || close ? "none" : "grayscale(0.3) opacity(0.9)",
+            }}
+          />
+        </div>
+      ) : (
+        <span
+          className={`line-clamp-3 px-1 text-sm font-semibold leading-tight ${textCls}`}
+        >
+          {tile.value}
+        </span>
+      )}
     </div>
   );
 }
@@ -255,11 +314,14 @@ export function GuessCard({ movie, tiles, guessIndex, animate = false }: Props) 
             </div>
           )}
 
-          <div className="mt-3 grid grid-cols-3 gap-1.5 sm:gap-2">
+          <div className="mt-3 grid grid-cols-3 grid-rows-2 gap-1.5 sm:gap-2">
             <AttrBox tile={year} />
             <AttrBox tile={boxOffice} />
+            <BannerBox
+              tile={banner}
+              logoUrl={tmdbLogoUrl(movie.bannerLogoPath)}
+            />
             <AttrBox tile={imdb} />
-            <AttrBox tile={banner} />
             <AttrBox tile={music} />
           </div>
         </div>
