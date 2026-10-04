@@ -47,6 +47,7 @@ export type StagedMovie = {
   cast_top3: string[];
   music_directors: string[];
   banner: string;
+  banner_logo_path: string | null;
   banner_parent: string | null;
   genres: string[];
   box_office_cr: number | null;
@@ -84,7 +85,7 @@ type Detail = {
   original_title: string;
   release_date: string;
   genres: { name: string }[];
-  production_companies: { name: string }[];
+  production_companies: { name: string; logo_path: string | null }[];
   poster_path: string | null;
   vote_average: number;
   vote_count: number;
@@ -170,7 +171,9 @@ function detailToStaged(d: Detail): StagedMovie {
     .filter((c) => c.department === "Sound" && MUSIC_JOB_RE.test(c.job))
     .map((c) => c.name)
     .filter((v, i, a) => a.indexOf(v) === i);
-  const banner = d.production_companies[0]?.name ?? "Unknown";
+  const bannerCompany = d.production_companies[0];
+  const banner = bannerCompany?.name ?? "Unknown";
+  const banner_logo_path = bannerCompany?.logo_path ?? null;
   const genres = d.genres.map((g) => g.name);
   const people_images = buildPeopleImages(d.credits, director, cast_top3);
   return {
@@ -184,6 +187,7 @@ function detailToStaged(d: Detail): StagedMovie {
     music_directors,
     banner,
     banner_parent: null,
+    banner_logo_path,
     genres,
     box_office_cr: boxOfficeCrFromTmdbRevenue(d.revenue),
     imdb_score: d.vote_average ?? null,

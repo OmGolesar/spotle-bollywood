@@ -76,6 +76,7 @@ function toMovieRow(m: StagedMovie) {
     hint_hard: m.hint_hard,
     data_quality: m.data_quality,
     people_images: m.people_images ?? {},
+    banner_logo_path: m.banner_logo_path ?? null,
   };
 }
 

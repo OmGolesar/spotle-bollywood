@@ -56,6 +56,7 @@ export async function GET(req: Request) {
         director: g.movie.director,
         castTop3: g.movie.castTop3,
         peopleImages: g.movie.peopleImages ?? {},
+        bannerLogoPath: g.movie.bannerLogoPath ?? null,
       },
       tiles: g.tiles,
     })),

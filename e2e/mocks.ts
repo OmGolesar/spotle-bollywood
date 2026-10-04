@@ -61,6 +61,7 @@ const MOCK_GUESS_MOVIE = {
   director: ["Someone Else"],
   castTop3: ["A", "B", "C"],
   peopleImages: {} as Record<string, string>,
+  bannerLogoPath: null,
 };
 
 export async function installApiMocks(page: Page, scenario: Scenario = {}) {
