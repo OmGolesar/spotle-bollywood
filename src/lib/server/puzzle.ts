@@ -54,13 +54,19 @@ function rowToMovie(r: MovieRow): Movie {
 export async function resolveTodayPuzzle(
   difficulty: Difficulty
 ): Promise<{ puzzle: DailyPuzzleRow; mystery: MovieRow } | null> {
+  return resolvePuzzleForDate(istDateKey(), difficulty);
+}
+
+export async function resolvePuzzleForDate(
+  puzzleDate: string,
+  difficulty: Difficulty
+): Promise<{ puzzle: DailyPuzzleRow; mystery: MovieRow } | null> {
   const db = supabaseAdmin();
-  const today = istDateKey();
 
   const { data: puzzle, error } = await db
     .from("daily_puzzles")
     .select("puzzle_date, difficulty, movie_id, status")
-    .eq("puzzle_date", today)
+    .eq("puzzle_date", puzzleDate)
     .eq("difficulty", difficulty)
     .maybeSingle();
 
@@ -417,6 +423,147 @@ export async function revealHint(
   };
   const state = await buildHintState(resolved.mystery, nextPlay);
   return { status: "ok", reveal, state };
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Archive mode — stateless, no persistence. Clients hold the guess list and
+// POST the full history every turn. We never write to the plays table and
+// never touch streaks.
+// ─────────────────────────────────────────────────────────────────────────────
+
+export type ArchiveAnswer = {
+  id: string;
+  title: string;
+  year: number;
+  director: string[];
+  castTop3: string[];
+  trivia: string;
+  whereToWatchUrl: string | null;
+  posterUrl: string;
+};
+
+function toArchiveAnswer(m: MovieRow): ArchiveAnswer {
+  return {
+    id: m.id,
+    title: m.title,
+    year: m.year,
+    director: m.director,
+    castTop3: m.cast_top3,
+    trivia: m.trivia,
+    whereToWatchUrl: m.where_to_watch_url,
+    posterUrl: m.poster_url,
+  };
+}
+
+export type ArchivePuzzleHeader = {
+  puzzleDate: string;
+  difficulty: Difficulty;
+  totalGuesses: number;
+  posterUrl: string;
+  posterBlurPx: number;
+};
+
+export async function loadArchivePuzzle(
+  puzzleDate: string,
+  difficulty: Difficulty
+): Promise<ArchivePuzzleHeader | null> {
+  const resolved = await resolvePuzzleForDate(puzzleDate, difficulty);
+  if (!resolved) return null;
+  return {
+    puzzleDate: resolved.puzzle.puzzle_date,
+    difficulty,
+    totalGuesses: TOTAL_GUESSES,
+    posterUrl: resolved.mystery.poster_url,
+    posterBlurPx: blurFor(0, "in_progress"),
+  };
+}
+
+export type ArchiveGuessResult =
+  | {
+      status: "ok";
+      tiles: TileState[];
+      movie: GuessedMovieBrief;
+      correct: boolean;
+      outcome: PlayRow["outcome"];
+      guessesRemaining: number;
+      posterBlurPx: number;
+      answer: ArchiveAnswer | null;
+    }
+  | { status: "no_puzzle" }
+  | { status: "not_in_pool" }
+  | { status: "already_finished" };
+
+export async function evaluateArchiveGuess(
+  puzzleDate: string,
+  difficulty: Difficulty,
+  guessMovieId: string,
+  priorGuessIds: string[]
+): Promise<ArchiveGuessResult> {
+  const resolved = await resolvePuzzleForDate(puzzleDate, difficulty);
+  if (!resolved) return { status: "no_puzzle" };
+
+  // Replay the client-supplied history to work out which guess number this
+  // one is, and whether the game had already ended before this turn. Taking
+  // the list from the client is safe here: archive mode has no streaks or
+  // scores on the line, so there's nothing worth lying about.
+  const seen = new Set<string>();
+  let alreadyWon = false;
+  for (const id of priorGuessIds) {
+    if (id === resolved.mystery.id) alreadyWon = true;
+    seen.add(id);
+  }
+  if (alreadyWon || priorGuessIds.length >= TOTAL_GUESSES) {
+    return { status: "already_finished" };
+  }
+
+  const db = supabaseAdmin();
+  const guessRow = await db
+    .from("movies")
+    .select("*")
+    .eq("id", guessMovieId)
+    .single();
+  if (guessRow.error || !guessRow.data) return { status: "not_in_pool" };
+
+  const edges = await loadEdgeIndex();
+  const guess = rowToMovie(guessRow.data as MovieRow);
+  const mystery = rowToMovie(resolved.mystery);
+  const tiles = compareMovies(guess, mystery, edges);
+
+  const correct = guessMovieId === resolved.mystery.id;
+  const totalGuessesSoFar = priorGuessIds.length + 1;
+  let outcome: PlayRow["outcome"] = "in_progress";
+  if (correct) outcome = "won";
+  else if (totalGuessesSoFar >= TOTAL_GUESSES) outcome = "lost";
+
+  return {
+    status: "ok",
+    tiles,
+    movie: {
+      id: guess.id,
+      title: guess.title,
+      year: guess.year,
+      posterUrl: guess.posterUrl,
+      genres: guess.genres,
+      director: guess.director,
+      castTop3: guess.castTop3,
+      peopleImages: guess.peopleImages ?? {},
+      bannerLogoPath: guess.bannerLogoPath ?? null,
+    },
+    correct,
+    outcome,
+    guessesRemaining: TOTAL_GUESSES - totalGuessesSoFar,
+    posterBlurPx: blurFor(totalGuessesSoFar, outcome),
+    answer: outcome === "in_progress" ? null : toArchiveAnswer(resolved.mystery),
+  };
+}
+
+export async function getArchiveAnswer(
+  puzzleDate: string,
+  difficulty: Difficulty
+): Promise<ArchiveAnswer | null> {
+  const resolved = await resolvePuzzleForDate(puzzleDate, difficulty);
+  if (!resolved) return null;
+  return toArchiveAnswer(resolved.mystery);
 }
 
 export async function finish(

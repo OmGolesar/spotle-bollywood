@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { ThemeToggle } from "./ThemeToggle";
 
 export function SiteHeader() {
@@ -17,7 +18,15 @@ export function SiteHeader() {
           Bollywood
         </span>
       </a>
-      <ThemeToggle />
+      <div className="flex items-center gap-2 sm:gap-3">
+        <Link
+          href="/archive"
+          className="hidden h-10 items-center rounded-full border border-border bg-surface px-3 text-xs font-semibold text-foreground hover:bg-surface-muted sm:inline-flex"
+        >
+          Archive
+        </Link>
+        <ThemeToggle />
+      </div>
     </header>
   );
 }
