@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { SiteHeader } from "@/components/SiteHeader";
 import { ModeCard } from "@/components/ModeCard";
@@ -121,6 +122,24 @@ export default async function Home({
             </span>
           </div>
           <HowToPlaySheet />
+        </section>
+
+        <section
+          aria-label="Past puzzles"
+          className="flex items-center justify-between gap-4 rounded-xl border border-border bg-surface px-4 py-3 text-sm"
+        >
+          <div className="flex flex-col">
+            <span className="font-medium text-foreground">Catch up on past puzzles</span>
+            <span className="text-xs text-muted">
+              Practice mode — no streak impact, unlimited replays.
+            </span>
+          </div>
+          <Link
+            href="/archive"
+            className="inline-flex h-10 shrink-0 items-center rounded-full border border-border bg-surface-muted/60 px-4 text-xs font-semibold text-foreground hover:bg-surface-muted"
+          >
+            Browse archive →
+          </Link>
         </section>
 
         <HowItWorks />

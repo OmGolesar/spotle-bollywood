@@ -214,6 +214,12 @@ export function ResultScreen({
             })}
           </div>
           <Link
+            href="/archive"
+            className="mt-1 inline-flex h-11 items-center justify-center rounded-full border border-border bg-surface px-5 text-sm font-semibold text-foreground hover:bg-surface-muted"
+          >
+            Play past puzzles →
+          </Link>
+          <Link
             href="/"
             className="mt-1 self-center text-sm font-medium text-muted underline underline-offset-4 hover:text-foreground"
           >
