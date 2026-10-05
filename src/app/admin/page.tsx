@@ -9,16 +9,20 @@ export const dynamic = "force-dynamic";
 export default async function AdminHome() {
   await requireAdmin();
   const today = istDateKey();
-  const rows = await loadSchedule(30);
+  // Show the past 30 days too so the curator can backfill the archive —
+  // past dates can be scheduled retroactively and the archive page picks
+  // them up as soon as their status is live/archived.
+  const rows = await loadSchedule({ pastDays: 30, futureDays: 30 });
 
+  const futureRows = rows.filter((r) => r.dateKey >= today);
   const scheduledCount = (d: Difficulty) =>
-    rows.filter((r) => r.cells[d] != null).length;
+    futureRows.filter((r) => r.cells[d] != null).length;
 
   return (
     <main className="mx-auto flex w-full max-w-5xl flex-col gap-8 px-5 py-6 sm:px-8 sm:py-10">
       <section className="flex flex-col gap-2">
         <p className="text-xs font-medium uppercase tracking-[0.14em] text-muted">
-          Next 30 days · IST
+          Last 30 · Next 30 days · IST
         </p>
         <h1 className="font-display text-3xl font-semibold tracking-tight text-foreground">
           Schedule
