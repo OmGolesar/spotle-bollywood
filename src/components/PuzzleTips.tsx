@@ -1,6 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
+
+const AUTO_ADVANCE_MS = 5000;
 
 type Dot = { color: "green" | "yellow"; label: string; text: string };
 type Tip = { title: string; body: string; dots?: Dot[] };
@@ -88,10 +90,46 @@ const TIPS: Tip[] = [
 
 export function PuzzleTips() {
   const [idx, setIdx] = useState(0);
+  const [paused, setPaused] = useState(false);
   const total = TIPS.length;
   const tip = TIPS[idx];
-  const prev = () => setIdx((i) => (i - 1 + total) % total);
-  const next = () => setIdx((i) => (i + 1) % total);
+  const pauseTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Nudge the user back into auto-advance a few seconds after they stop
+  // interacting — matches the behaviour of carousels like the one on the
+  // landing page: manual nav wins briefly, then the loop resumes.
+  const nudgePause = () => {
+    setPaused(true);
+    if (pauseTimer.current) clearTimeout(pauseTimer.current);
+    pauseTimer.current = setTimeout(() => setPaused(false), 15000);
+  };
+
+  const prev = () => {
+    nudgePause();
+    setIdx((i) => (i - 1 + total) % total);
+  };
+  const next = () => {
+    nudgePause();
+    setIdx((i) => (i + 1) % total);
+  };
+  const jump = (i: number) => {
+    nudgePause();
+    setIdx(i);
+  };
+
+  useEffect(() => {
+    if (paused) return;
+    const id = setInterval(() => {
+      setIdx((i) => (i + 1) % total);
+    }, AUTO_ADVANCE_MS);
+    return () => clearInterval(id);
+  }, [paused, total]);
+
+  useEffect(() => {
+    return () => {
+      if (pauseTimer.current) clearTimeout(pauseTimer.current);
+    };
+  }, []);
 
   return (
     <aside
@@ -110,7 +148,7 @@ export function PuzzleTips() {
             role="tab"
             aria-selected={i === idx}
             aria-label={`Tip ${i + 1} of ${total}`}
-            onClick={() => setIdx(i)}
+            onClick={() => jump(i)}
             className="h-1 flex-1 rounded-full transition-colors"
             style={{
               background: i === idx ? "var(--accent)" : "var(--border)",

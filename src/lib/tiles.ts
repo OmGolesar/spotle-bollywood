@@ -133,8 +133,10 @@ export function compareMovies(
     const diffCents = Math.abs(toCents(guess.boxOfficeCr) - toCents(mystery.boxOfficeCr));
     const mysteryCents = toCents(mystery.boxOfficeCr);
     if (diffCents * 10 <= mysteryCents) bo.color = "green";
-    else if (diffCents * 2 <= mysteryCents) {
-      bo.color = "yellow";
+    else if (diffCents * 2 <= mysteryCents) bo.color = "yellow";
+    // Arrow is independent of color — a gray tile still tells the player
+    // which direction to search in (same as the Year tile).
+    if (guess.boxOfficeCr !== mystery.boxOfficeCr) {
       bo.arrow = guess.boxOfficeCr < mystery.boxOfficeCr ? "up" : "down";
     }
   }
@@ -199,8 +201,10 @@ export function compareMovies(
       Math.round(guess.imdbScore * 10) - Math.round(mystery.imdbScore * 10)
     );
     if (diffTenths === 0) imdb.color = "green";
-    else if (diffTenths <= 5) {
-      imdb.color = "yellow";
+    else if (diffTenths <= 5) imdb.color = "yellow";
+    // Arrow is independent of color — a gray IMDb tile still points the
+    // player at a higher or lower rating.
+    if (diffTenths !== 0) {
       imdb.arrow = arrow(guess.imdbScore, mystery.imdbScore);
     }
   }
