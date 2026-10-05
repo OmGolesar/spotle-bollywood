@@ -34,11 +34,13 @@ export async function loadArchiveGrid(
   const db = supabaseAdmin();
   const today = istDateKey();
 
+  // Any puzzle scheduled for today-or-earlier is archive-eligible. Status
+  // doesn't matter: a backfilled past date may still read as `scheduled`
+  // if the admin saved it that way, and we want it to show up.
   const { data, error } = await db
     .from("daily_puzzles")
     .select("puzzle_date, status, movies!inner(title, poster_url)")
     .eq("difficulty", difficulty)
-    .in("status", ["live", "archived"])
     .lte("puzzle_date", today)
     .order("puzzle_date", { ascending: true });
 
@@ -48,7 +50,7 @@ export async function loadArchiveGrid(
 
   type Row = {
     puzzle_date: string;
-    status: "live" | "archived";
+    status: "scheduled" | "live" | "archived";
     movies:
       | { title: string; poster_url: string }
       | { title: string; poster_url: string }[]

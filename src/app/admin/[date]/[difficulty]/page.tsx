@@ -6,7 +6,6 @@ import {
   loadPool,
   loadSchedule,
   recentOverlapWarnings,
-  isTodayOrFuture,
 } from "@/lib/server/schedule";
 import { schedulePuzzle, unschedulePuzzle } from "./actions";
 import { FilmPicker } from "./FilmPicker";
@@ -30,12 +29,14 @@ export default async function EditDay({
   if (!(DIFFICULTIES as readonly string[]).includes(diffRaw)) notFound();
   const difficulty = diffRaw as Difficulty;
 
+  // Load past + future so this page can edit any date the admin index can
+  // reach. The old 30-future-only range made past dates look empty even
+  // when something was scheduled, which confused the archive backfill flow.
   const [schedule, pool] = await Promise.all([
-    loadSchedule(30),
+    loadSchedule({ pastDays: 60, futureDays: 30 }),
     loadPool(difficulty),
   ]);
   const current = schedule.find((r) => r.dateKey === date)?.cells[difficulty] ?? null;
-  const canSchedule = isTodayOrFuture(date);
 
   const previewId = sp.pick;
   const preview = previewId ? pool.find((p) => p.id === previewId) ?? null : null;
@@ -79,7 +80,7 @@ export default async function EditDay({
               <p className="text-muted">Nothing scheduled yet.</p>
             )}
           </div>
-          {current && canSchedule && (
+          {current && (
             <form action={unschedulePuzzle}>
               <input type="hidden" name="date" value={date} />
               <input type="hidden" name="difficulty" value={difficulty} />
@@ -92,15 +93,6 @@ export default async function EditDay({
             </form>
           )}
         </div>
-        {!canSchedule && (
-          <p
-            className="text-xs"
-            style={{ color: "var(--tile-yellow)" }}
-            role="status"
-          >
-            This date is in the past — edits are locked.
-          </p>
-        )}
       </section>
 
       {preview && (
@@ -136,30 +128,28 @@ export default async function EditDay({
               ))}
             </ul>
           )}
-          {canSchedule && (
-            <form action={schedulePuzzle} className="flex justify-end gap-2">
-              <input type="hidden" name="date" value={date} />
-              <input type="hidden" name="difficulty" value={difficulty} />
-              <input type="hidden" name="movieId" value={preview.id} />
-              <Link
-                href={`/admin/${date}/${difficulty}`}
-                className="inline-flex h-10 items-center justify-center rounded-full border border-border bg-surface px-4 text-xs font-semibold hover:bg-surface-muted"
-              >
-                Cancel
-              </Link>
-              <button
-                type="submit"
-                className="inline-flex h-10 items-center justify-center rounded-full px-4 text-xs font-semibold"
-                style={{ background: "var(--accent)", color: "var(--accent-ink)" }}
-              >
-                Confirm &amp; schedule
-              </button>
-            </form>
-          )}
+          <form action={schedulePuzzle} className="flex justify-end gap-2">
+            <input type="hidden" name="date" value={date} />
+            <input type="hidden" name="difficulty" value={difficulty} />
+            <input type="hidden" name="movieId" value={preview.id} />
+            <Link
+              href={`/admin/${date}/${difficulty}`}
+              className="inline-flex h-10 items-center justify-center rounded-full border border-border bg-surface px-4 text-xs font-semibold hover:bg-surface-muted"
+            >
+              Cancel
+            </Link>
+            <button
+              type="submit"
+              className="inline-flex h-10 items-center justify-center rounded-full px-4 text-xs font-semibold"
+              style={{ background: "var(--accent)", color: "var(--accent-ink)" }}
+            >
+              Confirm &amp; schedule
+            </button>
+          </form>
         </section>
       )}
 
-      {canSchedule && !preview && (
+      {!preview && (
         <section className="flex flex-col gap-3">
           <p className="text-xs font-medium uppercase tracking-wider text-muted">
             Pick a film from the {DIFFICULTY_META[difficulty].label} pool
