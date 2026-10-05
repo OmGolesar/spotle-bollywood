@@ -1,3 +1,4 @@
+import { redirect } from "next/navigation";
 import { SiteHeader } from "@/components/SiteHeader";
 import { ModeCard } from "@/components/ModeCard";
 import { HowToPlaySheet } from "@/components/HowToPlaySheet";
@@ -47,7 +48,32 @@ async function loadStreakState(): Promise<Record<Difficulty, { streak: number; p
   }
 }
 
-export default async function Home() {
+type HomeSearchParams = {
+  code?: string;
+  token_hash?: string;
+  type?: string;
+  next?: string;
+};
+
+export default async function Home({
+  searchParams,
+}: {
+  searchParams: Promise<HomeSearchParams>;
+}) {
+  // Supabase sometimes lands the magic-link callback on '/' instead of
+  // '/auth/callback' (when Site URL is set to a bare hostname and the
+  // email was sent before our emailRedirectTo value was accepted).
+  // Catch the auth params here and forward them to our real callback.
+  const sp = await searchParams;
+  if (sp.code || (sp.token_hash && sp.type)) {
+    const q = new URLSearchParams();
+    if (sp.code) q.set("code", sp.code);
+    if (sp.token_hash) q.set("token_hash", sp.token_hash);
+    if (sp.type) q.set("type", sp.type);
+    q.set("next", sp.next ?? "/admin");
+    redirect(`/auth/callback?${q.toString()}`);
+  }
+
   const todayLabel = istDisplayDate();
   const streakState = await loadStreakState();
 
