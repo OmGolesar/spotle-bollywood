@@ -49,8 +49,21 @@ export function nextNDays(n: number, startKey = istDateKey()): string[] {
   return out;
 }
 
-export async function loadSchedule(days = 30): Promise<DayRow[]> {
-  const dateKeys = nextNDays(days);
+function dateRangeKeys(pastDays: number, futureDays: number): string[] {
+  const today = istDateKey();
+  const out: string[] = [];
+  for (let i = pastDays; i >= 1; i--) out.push(addDays(today, -i));
+  for (let i = 0; i < futureDays; i++) out.push(addDays(today, i));
+  return out;
+}
+
+export async function loadSchedule(
+  daysOrOpts: number | { pastDays?: number; futureDays?: number } = 30
+): Promise<DayRow[]> {
+  const dateKeys =
+    typeof daysOrOpts === "number"
+      ? nextNDays(daysOrOpts)
+      : dateRangeKeys(daysOrOpts.pastDays ?? 0, daysOrOpts.futureDays ?? 30);
   const first = dateKeys[0];
   const last = dateKeys[dateKeys.length - 1];
 
