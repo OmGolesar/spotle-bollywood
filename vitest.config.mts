@@ -3,14 +3,17 @@ import path from "node:path";
 
 export default defineConfig({
   resolve: {
-    alias: {
-      "@": path.resolve(__dirname, "src"),
-    },
+    // Order matters: longest prefix first so "@/frontend/..." isn't rewritten by "@".
+    alias: [
+      { find: "@/frontend", replacement: path.resolve(__dirname, "frontend") },
+      { find: "@", replacement: path.resolve(__dirname, "src") },
+    ],
   },
   test: {
-    environment: "node",
+    environment: "jsdom",
     globals: false,
-    include: ["src/**/*.test.ts"],
+    setupFiles: ["./frontend/test-setup.ts"],
+    include: ["src/**/*.test.ts", "frontend/**/*.test.{ts,tsx}"],
     coverage: {
       provider: "v8",
       include: ["src/lib/**/*.ts"],
