@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
-import { Inter, Fraunces } from "next/font/google";
+import { Inter, Fraunces, Yatra_One } from "next/font/google";
 import "./globals.css";
+import { LoadingGate } from "@/frontend/components/loading/LoadingGate";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -13,6 +14,13 @@ const fraunces = Fraunces({
   subsets: ["latin"],
   display: "swap",
   weight: ["500", "600", "700"],
+});
+
+const yatraOne = Yatra_One({
+  variable: "--font-yatra-one",
+  subsets: ["latin", "devanagari"],
+  display: "swap",
+  weight: "400",
 });
 
 export const metadata: Metadata = {
@@ -34,13 +42,15 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
-      className={`${inter.variable} ${fraunces.variable} h-full`}
+      className={`${inter.variable} ${fraunces.variable} ${yatraOne.variable} h-full`}
       suppressHydrationWarning
     >
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
       </head>
-      <body className="min-h-full antialiased">{children}</body>
+      <body className="min-h-full antialiased">
+        <LoadingGate>{children}</LoadingGate>
+      </body>
     </html>
   );
 }

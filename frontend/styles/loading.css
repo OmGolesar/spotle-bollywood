@@ -21,7 +21,7 @@
 }
 
 .loading-title {
-  font-family: 'Yatra One', serif;
+  font-family: var(--font-yatra-one), 'Yatra One', serif;
   color: #F2B01E;
   font-size: clamp(42px, 7vw, 88px);
   letter-spacing: 0.03em;
