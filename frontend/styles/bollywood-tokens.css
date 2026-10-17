@@ -272,6 +272,17 @@
   gap: clamp(14px, 1.4vw, 24px);
 }
 
+/* The English wordmark uses Fraunces instead of Yatra One because Yatra One's
+ * Latin is a lightweight rounded sans that doesn't match its heavy display
+ * Devanagari — they look like two different brands side by side. Fraunces 700
+ * gives the Latin side display weight + editorial character that pairs with
+ * Yatra One's Devanagari. */
+.brand-mini-en {
+  font-family: var(--font-fraunces), 'Fraunces', serif;
+  font-weight: 700;
+  letter-spacing: 0.005em;
+}
+
 /* On mobile the util bar reads as a title lockup, not a nav wordmark.
  * Center the Devanagari, size it like a title, and float the streak chip
  * (when present) to the top-right. English wordmark hidden — the single
