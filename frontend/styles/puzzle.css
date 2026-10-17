@@ -516,3 +516,171 @@
   font-variant-numeric: tabular-nums;
   margin-top: 2px;
 }
+
+/* === Hint sheet === */
+.bw-hint-wrap {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+@media (min-width: 640px) {
+  .bw-hint-wrap { align-items: center; padding: 24px; }
+}
+.bw-hint-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(2px);
+  border: none;
+  cursor: pointer;
+}
+.bw-hint-sheet {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 520px;
+  background: var(--paper);
+  color: var(--charcoal);
+  border: 3px solid var(--charcoal);
+  border-radius: 20px 20px 0 0;
+  padding: 24px 24px 24px;
+  box-shadow: 0 -24px 60px rgba(0, 0, 0, 0.4);
+}
+@media (min-width: 640px) {
+  .bw-hint-sheet { border-radius: 20px; box-shadow: 0 30px 80px rgba(0, 0, 0, 0.5); }
+}
+.bw-hint-sheet .corner {
+  position: absolute;
+  width: 24px;
+  height: 24px;
+  background: var(--paper);
+  border: 2px solid var(--charcoal);
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--matchbox-red);
+  font-size: 14px;
+}
+.bw-hint-sheet .corner.tl { top: -14px; left: -14px; }
+.bw-hint-sheet .corner.tr { top: -14px; right: -14px; }
+/* Bottom star corners only on desktop (hidden on mobile where the sheet is anchored to the bottom edge). */
+@media (min-width: 640px) {
+  .bw-hint-sheet .corner.bl { bottom: -14px; left: -14px; }
+  .bw-hint-sheet .corner.br { bottom: -14px; right: -14px; }
+}
+@media (max-width: 639px) {
+  .bw-hint-sheet .corner.bl, .bw-hint-sheet .corner.br { display: none; }
+}
+.bw-hint-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 6px;
+}
+.bw-hint-title {
+  font-family: var(--font-yatra-one), 'Yatra One', serif;
+  font-size: 24px;
+  color: var(--charcoal);
+  margin: 0;
+}
+.bw-hint-title .hi {
+  font-size: 0.7em;
+  color: var(--paper-dim);
+}
+.bw-hint-close {
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  background: transparent;
+  border: 1.5px solid rgba(26, 22, 18, 0.3);
+  color: var(--charcoal);
+  cursor: pointer;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+.bw-hint-close:hover { background: rgba(26, 22, 18, 0.06); }
+.bw-hint-status {
+  font-family: var(--font-anek-devanagari), system-ui, sans-serif;
+  font-size: 12px;
+  color: var(--paper-dim);
+  margin: 0 0 16px 0;
+}
+.bw-hint-status .active { color: var(--matchbox-red); font-weight: 600; }
+.bw-hint-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+@media (min-width: 540px) {
+  .bw-hint-grid { grid-template-columns: repeat(3, 1fr); }
+}
+.bw-hint-category {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 6px;
+  min-height: 140px;
+  padding: 16px 12px;
+  border-radius: 14px;
+  text-align: center;
+  cursor: pointer;
+  background: var(--paper);
+  border: 2px solid rgba(26, 22, 18, 0.14);
+  transition: all 0.15s;
+  font-family: var(--font-anek-devanagari), system-ui, sans-serif;
+  color: var(--charcoal);
+}
+.bw-hint-category.available:hover { border-color: var(--mustard); background: rgba(242, 176, 30, 0.08); }
+.bw-hint-category.locked { opacity: 0.5; cursor: not-allowed; }
+.bw-hint-category.revealed { border-color: var(--teal); background: rgba(14, 126, 126, 0.08); cursor: default; }
+.bw-hint-category .icon {
+  font-size: 24px;
+  color: var(--mustard);
+}
+.bw-hint-category.revealed .icon { color: var(--teal); }
+.bw-hint-category .label {
+  font-family: var(--font-yatra-one), 'Yatra One', serif;
+  font-size: 15px;
+  color: var(--charcoal);
+  letter-spacing: 0.02em;
+}
+.bw-hint-category .description {
+  font-size: 11px;
+  line-height: 1.5;
+  color: var(--paper-dim);
+}
+.bw-hint-category .revealed-text {
+  font-size: 13px;
+  line-height: 1.4;
+  color: var(--charcoal);
+  font-family: var(--font-anek-devanagari), system-ui, sans-serif;
+}
+.bw-hint-category .busy {
+  font-size: 10px;
+  color: var(--paper-dim);
+}
+.bw-hint-footer {
+  display: flex;
+  justify-content: center;
+}
+.bw-hint-dismiss {
+  padding: 10px 20px;
+  border-radius: 999px;
+  border: 1.5px solid rgba(26, 22, 18, 0.3);
+  background: transparent;
+  color: var(--charcoal);
+  cursor: pointer;
+  font-family: var(--font-anek-devanagari), system-ui, sans-serif;
+  font-weight: 600;
+  font-size: 13px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.bw-hint-dismiss:hover { background: rgba(26, 22, 18, 0.06); }

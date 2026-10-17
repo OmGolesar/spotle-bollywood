@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import { HINT_META, type HintCategory } from "@/lib/hintCategories";
+import "@/frontend/styles/puzzle.css";
 
 export type HintStateItem = {
   category: HintCategory;
@@ -51,32 +52,38 @@ export function HintSheet({ open, onClose, state, onPick, busyCategory }: Props)
       role="dialog"
       aria-modal="true"
       aria-labelledby="hints-title"
-      className="fixed inset-0 z-50 flex items-end justify-center sm:items-center"
+      className="bw-hint-wrap"
     >
       <button
         type="button"
         aria-label="Close"
         onClick={onClose}
-        className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+        className="bw-hint-backdrop"
       />
-      <div className="relative z-10 w-full max-w-xl rounded-t-3xl bg-surface shadow-2xl border border-border sm:rounded-3xl">
-        <div className="flex items-start justify-between gap-4 px-6 pt-6">
-          <h2 id="hints-title" className="font-display text-2xl font-semibold tracking-tight">
+      <div className="bw-hint-sheet">
+        <span className="corner tl" aria-hidden="true">★</span>
+        <span className="corner tr" aria-hidden="true">★</span>
+        <span className="corner bl" aria-hidden="true">★</span>
+        <span className="corner br" aria-hidden="true">★</span>
+
+        <div className="bw-hint-header">
+          <h2 id="hints-title" className="bw-hint-title">
             Choose a hint
+            <span className="hi" lang="hi"> · एक संकेत चुनिए</span>
           </h2>
           <button
             type="button"
             onClick={onClose}
             aria-label="Close hints"
-            className="inline-flex h-9 w-9 items-center justify-center rounded-full text-muted hover:bg-surface-muted"
+            className="bw-hint-close"
           >
             ✕
           </button>
         </div>
 
-        <div className="px-6 pt-1 text-xs text-muted">
+        <p className="bw-hint-status">
           {usesRemaining > 0 ? (
-            <span className="font-medium" style={{ color: "var(--accent)" }}>
+            <span className="active">
               {usesRemaining} {usesRemaining === 1 ? "use" : "uses"} remaining
             </span>
           ) : nextUnlock != null ? (
@@ -84,9 +91,9 @@ export function HintSheet({ open, onClose, state, onPick, busyCategory }: Props)
           ) : (
             <>All hints used.</>
           )}
-        </div>
+        </p>
 
-        <div className="grid grid-cols-1 gap-3 px-6 py-5 sm:grid-cols-3">
+        <div className="bw-hint-grid">
           {state?.items.map((item) => {
             const meta = HINT_META[item.category];
             const disabled =
@@ -95,6 +102,11 @@ export function HintSheet({ open, onClose, state, onPick, busyCategory }: Props)
               usesRemaining === 0 ||
               busyCategory !== null;
             const activeCta = item.available && !item.revealed && usesRemaining > 0;
+            const stateClass = item.revealed
+              ? " revealed"
+              : activeCta
+              ? " available"
+              : " locked";
             return (
               <button
                 key={item.category}
@@ -102,47 +114,30 @@ export function HintSheet({ open, onClose, state, onPick, busyCategory }: Props)
                 disabled={disabled && !item.revealed}
                 onClick={() => activeCta && onPick(item.category)}
                 aria-pressed={item.revealed}
-                className={`flex min-h-[9rem] flex-col items-center justify-start gap-2 rounded-2xl border p-4 text-center transition-colors ${
-                  item.revealed
-                    ? "border-border bg-surface-muted"
-                    : activeCta
-                    ? "border-border bg-surface hover:bg-surface-muted"
-                    : "border-border bg-surface opacity-50"
-                }`}
-                style={
-                  item.revealed
-                    ? {
-                        background: "color-mix(in srgb, var(--accent) 10%, var(--surface))",
-                      }
-                    : undefined
-                }
+                className={`bw-hint-category${stateClass}`}
               >
-                <span className="text-2xl leading-none" aria-hidden="true">
-                  {meta.icon}
-                </span>
-                <span className="text-xs font-semibold uppercase tracking-wider text-foreground">
-                  {meta.label}
-                </span>
+                <span className="icon" aria-hidden="true">{meta.icon}</span>
+                <span className="label">{meta.label}</span>
                 {item.revealed && item.text ? (
-                  <span className="text-sm leading-5 text-foreground">{item.text}</span>
+                  <span className="revealed-text">{item.text}</span>
                 ) : (
-                  <span className="text-xs leading-4 text-muted">
+                  <span className="description">
                     {item.available ? meta.description : "Not available for this film"}
                   </span>
                 )}
                 {busyCategory === item.category && (
-                  <span className="mt-1 text-[11px] text-muted">Revealing…</span>
+                  <span className="busy">Revealing…</span>
                 )}
               </button>
             );
           })}
         </div>
 
-        <div className="flex justify-center pb-6">
+        <div className="bw-hint-footer">
           <button
             type="button"
             onClick={onClose}
-            className="inline-flex h-11 items-center justify-center rounded-full border border-border bg-surface px-6 text-sm font-medium hover:bg-surface-muted"
+            className="bw-hint-dismiss"
           >
             Keep guessing
           </button>
