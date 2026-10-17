@@ -264,29 +264,9 @@
   color: var(--mustard);
   text-shadow: 0 1px 0 rgba(0, 0, 0, 0.4);
 }
-/* Right side of the util bar — English wordmark + optional streak chip,
- * grouped so the chip tucks to the left of the English wordmark. */
-.bw-util-right {
-  display: flex;
-  align-items: center;
-  gap: clamp(14px, 1.4vw, 24px);
-}
-
-/* The English wordmark uses Fraunces instead of Yatra One because Yatra One's
- * Latin is a lightweight rounded sans that doesn't match its heavy display
- * Devanagari — they look like two different brands side by side. Fraunces 700
- * gives the Latin side display weight + editorial character that pairs with
- * Yatra One's Devanagari. */
-.brand-mini-en {
-  font-family: var(--font-fraunces), 'Fraunces', serif;
-  font-weight: 700;
-  letter-spacing: 0.005em;
-}
-
 /* On mobile the util bar reads as a title lockup, not a nav wordmark.
  * Center the Devanagari, size it like a title, and float the streak chip
- * (when present) to the top-right. English wordmark hidden — the single
- * centered Devanagari is enough on narrow viewports. */
+ * (when present) to the top-right so it doesn't break the centering. */
 @media (max-width: 720px) {
   .bw-util-bar {
     justify-content: center;
@@ -297,8 +277,6 @@
     font-size: clamp(26px, 7vw, 34px);
     letter-spacing: 0.02em;
   }
-  .brand-mini-en { display: none; }
-  .bw-util-right { gap: 0; }
   .bw-util-streak {
     position: absolute;
     top: 20px;

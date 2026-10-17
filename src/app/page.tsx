@@ -87,18 +87,15 @@ export default async function Home({
 
       <header className="bw-util-bar">
         <span className="brand-mini" lang="hi">बॉलीवुड स्पॉटल</span>
-        <div className="bw-util-right">
-          {chipStreak !== null && (
-            <div className="bw-util-streak">
-              <span className="label">Streak</span>
-              <span className="streak-chip">
-                <span className="star">★</span>
-                {chipStreak}
-              </span>
-            </div>
-          )}
-          <span className="brand-mini brand-mini-en" lang="en">Spotle Bollywood</span>
-        </div>
+        {chipStreak !== null && (
+          <div className="bw-util-streak">
+            <span className="label">Streak</span>
+            <span className="streak-chip">
+              <span className="star">★</span>
+              {chipStreak}
+            </span>
+          </div>
+        )}
       </header>
 
       <StarRail side="left" />
