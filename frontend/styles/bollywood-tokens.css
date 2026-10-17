@@ -411,7 +411,6 @@
 /* === sections + step cards (used by HowItWorks, GameAttributes, FaqAccordion) === */
 .bw-section {
   position: relative;
-  z-index: 1;
   padding: 64px clamp(20px, 4vw, 40px);
   max-width: 900px;
   margin: 0 auto;
