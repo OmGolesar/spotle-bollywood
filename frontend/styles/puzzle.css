@@ -413,3 +413,106 @@
 @media (max-width: 480px) {
   .bw-puzzle-statusbar .label { display: none; }
 }
+
+/* === Autocomplete === */
+.bw-autocomplete {
+  position: relative;
+  width: 100%;
+}
+.bw-autocomplete-field {
+  position: relative;
+}
+.bw-autocomplete-search-icon {
+  position: absolute;
+  left: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  color: var(--mustard);
+  font-size: 16px;
+}
+.bw-autocomplete-input {
+  width: 100%;
+  height: 54px;
+  padding: 0 18px 0 46px;
+  background: var(--paper);
+  border: 2px solid var(--charcoal);
+  border-radius: 12px;
+  font-family: var(--font-anek-devanagari), system-ui, sans-serif;
+  font-weight: 500;
+  font-size: 15px;
+  color: var(--charcoal);
+  outline: none;
+  transition: box-shadow 0.15s ease-out;
+}
+.bw-autocomplete-input::placeholder {
+  color: var(--paper-dim);
+}
+.bw-autocomplete-input:focus {
+  box-shadow: 0 0 0 3px rgba(242, 176, 30, 0.5);
+}
+.bw-autocomplete-input:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+.bw-autocomplete-listbox {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  margin: 8px 0 0;
+  padding: 6px 0;
+  background: var(--paper);
+  border: 2px solid var(--charcoal);
+  border-radius: 12px;
+  box-shadow: 0 24px 48px rgba(26, 22, 18, 0.18);
+  z-index: 30;
+  max-height: min(50vh, 320px);
+  overflow-y: auto;
+  list-style: none;
+}
+.bw-autocomplete-option {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 56px;
+  padding: 8px 14px;
+  cursor: pointer;
+  color: var(--charcoal);
+}
+.bw-autocomplete-option.is-active {
+  background: rgba(46, 82, 166, 0.08);
+}
+.bw-autocomplete-option.is-used {
+  color: var(--paper-dim);
+  text-decoration: line-through;
+}
+.bw-autocomplete-thumb {
+  position: relative;
+  width: 40px;
+  height: 56px;
+  flex-shrink: 0;
+  overflow: hidden;
+  border-radius: 4px;
+  background: rgba(26, 22, 18, 0.08);
+}
+.bw-autocomplete-meta {
+  min-width: 0;
+  flex: 1;
+}
+.bw-autocomplete-meta .title {
+  font-family: var(--font-yatra-one), 'Yatra One', serif;
+  font-size: 16px;
+  color: var(--charcoal);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.bw-autocomplete-option.is-used .title { color: var(--paper-dim); }
+.bw-autocomplete-meta .year {
+  font-family: var(--font-anek-devanagari), system-ui, sans-serif;
+  font-size: 12px;
+  color: var(--paper-dim);
+  font-variant-numeric: tabular-nums;
+  margin-top: 2px;
+}
