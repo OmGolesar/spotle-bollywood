@@ -75,3 +75,69 @@
   justify-content: center;
   color: var(--paper-dim);
 }
+
+/* === End-of-round banner === */
+.bw-end-banner {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  background: var(--paper);
+  border: 2px solid var(--charcoal);
+  border-radius: 14px;
+  padding: 16px 18px;
+  box-shadow: 0 8px 24px rgba(26, 22, 18, 0.08);
+}
+@media (min-width: 640px) {
+  .bw-end-banner {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+  }
+}
+.bw-end-banner.won { border-color: var(--teal); }
+.bw-end-banner.lost { border-color: var(--charcoal); }
+.bw-end-banner .copy { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.bw-end-banner .headline {
+  font-family: var(--font-yatra-one), 'Yatra One', serif;
+  font-size: 18px;
+  line-height: 1.2;
+  color: var(--charcoal);
+  margin: 0;
+}
+.bw-end-banner.won .headline { color: var(--teal); }
+.bw-end-banner .headline .kicker {
+  font-family: var(--font-yatra-one), 'Yatra One', serif;
+  color: var(--matchbox-red);
+  font-size: 0.9em;
+}
+.bw-end-banner.won .headline .kicker { color: var(--teal); }
+.bw-end-banner .sub {
+  font-family: var(--font-anek-devanagari), system-ui, sans-serif;
+  font-size: 13px;
+  color: var(--paper-dim);
+  margin: 0;
+}
+.bw-end-banner .sub strong {
+  color: var(--charcoal);
+  font-weight: 600;
+}
+.bw-end-banner-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-yatra-one), 'Yatra One', serif;
+  font-size: 16px;
+  letter-spacing: 0.03em;
+  background: var(--mustard);
+  color: var(--charcoal);
+  padding: 10px 20px;
+  border-radius: 999px;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 0 0 3px rgba(242, 176, 30, 0.15), 0 10px 26px rgba(242, 176, 30, 0.3);
+  transition: transform 0.15s, box-shadow 0.15s;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.bw-end-banner-cta:hover { transform: translateY(-1px); }
