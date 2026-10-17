@@ -237,6 +237,97 @@
   .bw-star-rail { display: none; }
 }
 
+/* === demo guess card (used by HowItWorks) === */
+.bw-demo-guess {
+  background: var(--paper);
+  color: var(--charcoal);
+  border-radius: 14px;
+  padding: 16px;
+  position: relative;
+}
+.bw-demo-guess-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+.bw-demo-poster {
+  width: 52px;
+  height: 78px;
+  border-radius: 6px;
+  overflow: hidden;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--paper);
+  font-size: 9px;
+  text-align: center;
+  line-height: 1.2;
+  padding: 4px;
+  font-family: var(--font-yatra-one), 'Yatra One', serif;
+}
+.bw-demo-info { flex: 1; }
+.bw-demo-info .t {
+  font-family: var(--font-yatra-one), 'Yatra One', serif;
+  font-size: 17px;
+  line-height: 1.1;
+  color: var(--charcoal);
+}
+.bw-demo-info .s {
+  font-size: 12px;
+  color: var(--paper-dim);
+  margin-top: 3px;
+  font-weight: 500;
+}
+.bw-demo-tiles {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  gap: 6px;
+}
+@media (max-width: 600px) {
+  .bw-demo-tiles { grid-template-columns: repeat(2, 1fr); }
+}
+.bw-demo-tile {
+  position: relative;
+  padding: 9px 10px;
+  border-radius: 7px;
+  color: var(--paper);
+  border: 1.5px solid var(--charcoal);
+  min-height: 52px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  overflow: hidden;
+}
+.bw-demo-tile .label {
+  font-family: var(--font-anek-devanagari), system-ui, sans-serif;
+  font-weight: 700;
+  font-size: 9px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  opacity: 0.85;
+}
+.bw-demo-tile .val {
+  font-family: var(--font-yatra-one), 'Yatra One', serif;
+  font-size: 12px;
+  line-height: 1.15;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.bw-demo-tile.teal { background: var(--teal); color: var(--paper); }
+.bw-demo-tile.mustard { background: var(--mustard); color: var(--charcoal); }
+.bw-demo-tile.red { background: var(--matchbox-red); color: var(--paper); }
+.bw-demo-tile .hi {
+  position: absolute;
+  top: 3px;
+  right: 5px;
+  font-family: var(--font-yatra-one), 'Yatra One', serif;
+  font-size: 11px;
+  opacity: 0.35;
+  line-height: 1;
+}
+
 /* === info strip === */
 .bw-info-strip {
   display: flex;
