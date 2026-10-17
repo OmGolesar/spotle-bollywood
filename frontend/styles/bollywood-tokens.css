@@ -237,6 +237,129 @@
   .bw-star-rail { display: none; }
 }
 
+/* === mode cards === */
+.bw-mode-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+@media (max-width: 720px) {
+  .bw-mode-grid { grid-template-columns: 1fr; }
+}
+.bw-mode-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 22px;
+  background: rgba(245, 237, 217, 0.04);
+  border: 1px solid rgba(245, 237, 217, 0.14);
+  border-radius: 16px;
+  transition: all 0.2s;
+  cursor: pointer;
+  text-decoration: none;
+  color: var(--paper);
+}
+.bw-mode-card:hover {
+  transform: translateY(-3px);
+  border-color: rgba(242, 176, 30, 0.5);
+  background: rgba(245, 237, 217, 0.07);
+}
+.bw-mode-card.hard { border-color: rgba(232, 50, 138, 0.3); }
+.bw-mode-card.hard:hover { border-color: var(--pink); }
+.bw-mode-badge {
+  position: absolute;
+  top: -10px;
+  right: 18px;
+  background: var(--ink-deep);
+  border: 1px solid rgba(232, 50, 138, 0.5);
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-family: var(--font-anek-devanagari), system-ui, sans-serif;
+  font-weight: 700;
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--pink);
+}
+.bw-mode-top {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+}
+.bw-mode-title {
+  font-family: var(--font-yatra-one), 'Yatra One', serif;
+  font-size: 22px;
+  color: var(--paper);
+}
+.bw-mode-title.hard { color: var(--pink); }
+.bw-mode-pt {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(14, 126, 126, 0.2);
+  color: var(--teal);
+  padding: 3px 9px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.bw-mode-blurb {
+  font-size: 13px;
+  color: var(--paper-mute);
+  line-height: 1.55;
+  flex: 1;
+  margin: 0;
+}
+.bw-mode-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.bw-mode-streak-label {
+  font-size: 10px;
+  color: var(--paper-mute);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-weight: 600;
+}
+.bw-mode-streak-num {
+  font-family: var(--font-yatra-one), 'Yatra One', serif;
+  font-size: 22px;
+  color: var(--paper);
+}
+.bw-mode-streak-num span {
+  font-family: var(--font-anek-devanagari), system-ui, sans-serif;
+  font-size: 12px;
+  color: var(--paper-mute);
+  font-weight: 500;
+  margin-left: 3px;
+}
+.bw-mode-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--mustard);
+  color: var(--charcoal);
+  padding: 9px 16px;
+  border-radius: 999px;
+  font-family: var(--font-yatra-one), 'Yatra One', serif;
+  font-size: 14px;
+  letter-spacing: 0.04em;
+  box-shadow: 0 4px 14px rgba(242, 176, 30, 0.3);
+}
+.bw-mode-pool {
+  font-size: 10px;
+  color: var(--paper-dim);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
 /* === demo guess card (used by HowItWorks) === */
 .bw-demo-guess {
   background: var(--paper);
