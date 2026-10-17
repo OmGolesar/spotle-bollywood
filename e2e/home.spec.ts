@@ -7,8 +7,8 @@ test.describe("Home", () => {
     // Wait out the loading overlay
     await expect(page.locator('[aria-label="Loading"]')).toHaveCount(0, { timeout: 10_000 });
 
-    // Bilingual wordmark top-left
-    await expect(page.locator(".brand-mini")).toHaveText("बॉलीवुड स्पॉटल");
+    // Bilingual wordmark — Devanagari in util-bar lockup (first .brand-mini)
+    await expect(page.locator(".brand-mini").first()).toHaveText("बॉलीवुड स्पॉटल");
 
     // Hero tagline (Devanagari H1 + English sub). First H1 is the hero;
     // the loading overlay briefly renders a second H1 during its fade-out.
@@ -73,7 +73,7 @@ test.describe("Home", () => {
     await page.goto("/");
     await expect(page.locator('[aria-label="Loading"]')).toHaveCount(0, { timeout: 10_000 });
     // Util bar renders without the streak chip when all streaks are 0.
-    await expect(page.locator(".brand-mini")).toBeVisible();
+    await expect(page.locator(".brand-mini").first()).toBeVisible();
     await expect(page.locator(".streak-chip")).toHaveCount(0);
   });
 });
