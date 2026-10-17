@@ -250,11 +250,11 @@
   top: 0;
   left: 0;
   right: 0;
-  height: 68px;
+  min-height: 68px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 clamp(20px, 3vw, 40px);
+  padding: 14px clamp(20px, 3vw, 40px);
   z-index: 3;
 }
 .brand-mini {
@@ -263,6 +263,25 @@
   letter-spacing: 0.04em;
   color: var(--mustard);
   text-shadow: 0 1px 0 rgba(0, 0, 0, 0.4);
+}
+/* On mobile the util bar reads as a title lockup, not a nav wordmark.
+ * Center the brand, size it like a title, and float the streak chip
+ * (when present) to the top-right so it doesn't break the centering. */
+@media (max-width: 720px) {
+  .bw-util-bar {
+    justify-content: center;
+    padding-top: 20px;
+    padding-bottom: 10px;
+  }
+  .brand-mini {
+    font-size: clamp(26px, 7vw, 34px);
+    letter-spacing: 0.02em;
+  }
+  .bw-util-streak {
+    position: absolute;
+    top: 20px;
+    right: clamp(16px, 4vw, 24px);
+  }
 }
 .bw-util-streak {
   display: flex;
