@@ -684,3 +684,255 @@
   text-transform: uppercase;
 }
 .bw-hint-dismiss:hover { background: rgba(26, 22, 18, 0.06); }
+
+/* === Guess card === */
+.bw-guess-card {
+  position: relative;
+  background: var(--paper);
+  color: var(--charcoal);
+  border: 2px solid var(--charcoal);
+  border-radius: 14px;
+  padding: 16px;
+  box-shadow: 0 8px 24px rgba(26, 22, 18, 0.1);
+}
+.bw-guess-card .corner {
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  background: var(--paper);
+  border: 1.5px solid var(--charcoal);
+  border-radius: 3px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--matchbox-red);
+  font-size: 10px;
+}
+.bw-guess-card .corner.tl { top: -9px; left: -9px; }
+.bw-guess-card .corner.tr { top: -9px; right: -9px; }
+.bw-guess-card .corner.bl { bottom: -9px; left: -9px; }
+.bw-guess-card .corner.br { bottom: -9px; right: -9px; }
+
+.bw-guess-card.is-latest {
+  animation: bw-guess-card-in 180ms ease-out both;
+}
+@keyframes bw-guess-card-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .bw-guess-card.is-latest { animation: none; }
+}
+
+.bw-guess-header {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 14px;
+}
+.bw-guess-poster {
+  position: relative;
+  width: 48px;
+  height: 72px;
+  flex-shrink: 0;
+  overflow: hidden;
+  border-radius: 6px;
+  background: rgba(26, 22, 18, 0.1);
+  border: 1.5px solid var(--charcoal);
+}
+.bw-guess-meta {
+  min-width: 0;
+  flex: 1;
+}
+.bw-guess-title {
+  font-family: var(--font-yatra-one), 'Yatra One', serif;
+  font-size: 18px;
+  color: var(--charcoal);
+  line-height: 1.15;
+  margin: 0;
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 6px;
+  overflow: hidden;
+}
+.bw-guess-year {
+  font-family: var(--font-anek-devanagari), system-ui, sans-serif;
+  font-size: 12px;
+  color: var(--paper-dim);
+  font-weight: 500;
+}
+.bw-guess-genres {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 6px;
+}
+.bw-genre-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-family: var(--font-anek-devanagari), system-ui, sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.bw-genre-pill.green,
+.bw-genre-pill.yellow { color: var(--paper); }
+.bw-genre-pill.yellow { color: var(--charcoal); }
+.bw-genre-pill.gray {
+  background: transparent;
+  border: 1px solid rgba(26, 22, 18, 0.3);
+  color: var(--paper-dim);
+}
+
+.bw-guess-tiles {
+  display: grid;
+  grid-template-columns: repeat(8, minmax(0, 1fr));
+  gap: 5px;
+}
+@media (max-width: 720px) {
+  .bw-guess-tiles { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+
+.bw-guess-tile {
+  position: relative;
+  padding: 7px 7px 6px;
+  border-radius: 7px;
+  border: 1.5px solid var(--charcoal);
+  min-height: 54px;
+  color: var(--paper);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  overflow: hidden;
+  min-width: 0;
+}
+.bw-guess-tile.yellow { color: var(--charcoal); }
+.bw-guess-tile.placeholder { background: rgba(26, 22, 18, 0.04); border-style: dashed; }
+.bw-guess-tile .label {
+  font-family: var(--font-anek-devanagari), system-ui, sans-serif;
+  font-weight: 700;
+  font-size: 8px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  opacity: 0.85;
+}
+.bw-guess-tile .value {
+  font-family: var(--font-yatra-one), 'Yatra One', serif;
+  font-size: 11px;
+  line-height: 1.1;
+  min-width: 0;
+  display: flex;
+  align-items: baseline;
+  gap: 3px;
+}
+.bw-guess-tile .value .val-text {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex: 1;
+}
+.bw-guess-tile .value .arrow {
+  flex-shrink: 0;
+  font-size: 10px;
+}
+.bw-guess-tile-numeral {
+  position: absolute;
+  top: 3px;
+  right: 5px;
+  font-family: var(--font-yatra-one), 'Yatra One', serif;
+  font-size: 10px;
+  line-height: 1;
+  opacity: 0.35;
+}
+
+.bw-guess-people {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+  margin-top: 14px;
+}
+@media (min-width: 640px) {
+  .bw-guess-people { grid-template-columns: 1fr 1fr; }
+}
+.bw-people-row {
+  padding: 10px 12px;
+  background: var(--paper);
+  border: 1.5px solid rgba(26, 22, 18, 0.14);
+  border-radius: 10px;
+}
+.bw-people-label {
+  font-family: var(--font-anek-devanagari), system-ui, sans-serif;
+  font-weight: 700;
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--paper-dim);
+  margin-bottom: 8px;
+}
+.bw-people-portraits {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.bw-person {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+}
+.bw-person-portrait {
+  position: relative;
+  width: 48px;
+  height: 48px;
+  border-radius: 999px;
+  overflow: hidden;
+  background: rgba(26, 22, 18, 0.08);
+  flex-shrink: 0;
+}
+.bw-person-devnum {
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  width: 16px;
+  height: 16px;
+  background: var(--mustard);
+  color: var(--charcoal);
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-yatra-one), 'Yatra One', serif;
+  font-size: 10px;
+  z-index: 2;
+  border: 1px solid var(--charcoal);
+}
+.bw-person-initials {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  font-family: var(--font-anek-devanagari), system-ui, sans-serif;
+  font-weight: 600;
+  font-size: 12px;
+  color: var(--paper-dim);
+}
+.bw-person-name {
+  max-width: 6rem;
+  text-align: center;
+  font-family: var(--font-anek-devanagari), system-ui, sans-serif;
+  font-size: 11px;
+  line-height: 1.1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.bw-person-name.match-green { color: var(--teal); font-weight: 600; }
+.bw-person-name.match-yellow { color: var(--matchbox-red); font-weight: 600; }
+.bw-person-name.match-gray { color: var(--paper-dim); }
