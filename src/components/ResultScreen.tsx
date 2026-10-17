@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { Difficulty } from "@/lib/difficulty";
 import { DIFFICULTIES, DIFFICULTY_META } from "@/lib/difficulty";
 import { istDisplayDate } from "@/lib/dateIst";
@@ -10,6 +10,7 @@ import { buildShareText, emojiGrid, share } from "@/lib/share";
 import type { PuzzleOutcome, TileState } from "@/lib/types";
 import { TOTAL_GUESSES } from "@/lib/types";
 import { Countdown } from "./Countdown";
+import "@/frontend/styles/puzzle.css";
 
 export type ResultAnswer = {
   id: string;
@@ -45,12 +46,20 @@ export function ResultScreen({
   onClose,
 }: Props) {
   const meta = DIFFICULTY_META[difficulty];
-  const isHard = difficulty === "hard";
   const dateLabel = useMemo(() => istDisplayDate(), []);
   const grid = useMemo(() => emojiGrid(guesses), [guesses]);
   const otherModes = DIFFICULTIES.filter((d) => d !== difficulty);
 
   const [shareState, setShareState] = useState<"idle" | "copied" | "shared">("idle");
+
+  useEffect(() => {
+    if (!onClose) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [onClose]);
 
   async function onShare() {
     const siteUrl =
@@ -66,48 +75,49 @@ export function ResultScreen({
     setTimeout(() => setShareState("idle"), 2000);
   }
 
+  const kicker = outcome === "won" ? "शाबाश!" : "फिर कल";
+  const headline = outcome === "won" ? "Solved!" : "Game over";
+
   return (
     <div
       role="dialog"
       aria-modal="true"
       aria-labelledby="result-title"
-      className="fixed inset-0 z-40 overflow-y-auto bg-background"
+      className={`bw-result-screen ${outcome}`}
     >
-      <div className="mx-auto flex min-h-full w-full max-w-xl flex-col gap-6 px-5 py-6 sm:px-8 sm:py-10">
+      {outcome === "won" && <div className="bw-result-sunburst" aria-hidden="true" />}
+
+      <div className="bw-result-inner">
         {onClose && (
           <button
             type="button"
             onClick={onClose}
             aria-label="Close summary"
-            className="absolute right-4 top-4 inline-flex h-10 w-10 items-center justify-center rounded-full border border-border bg-surface text-muted hover:bg-surface-muted hover:text-foreground sm:right-6 sm:top-6"
+            className="bw-result-close"
           >
-            <span aria-hidden="true" className="text-lg">✕</span>
+            <span aria-hidden="true">✕</span>
           </button>
         )}
-        {/* Header */}
-        <header className="flex flex-col items-center gap-1 text-center">
-          <p
-            className="text-xs font-medium uppercase tracking-[0.14em]"
-            style={{ color: isHard ? "var(--hard-accent)" : "var(--accent)" }}
-          >
-            {meta.label}{isHard ? " · 🎬⭐" : ""}
-          </p>
-          <h1
-            id="result-title"
-            className="font-display text-3xl font-semibold tracking-tight sm:text-4xl"
-          >
-            {outcome === "won" ? "Solved!" : "Game over"}
+
+        <header className="bw-result-header">
+          <p className="mode-eyebrow">★ {meta.label}{difficulty === "hard" ? " · 🎬⭐" : ""} ★</p>
+          <h1 id="result-title" className="bw-result-headline">
+            <span className="hi" lang="hi">{kicker}</span>
+            <span className="en"> · {headline}</span>
           </h1>
-          <p className="text-sm text-muted">
+          <p className="bw-result-sub">
             {outcome === "won"
               ? `In ${guesses.length} ${guesses.length === 1 ? "guess" : "guesses"}`
               : `Out of ${TOTAL_GUESSES} guesses`}
           </p>
         </header>
 
-        {/* Poster + title block */}
-        <section className="flex flex-col items-center gap-3">
-          <div className="relative aspect-[2/3] w-40 overflow-hidden rounded-xl border border-border bg-surface-muted sm:w-48">
+        <section className="bw-result-poster-block">
+          <div className="bw-result-poster">
+            <span className="corner tl" aria-hidden="true">★</span>
+            <span className="corner tr" aria-hidden="true">★</span>
+            <span className="corner bl" aria-hidden="true">★</span>
+            <span className="corner br" aria-hidden="true">★</span>
             <Image
               src={mystery.posterUrl}
               alt={`Poster for ${mystery.title}`}
@@ -117,75 +127,52 @@ export function ResultScreen({
               priority
             />
           </div>
-          <div className="text-center">
-            <h2 className="font-display text-2xl font-semibold tracking-tight text-foreground">
-              {mystery.title}
-            </h2>
-            <p className="mt-1 text-sm text-muted">
-              {mystery.director.join(" & ")} · {mystery.year}
-            </p>
+          <div className="bw-result-film">
+            <h2 className="film-title">{mystery.title}</h2>
+            <p className="film-meta">{mystery.director.join(" & ")} · {mystery.year}</p>
           </div>
         </section>
 
-        {/* Emoji grid */}
-        <section className="rounded-2xl border border-border bg-surface p-4 shadow-sm">
-          <div className="mb-2 flex items-center justify-between text-xs font-medium uppercase tracking-wider text-muted">
-            <span>Your grid</span>
+        <section className="bw-result-card">
+          <div className="head">
+            <span>Your grid · आपका ग्रिड</span>
             <span>{dateLabel}</span>
           </div>
-          <pre className="whitespace-pre font-mono text-center text-lg leading-7 tracking-wider text-foreground">
-            {grid}
-          </pre>
+          <pre className="bw-result-emoji-grid">{grid}</pre>
         </section>
 
-        {/* Trivia */}
-        <section className="rounded-2xl bg-surface-muted p-4">
-          <p className="mb-1 text-xs font-medium uppercase tracking-wider text-muted">
-            Trivia
-          </p>
-          <p className="text-sm leading-6 text-foreground">{mystery.trivia}</p>
+        <section className="bw-result-trivia">
+          <div className="label">★ Trivia · रोचक तथ्य</div>
+          <p>{mystery.trivia}</p>
         </section>
 
-        {/* Where to watch */}
         {mystery.whereToWatchUrl && (
           <a
             href={mystery.whereToWatchUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex h-11 items-center justify-center rounded-full border border-border bg-surface px-5 text-sm font-semibold text-foreground hover:bg-surface-muted"
+            className="bw-result-watch"
           >
             Where to watch →
           </a>
         )}
 
-        {/* Streak + share */}
-        <section className="flex flex-col gap-4 rounded-2xl border border-border bg-surface p-5">
-          <div className="flex items-center justify-between">
+        <section className="bw-result-streak-share">
+          <div className="row">
             <div>
-              <p className="text-xs font-medium uppercase tracking-wider text-muted">
-                {meta.label} streak
-              </p>
-              <p className="font-display text-2xl font-semibold tabular-nums text-foreground">
+              <div className="label">{meta.label} streak</div>
+              <div className="num">
                 {streakAfter}
-                <span className="ml-1 text-sm font-medium text-muted">
-                  {streakAfter === 1 ? "day" : "days"}
-                </span>
-              </p>
+                <span>{streakAfter === 1 ? "day" : "days"}</span>
+              </div>
             </div>
-            <div className="text-right">
-              <p className="text-xs font-medium uppercase tracking-wider text-muted">
-                Next puzzle
-              </p>
+            <div className="right">
+              <div className="label">Next puzzle</div>
               <Countdown />
             </div>
           </div>
-          <button
-            type="button"
-            onClick={onShare}
-            className="inline-flex h-12 items-center justify-center gap-2 rounded-full px-5 text-sm font-semibold shadow-sm transition-colors"
-            style={{ background: "var(--accent)", color: "var(--accent-ink)" }}
-          >
-            {shareState === "copied"
+          <button type="button" onClick={onShare} className="bw-result-share">
+            ★ {shareState === "copied"
               ? "Copied to clipboard"
               : shareState === "shared"
               ? "Shared!"
@@ -193,36 +180,23 @@ export function ResultScreen({
           </button>
         </section>
 
-        {/* Cross-sell */}
-        <section className="flex flex-col gap-2">
-          <p className="text-xs font-medium uppercase tracking-wider text-muted">
-            Try another mode
-          </p>
-          <div className="grid grid-cols-2 gap-2">
+        <section className="bw-result-cross-sell">
+          <div className="label">Try another mode</div>
+          <div className="row">
             {otherModes.map((d) => {
               const m = DIFFICULTY_META[d];
               return (
-                <Link
-                  key={d}
-                  href={`/${d}`}
-                  className="flex min-h-11 items-center justify-between rounded-xl border border-border bg-surface px-4 py-2 text-sm font-medium text-foreground hover:bg-surface-muted"
-                >
+                <Link key={d} href={`/${d}`} className="mode-link">
                   <span>{m.label}</span>
                   <span aria-hidden="true">→</span>
                 </Link>
               );
             })}
           </div>
-          <Link
-            href="/archive"
-            className="mt-1 inline-flex h-11 items-center justify-center rounded-full border border-border bg-surface px-5 text-sm font-semibold text-foreground hover:bg-surface-muted"
-          >
+          <Link href="/archive" className="bw-result-archive">
             Play past puzzles →
           </Link>
-          <Link
-            href="/"
-            className="mt-1 self-center text-sm font-medium text-muted underline underline-offset-4 hover:text-foreground"
-          >
+          <Link href="/" className="bw-result-home">
             Back to home
           </Link>
         </section>
