@@ -259,8 +259,8 @@
 }
 .brand-mini {
   font-family: var(--font-yatra-one), 'Yatra One', serif;
-  font-size: clamp(16px, 1.4vw, 20px);
-  letter-spacing: 0.04em;
+  font-size: clamp(22px, 2vw, 36px);
+  letter-spacing: 0.03em;
   color: var(--mustard);
   text-shadow: 0 1px 0 rgba(0, 0, 0, 0.4);
 }
