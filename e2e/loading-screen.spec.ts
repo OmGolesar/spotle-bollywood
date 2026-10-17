@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+import { installApiMocks } from "./mocks";
 
 /**
  * Loading-screen acceptance coverage. The gate shows:
@@ -51,6 +52,8 @@ test.describe("Loading screen — mobile", () => {
  */
 test.describe("Loading gate — game regression guard", () => {
   test("game search combobox is reachable after loading", async ({ page }) => {
+    // Mock the puzzle API so this test doesn't depend on a scheduled puzzle in the dev DB.
+    await installApiMocks(page);
     await page.context().clearCookies();
     await page.goto("/easy");
     // Wait out any loading overlay
