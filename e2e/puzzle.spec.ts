@@ -53,6 +53,20 @@ test.describe("Puzzle flow", () => {
     await expect(page.getByText(/Out of guesses/i)).toBeVisible();
   });
 
+  test("submits a guess via keyboard only (tab → type → ArrowDown → Enter)", async ({
+    page,
+  }) => {
+    await installApiMocks(page);
+    await page.goto("/easy");
+    const combo = page.getByRole("combobox");
+    await combo.focus();
+    await combo.pressSequentially("lag", { delay: 20 });
+    await expect(page.getByRole("option", { name: /Lagaan/i }).first()).toBeVisible();
+    await page.keyboard.press("ArrowDown");
+    await page.keyboard.press("Enter");
+    await expect(page.getByLabel(/Guess 1: Lagaan/i)).toBeVisible();
+  });
+
   test("submitting the correct guess shows a success banner the player can open", async ({
     page,
   }) => {
