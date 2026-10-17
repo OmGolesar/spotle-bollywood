@@ -12,6 +12,7 @@ import { istDateKey, istDisplayDate } from "@/lib/dateIst";
 import { hasSupabaseConfigured } from "@/lib/supabase/env";
 import { readStreaks } from "@/lib/server/puzzle";
 import { readPlayerId } from "@/lib/playerCookie";
+import { visibleStreak } from "@/lib/homeStreak";
 
 export const dynamic = "force-dynamic";
 
@@ -78,10 +79,7 @@ export default async function Home({
 
   const todayLabel = istDisplayDate();
   const streakState = await loadStreakState();
-  const anyStreak =
-    streakState.easy.streak > 0 ||
-    streakState.medium.streak > 0 ||
-    streakState.hard.streak > 0;
+  const chipStreak = visibleStreak(streakState);
 
   return (
     <div className="bw-home-root bw-surface-ink">
@@ -89,12 +87,12 @@ export default async function Home({
 
       <header className="bw-util-bar">
         <span className="brand-mini">बॉलीवुड स्पॉटल</span>
-        {anyStreak && (
+        {chipStreak !== null && (
           <div className="bw-util-streak">
             <span className="label">Streak</span>
             <span className="streak-chip">
               <span className="star">★</span>
-              {streakState.easy.streak}
+              {chipStreak}
             </span>
           </div>
         )}
