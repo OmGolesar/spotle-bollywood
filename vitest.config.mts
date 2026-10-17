@@ -13,7 +13,7 @@ export default defineConfig({
     environment: "jsdom",
     globals: false,
     setupFiles: ["./frontend/test-setup.ts"],
-    include: ["src/**/*.test.ts", "frontend/**/*.test.{ts,tsx}"],
+    include: ["src/**/*.test.{ts,tsx}", "frontend/**/*.test.{ts,tsx}"],
     coverage: {
       provider: "v8",
       include: ["src/lib/**/*.ts"],
