@@ -176,6 +176,26 @@
   border-color: var(--matchbox-red);
 }
 
+/* === star rail (decorative column flanking the hero) === */
+.bw-star-rail {
+  position: fixed;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  color: var(--mustard);
+  font-size: 11px;
+  opacity: 0.5;
+  z-index: 1;
+  pointer-events: none;
+}
+.bw-star-rail.is-left { left: clamp(20px, 3vw, 40px); }
+.bw-star-rail.is-right { right: clamp(20px, 3vw, 40px); }
+@media (max-width: 720px) {
+  .bw-star-rail { display: none; }
+}
+
 /* === info strip === */
 .bw-info-strip {
   display: flex;
