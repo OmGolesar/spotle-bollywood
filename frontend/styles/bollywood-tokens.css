@@ -1,0 +1,204 @@
+/* Bollywood design tokens — palette, type, motifs, shared primitives.
+ * Imported once from src/app/globals.css so every component sees these
+ * tokens without extra imports. New in PR 2; sourced from the parent
+ * redesign spec (2026-10-08-bollywood-redesign-design.md) + the approved
+ * end-to-end mockup. */
+
+:root {
+  --ink: #2B2250;
+  --ink-deep: #1C1639;
+  --paper: #F5EDD9;
+  --matchbox-red: #D63024;
+  --mustard: #F2B01E;
+  --pink: #E8328A;
+  --royal: #2E52A6;
+  --teal: #0E7E7E;
+  --charcoal: #1A1612;
+  --paper-dim: #857C65;
+  --paper-mute: #C9BFA5;
+}
+
+/* === surfaces + grain overlays === */
+.bw-surface-ink {
+  background: var(--ink-deep);
+  color: var(--paper);
+  position: relative;
+}
+.bw-grain-ink,
+.bw-grain-paper {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.bw-grain-ink {
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='300' height='300'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.95  0 0 0 0 0.88  0 0 0 0 0.70  0 0 0 0.05 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+  mix-blend-mode: overlay;
+  opacity: 0.5;
+}
+.bw-grain-paper {
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='300' height='300'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.3  0 0 0 0 0.2  0 0 0 0 0.1  0 0 0 0.4 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+  mix-blend-mode: multiply;
+  opacity: 0.06;
+}
+
+/* === shared typography primitives === */
+.bw-eyebrow {
+  font-family: var(--font-anek-devanagari), system-ui, sans-serif;
+  font-weight: 600;
+  font-size: 11px;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  color: var(--paper-mute);
+}
+.bw-section-head {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 36px;
+}
+.bw-section-head .eyebrow-stars {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--mustard);
+  font-family: var(--font-anek-devanagari), system-ui, sans-serif;
+  font-weight: 600;
+  font-size: 11px;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+}
+.bw-section-head h2 {
+  font-family: var(--font-yatra-one), 'Yatra One', serif;
+  font-size: clamp(28px, 3.5vw, 40px);
+  line-height: 1.15;
+  color: var(--paper);
+  margin: 0;
+}
+.bw-section-head h2 .hi {
+  display: block;
+  font-family: var(--font-anek-devanagari), system-ui, sans-serif;
+  font-weight: 500;
+  font-size: 0.5em;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--paper-mute);
+  margin-top: 8px;
+}
+
+/* === pills === */
+.bw-pill-mustard {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  font-family: var(--font-yatra-one), 'Yatra One', serif;
+  font-size: 22px;
+  letter-spacing: 0.04em;
+  color: var(--charcoal);
+  background: var(--mustard);
+  padding: 13px 32px 13px 24px;
+  border-radius: 999px;
+  text-decoration: none;
+  cursor: pointer;
+  border: none;
+  box-shadow: 0 0 0 4px rgba(242, 176, 30, 0.18), 0 18px 40px rgba(242, 176, 30, 0.3);
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+.bw-pill-mustard:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 0 6px rgba(242, 176, 30, 0.22), 0 24px 50px rgba(242, 176, 30, 0.42);
+}
+.bw-pill-mustard .arrow {
+  display: inline-flex;
+  width: 26px;
+  height: 26px;
+  align-items: center;
+  justify-content: center;
+  background: var(--matchbox-red);
+  color: var(--paper);
+  border-radius: 999px;
+  font-size: 11px;
+  padding-left: 2px;
+}
+.bw-pill-mustard small {
+  font-family: var(--font-anek-devanagari), system-ui, sans-serif;
+  font-weight: 600;
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(26, 22, 18, 0.6);
+  margin-left: 2px;
+}
+.bw-pill-outline-ink {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--paper);
+  text-decoration: none;
+  cursor: pointer;
+  background: transparent;
+  padding: 9px 18px;
+  border: 1px solid rgba(245, 237, 217, 0.25);
+  border-radius: 999px;
+  font-family: var(--font-anek-devanagari), system-ui, sans-serif;
+  font-weight: 600;
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  transition: all 0.15s;
+}
+.bw-pill-outline-ink:hover {
+  background: rgba(245, 237, 217, 0.08);
+  border-color: rgba(242, 176, 30, 0.6);
+}
+.bw-pill-outline-paper {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--charcoal);
+  text-decoration: none;
+  cursor: pointer;
+  background: transparent;
+  padding: 9px 18px;
+  border: 1px solid rgba(26, 22, 18, 0.4);
+  border-radius: 999px;
+  font-family: var(--font-anek-devanagari), system-ui, sans-serif;
+  font-weight: 600;
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  transition: all 0.15s;
+}
+.bw-pill-outline-paper:hover {
+  background: rgba(26, 22, 18, 0.06);
+  border-color: var(--matchbox-red);
+}
+
+/* === info strip === */
+.bw-info-strip {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 20px;
+  border: 1px solid rgba(245, 237, 217, 0.14);
+  border-radius: 14px;
+  background: rgba(245, 237, 217, 0.04);
+}
+.bw-info-strip .copy {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.bw-info-strip .copy .t {
+  font-family: var(--font-yatra-one), 'Yatra One', serif;
+  font-size: 15px;
+  color: var(--paper);
+}
+.bw-info-strip .copy .s {
+  font-size: 11px;
+  color: var(--paper-mute);
+  letter-spacing: 0.08em;
+}

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter, Fraunces, Yatra_One } from "next/font/google";
+import { Inter, Fraunces, Yatra_One, Anek_Devanagari, Baloo_Bhai_2 } from "next/font/google";
 import "./globals.css";
 import { LoadingGate } from "@/frontend/components/loading/LoadingGate";
 
@@ -23,6 +23,20 @@ const yatraOne = Yatra_One({
   weight: "400",
 });
 
+const anek = Anek_Devanagari({
+  variable: "--font-anek-devanagari",
+  subsets: ["latin", "devanagari"],
+  display: "swap",
+  weight: ["400", "500", "600", "700"],
+});
+
+const baloo = Baloo_Bhai_2({
+  variable: "--font-baloo-bhai-2",
+  subsets: ["latin"],
+  display: "swap",
+  weight: ["500", "700"],
+});
+
 export const metadata: Metadata = {
   title: "Spotle Bollywood — Guess today's mystery Hindi film",
   description:
@@ -42,7 +56,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
-      className={`${inter.variable} ${fraunces.variable} ${yatraOne.variable} h-full`}
+      className={`${inter.variable} ${fraunces.variable} ${yatraOne.variable} ${anek.variable} ${baloo.variable} h-full`}
       suppressHydrationWarning
     >
       <head>

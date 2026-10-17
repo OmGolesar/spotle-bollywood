@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "../../frontend/styles/bollywood-tokens.css";
 
 @custom-variant dark (&:where(.dark, .dark *));
 

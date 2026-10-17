@@ -2,7 +2,7 @@
   position: fixed;
   inset: 0;
   z-index: 50;
-  background: #1C1639;
+  background: var(--ink-deep);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -22,7 +22,7 @@
 
 .loading-title {
   font-family: var(--font-yatra-one), 'Yatra One', serif;
-  color: #F2B01E;
+  color: var(--mustard);
   font-size: clamp(42px, 7vw, 88px);
   letter-spacing: 0.03em;
   text-shadow: 0 2px 0 rgba(0,0,0,0.3);
