@@ -176,6 +176,47 @@
   border-color: var(--matchbox-red);
 }
 
+/* === hero poster carousel === */
+.bw-hero-logo {
+  position: relative;
+  height: min(50vh, 440px);
+  aspect-ratio: 1134 / 1340;
+  max-width: min(85vw, 400px);
+  filter: drop-shadow(0 24px 48px rgba(0, 0, 0, 0.55));
+}
+.bw-hero-logo img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  opacity: 0;
+  transition: opacity 900ms ease-in-out;
+}
+.bw-hero-logo img.is-active { opacity: 1; }
+
+.bw-hero-dots {
+  display: flex;
+  gap: 7px;
+  justify-content: center;
+  margin-top: 10px;
+}
+.bw-hero-dots .dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: rgba(245, 237, 217, 0.25);
+  transition: all 0.3s;
+}
+.bw-hero-dots .dot.is-active {
+  background: var(--mustard);
+  transform: scale(1.4);
+}
+
+@media (max-width: 720px) {
+  .bw-hero-logo { height: min(44vh, 380px); }
+}
+
 /* === star rail (decorative column flanking the hero) === */
 .bw-star-rail {
   position: fixed;
