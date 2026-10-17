@@ -144,7 +144,7 @@ export default async function Home({
         </div>
       </section>
 
-      <section className="bw-section" style={{ paddingTop: 0, display: "flex", flexDirection: "column", gap: 14 }}>
+      <section className="bw-section bw-info-strips">
         <div className="bw-info-strip">
           <div className="copy">
             <div className="t">New puzzle at midnight IST</div>
