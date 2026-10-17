@@ -25,7 +25,7 @@ const FAQS: { q: string; a: React.ReactNode }[] = [
   },
   {
     q: "What counts as a close match?",
-    a: "Close (yellow) depends on the attribute. Year is within 5 years. Box office is within 50% of the answer's gross. IMDb is within 0.5 points — green means both films display the exact same rating. Director and music turn yellow when the two people are frequent collaborators (same cluster across films).",
+    a: "Close (mustard) depends on the attribute. Year is within 5 years. Box office is within 50% of the answer's gross. IMDb is within 0.5 points — teal means both films display the exact same rating. Director and music turn mustard when the two people are frequent collaborators (same cluster across films).",
   },
   {
     q: "What does the box-office figure represent?",
@@ -43,29 +43,22 @@ const FAQS: { q: string; a: React.ReactNode }[] = [
 
 export function FaqAccordion() {
   return (
-    <section
-      aria-label="Frequently asked questions"
-      className="flex flex-col gap-5 border-t border-border pt-10 sm:pt-14"
-    >
-      <p className="text-center text-xs font-semibold uppercase tracking-[0.18em] text-muted">
-        Questions from the audience
-      </p>
-      <div className="flex flex-col gap-2">
-        {FAQS.map((f) => (
-          <details
-            key={f.q}
-            className="group rounded-xl border border-border bg-surface open:bg-surface-muted"
-          >
-            <summary className="flex cursor-pointer list-none items-center justify-between gap-4 px-4 py-3 text-sm font-medium text-foreground sm:text-base">
+    <section aria-label="Frequently asked questions" className="bw-section">
+      <div className="bw-section-head">
+        <span className="eyebrow-stars">★ QUESTIONS FROM THE AUDIENCE ★</span>
+        <h2>
+          FAQ
+          <span className="hi">आपके सवाल</span>
+        </h2>
+      </div>
+      <div className="bw-faq">
+        {FAQS.map((f, i) => (
+          <details key={f.q} className="bw-faq-item" open={i === 0}>
+            <summary>
               <span>{f.q}</span>
-              <span
-                aria-hidden="true"
-                className="shrink-0 text-xl font-light text-accent transition-transform group-open:rotate-45"
-              >
-                +
-              </span>
+              <span className="plus" aria-hidden="true">+</span>
             </summary>
-            <p className="px-4 pb-4 text-sm leading-6 text-muted">{f.a}</p>
+            <p>{f.a}</p>
           </details>
         ))}
       </div>

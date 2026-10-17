@@ -90,11 +90,12 @@ export function GuessAutocomplete({ difficulty, disabled, disabledIds, onPick }:
   const showList = open && filtered.length > 0 && !disabled;
 
   return (
-    <div className="relative w-full">
+    <div className="bw-autocomplete">
       <label htmlFor={`${listId}-input`} className="sr-only">
         Guess a Bollywood film
       </label>
-      <div className="relative">
+      <div className="bw-autocomplete-field">
+        <span aria-hidden="true" className="bw-autocomplete-search-icon">🔍</span>
         <input
           id={`${listId}-input`}
           ref={inputRef}
@@ -106,7 +107,7 @@ export function GuessAutocomplete({ difficulty, disabled, disabledIds, onPick }:
           aria-autocomplete="list"
           aria-busy={loading}
           value={query}
-          placeholder={disabled ? "Game over" : "Search for a film…"}
+          placeholder={disabled ? "Game over" : "Guess a Hindi film…"}
           disabled={disabled}
           onChange={(e) => {
             setQuery(e.target.value);
@@ -126,28 +127,24 @@ export function GuessAutocomplete({ difficulty, disabled, disabledIds, onPick }:
             }, 120);
           }}
           onKeyDown={onKeyDown}
-          className="h-14 w-full rounded-xl border border-border bg-surface pl-12 pr-4 text-base text-foreground shadow-sm placeholder:text-muted focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/40 disabled:opacity-60"
+          className="bw-autocomplete-input"
           autoComplete="off"
           autoCapitalize="none"
           autoCorrect="off"
           spellCheck={false}
         />
-        <span
-          aria-hidden="true"
-          className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-muted"
-        >
-          🔍
-        </span>
       </div>
 
       {showList && (
         <ul
           id={`${listId}-list`}
           role="listbox"
-          className="absolute top-full z-40 mt-2 max-h-80 w-full overflow-auto rounded-xl border border-border bg-surface py-1 shadow-xl"
+          className="bw-autocomplete-listbox"
         >
           {filtered.map((m, i) => {
             const used = disabledIds?.has(m.id) ?? false;
+            const activeClass = active === i ? " is-active" : "";
+            const usedClass = used ? " is-used" : "";
             return (
               <li
                 key={m.id}
@@ -160,11 +157,9 @@ export function GuessAutocomplete({ difficulty, disabled, disabledIds, onPick }:
                   pick(m);
                 }}
                 onMouseEnter={() => setActive(i)}
-                className={`flex min-h-14 cursor-pointer items-center gap-3 px-3 py-2 text-sm ${
-                  active === i ? "bg-surface-muted" : ""
-                } ${used ? "text-muted line-through" : "text-foreground"}`}
+                className={`bw-autocomplete-option${activeClass}${usedClass}`}
               >
-                <div className="relative h-14 w-10 shrink-0 overflow-hidden rounded-md border border-border bg-surface-muted">
+                <div className="bw-autocomplete-thumb">
                   {m.posterThumb ? (
                     <Image
                       src={m.posterThumb}
@@ -176,9 +171,9 @@ export function GuessAutocomplete({ difficulty, disabled, disabledIds, onPick }:
                     />
                   ) : null}
                 </div>
-                <div className="min-w-0 flex-1">
-                  <div className="truncate font-medium">{m.title}</div>
-                  <div className="text-xs tabular-nums text-muted">{m.year}</div>
+                <div className="bw-autocomplete-meta">
+                  <div className="title">{m.title}</div>
+                  <div className="year">{m.year}</div>
                 </div>
               </li>
             );

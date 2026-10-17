@@ -11,24 +11,20 @@ const ATTRS = [
 
 export function GameAttributes() {
   return (
-    <section
-      aria-label="Game attributes"
-      className="flex flex-col gap-6 border-t border-border pt-10 sm:pt-14"
-    >
-      <p className="text-center text-xs font-semibold uppercase tracking-[0.18em] text-muted">
-        What the eight tiles mean
-      </p>
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+    <section aria-label="Game attributes" className="bw-section">
+      <div className="bw-section-head">
+        <span className="eyebrow-stars">★ WHAT THE EIGHT TILES MEAN ★</span>
+        <h2>
+          Every tile tells a story
+          <span className="hi">आठ संकेत · एक फ़िल्म</span>
+        </h2>
+      </div>
+      <div className="bw-attr-grid">
         {ATTRS.map((a) => (
-          <div
-            key={a.n}
-            className="relative flex flex-col gap-1.5 rounded-xl border border-border bg-surface p-4"
-          >
-            <span className="absolute right-3 top-3 text-[10px] font-semibold tabular-nums text-muted">
-              {a.n}
-            </span>
-            <div className="font-display text-base font-semibold text-accent">{a.label}</div>
-            <div className="text-xs leading-5 text-muted">{a.desc}</div>
+          <div key={a.n} className="bw-attr-card">
+            <div className="n">{a.n}</div>
+            <div className="label">{a.label}</div>
+            <div className="desc">{a.desc}</div>
           </div>
         ))}
       </div>

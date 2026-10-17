@@ -12,7 +12,7 @@ const TILE_ROWS: {
   { color: "gray", label: "✕", text: "No overlap." },
 ];
 
-export function HowToPlaySheet() {
+export function HowToPlaySheet({ triggerClassName }: { triggerClassName?: string } = {}) {
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
@@ -34,7 +34,7 @@ export function HowToPlaySheet() {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="text-sm font-medium text-muted underline underline-offset-4 decoration-border transition-colors hover:text-foreground hover:decoration-accent"
+        className={triggerClassName ?? "text-sm font-medium text-muted underline underline-offset-4 decoration-border transition-colors hover:text-foreground hover:decoration-accent"}
       >
         How to play
       </button>

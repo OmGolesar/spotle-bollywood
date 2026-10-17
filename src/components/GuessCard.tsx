@@ -1,5 +1,7 @@
 import Image from "next/image";
-import type { TileState } from "@/lib/types";
+import type { TileState, TileColor } from "@/lib/types";
+import { TILE_COLOR_VAR } from "@/frontend/components/puzzle/tileColor";
+import "@/frontend/styles/puzzle.css";
 
 export type GuessedMovieBrief = {
   id: string;
@@ -13,16 +15,18 @@ export type GuessedMovieBrief = {
   bannerLogoPath?: string | null;
 };
 
-function tmdbLogoUrl(path?: string | null): string | null {
-  if (!path) return null;
-  return `https://image.tmdb.org/t/p/w200${path}`;
+const DEVANAGARI_INDEX = ["०", "१", "२", "३", "४", "५", "६", "७", "८", "९", "१०"] as const;
+
+function devNumeral(n: number): string {
+  if (n < 0 || n >= DEVANAGARI_INDEX.length) return String(n);
+  return DEVANAGARI_INDEX[n]!;
 }
 
 const TMDB_PROFILE_PREFIX = "https://image.tmdb.org/t/p/w185";
 
-function profileUrl(profilePath?: string): string | null {
-  if (!profilePath) return null;
-  return `${TMDB_PROFILE_PREFIX}${profilePath}`;
+function profileUrl(path?: string): string | null {
+  if (!path) return null;
+  return `${TMDB_PROFILE_PREFIX}${path}`;
 }
 
 function initials(name: string): string {
@@ -33,36 +37,93 @@ function initials(name: string): string {
   return (first + last).toUpperCase() || "?";
 }
 
-function PersonChip({
+function tileByKey(tiles: TileState[], key: TileState["key"]) {
+  return tiles.find((t) => t.key === key);
+}
+
+/** Order of tiles in the 1×8 (desktop) / 4×2 (mobile) grid. Matches the mockup. */
+const TILE_ORDER: TileState["key"][] = [
+  "director",
+  "cast",
+  "year",
+  "boxOffice",
+  "music",
+  "banner",
+  "genre",
+  "imdb",
+];
+
+function Tile({
+  tile,
+  devHigh,
+}: {
+  tile: TileState | undefined;
+  devHigh: string;
+}) {
+  if (!tile) return <div className="bw-guess-tile placeholder" aria-hidden="true" />;
+  const arrowGlyph = tile.arrow === "up" ? "↑" : tile.arrow === "down" ? "↓" : "";
+  const ariaLabel = `${tile.label}: ${tile.value}${tile.arrow ? (tile.arrow === "up" ? " higher" : " lower") : ""}`;
+  return (
+    <div
+      className={`bw-guess-tile ${tile.color}`}
+      style={{ background: TILE_COLOR_VAR[tile.color] }}
+      aria-label={ariaLabel}
+    >
+      <span className="bw-guess-tile-numeral" aria-hidden="true">
+        {devHigh}
+      </span>
+      <div className="label">{tile.label}</div>
+      <div className="value">
+        <span className="val-text">{tile.value}</span>
+        {arrowGlyph && <span className="arrow" aria-hidden="true">{arrowGlyph}</span>}
+      </div>
+    </div>
+  );
+}
+
+function GenrePill({ label, color }: { label: string; color: TileColor }) {
+  return (
+    <span
+      className={`bw-genre-pill ${color}`}
+      style={color === "gray" ? undefined : { background: TILE_COLOR_VAR[color] }}
+    >
+      {label}
+    </span>
+  );
+}
+
+function PersonPortrait({
   name,
   imagePath,
   highlight,
+  devHigh,
 }: {
   name: string;
   imagePath?: string;
-  highlight: "green" | "yellow" | "gray";
+  highlight: TileColor;
+  devHigh: string;
 }) {
   const url = profileUrl(imagePath);
   const isMiss = highlight === "gray";
-  const ring =
+  const ringColor =
     highlight === "green"
-      ? "ring-2 ring-[var(--tile-green)]"
+      ? "var(--teal)"
       : highlight === "yellow"
-        ? "ring-2 ring-[var(--tile-yellow)]"
-        : "ring-1 ring-border";
-  const nameColor =
+        ? "var(--mustard)"
+        : "rgba(26,22,18,0.2)";
+  const nameClass =
     highlight === "green"
-      ? "text-[var(--tile-green)] font-semibold"
+      ? "match-green"
       : highlight === "yellow"
-        ? "text-[var(--tile-yellow)] font-semibold"
-        : "text-muted";
-  const imageFilter = isMiss ? "grayscale(1) opacity(0.6)" : undefined;
-
+        ? "match-yellow"
+        : "match-gray";
   return (
-    <div className="flex min-w-0 flex-col items-center gap-1">
+    <div className="bw-person">
       <div
-        className={`relative h-12 w-12 shrink-0 overflow-hidden rounded-full bg-surface-muted sm:h-14 sm:w-14 ${ring}`}
+        className="bw-person-portrait"
+        style={{ boxShadow: `0 0 0 2px ${ringColor}` }}
       >
+        <span className="bw-person-devnum" aria-hidden="true">{devHigh}</span>
         {url ? (
           <Image
             src={url}
@@ -71,22 +132,55 @@ function PersonChip({
             sizes="56px"
             unoptimized
             className="object-cover"
-            style={{ filter: imageFilter }}
+            style={{ filter: isMiss ? "grayscale(1) opacity(0.6)" : undefined }}
           />
         ) : (
-          <span
-            className="flex h-full w-full items-center justify-center text-xs font-semibold text-muted"
-            style={{ opacity: isMiss ? 0.6 : 1 }}
-          >
+          <span className="bw-person-initials" style={{ opacity: isMiss ? 0.6 : 1 }}>
             {initials(name)}
           </span>
         )}
       </div>
-      <span
-        className={`max-w-[6rem] truncate text-center text-[11px] leading-tight sm:max-w-[7rem] ${nameColor}`}
-      >
-        {name}
-      </span>
+      <span className={`bw-person-name ${nameClass}`}>{name}</span>
+    </div>
+  );
+}
+
+function PeopleRow({
+  label,
+  names,
+  color,
+  chipColors,
+  peopleImages,
+  rowDevHigh,
+}: {
+  label: string;
+  names: string[];
+  color: TileColor;
+  chipColors?: TileColor[];
+  peopleImages: Record<string, string>;
+  rowDevHigh: string;
+}) {
+  if (names.length === 0) return null;
+  const borderColor =
+    color === "green"
+      ? "var(--teal)"
+      : color === "yellow"
+        ? "var(--mustard)"
+        : "rgba(26,22,18,0.14)";
+  return (
+    <div className="bw-people-row" style={{ borderColor }}>
+      <div className="bw-people-label">{label}</div>
+      <div className="bw-people-portraits">
+        {names.map((n, i) => (
+          <PersonPortrait
+            key={n}
+            name={n}
+            imagePath={peopleImages[n]}
+            highlight={chipColors?.[i] ?? color}
+            devHigh={rowDevHigh}
+          />
+        ))}
+      </div>
     </div>
   );
 }
@@ -98,212 +192,46 @@ type Props = {
   animate?: boolean;
 };
 
-function tileByKey(tiles: TileState[], key: TileState["key"]) {
-  return tiles.find((t) => t.key === key);
-}
-
-function ArrowGlyph({ dir }: { dir: "up" | "down" }) {
-  return (
-    <span aria-hidden="true" className="ml-1 inline-block leading-none">
-      {dir === "up" ? "↑" : "↓"}
-    </span>
-  );
-}
-
-function AttrBox({ tile }: { tile: TileState | undefined }) {
-  if (!tile) return null;
-  const correct = tile.color === "green";
-  const close = tile.color === "yellow";
-  const bg = correct
-    ? "bg-[var(--tile-green)] text-white"
-    : close
-      ? "bg-[var(--tile-yellow)] text-black"
-      : "bg-surface-muted text-foreground";
-
-  return (
-    <div
-      className={`flex min-h-[64px] min-w-0 flex-col items-center justify-center gap-1 overflow-hidden rounded-lg px-2 py-2 text-center ${bg}`}
-      aria-label={`${tile.label}: ${tile.value}${tile.arrow ? (tile.arrow === "up" ? " higher" : " lower") : ""}`}
-    >
-      <span className="text-[10px] font-semibold uppercase tracking-wider opacity-70">
-        {tile.label}
-      </span>
-      <div className="flex w-full items-baseline justify-center gap-1 text-sm font-semibold leading-tight">
-        <span className="min-w-0 truncate">{tile.value}</span>
-        {tile.arrow && <ArrowGlyph dir={tile.arrow} />}
-      </div>
-    </div>
-  );
-}
-
-function BannerBox({
-  tile,
-  logoUrl,
-}: {
-  tile: TileState | undefined;
-  logoUrl: string | null;
-}) {
-  if (!tile) return null;
-  const correct = tile.color === "green";
-  const close = tile.color === "yellow";
-  const bg = correct
-    ? "bg-[var(--tile-green)]"
-    : close
-      ? "bg-[var(--tile-yellow)]"
-      : "bg-surface-muted";
-  const textCls = correct || close ? "text-black" : "text-foreground";
-  const labelCls = correct ? "text-white/85" : close ? "text-black/70" : "text-muted";
-
-  return (
-    <div
-      className={`col-start-3 row-span-2 flex min-w-0 flex-col items-center justify-center gap-2 overflow-hidden rounded-lg px-2 py-3 text-center ${bg}`}
-      aria-label={`${tile.label}: ${tile.value}`}
-    >
-      <span
-        className={`text-[10px] font-semibold uppercase tracking-wider ${labelCls}`}
-      >
-        {tile.label}
-      </span>
-      {logoUrl ? (
-        <div className="flex min-h-0 flex-1 w-full items-center justify-center px-1 py-1">
-          <Image
-            src={logoUrl}
-            alt=""
-            width={120}
-            height={80}
-            unoptimized
-            className="h-auto max-h-16 w-auto max-w-full object-contain"
-            style={{
-              filter: correct || close ? "none" : "grayscale(0.3) opacity(0.9)",
-            }}
-          />
-        </div>
-      ) : (
-        <span
-          className={`line-clamp-3 px-1 text-sm font-semibold leading-tight ${textCls}`}
-        >
-          {tile.value}
-        </span>
-      )}
-    </div>
-  );
-}
-
-function GenrePill({
-  label,
-  color,
-}: {
-  label: string;
-  color: "green" | "yellow" | "gray";
-}) {
-  const style =
-    color === "green"
-      ? "bg-[var(--tile-green)] text-white"
-      : color === "yellow"
-        ? "bg-[var(--tile-yellow)] text-black"
-        : "border border-border bg-transparent text-muted";
-  return (
-    <span
-      className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold ${style}`}
-    >
-      {label}
-    </span>
-  );
-}
-
-function PeopleRow({
-  label,
-  names,
-  color,
-  chipColors,
-  peopleImages,
-}: {
-  label: string;
-  names: string[];
-  color: TileState["color"];
-  chipColors?: TileState["color"][];
-  peopleImages: Record<string, string>;
-}) {
-  const correct = color === "green";
-  const close = color === "yellow";
-  const borderCls = correct
-    ? "border-[var(--tile-green)]"
-    : close
-      ? "border-[var(--tile-yellow)]"
-      : "border-border";
-
-  if (names.length === 0) return null;
-
-  return (
-    <div className={`rounded-lg border ${borderCls} bg-surface px-3 py-2.5`}>
-      <div className="text-[10px] font-semibold uppercase tracking-wider text-muted">
-        {label}
-      </div>
-      <div className="mt-2 flex flex-wrap gap-2.5">
-        {names.map((n, i) => (
-          <PersonChip
-            key={n}
-            name={n}
-            imagePath={peopleImages[n]}
-            highlight={chipColors?.[i] ?? color}
-          />
-        ))}
-      </div>
-    </div>
-  );
-}
-
 export function GuessCard({ movie, tiles, guessIndex, animate = false }: Props) {
-  const year = tileByKey(tiles, "year");
-  const boxOffice = tileByKey(tiles, "boxOffice");
-  const music = tileByKey(tiles, "music");
-  const banner = tileByKey(tiles, "banner");
-  const imdb = tileByKey(tiles, "imdb");
-  const genre = tileByKey(tiles, "genre");
   const director = tileByKey(tiles, "director");
   const cast = tileByKey(tiles, "cast");
-
+  const genre = tileByKey(tiles, "genre");
   const genreChipColors = genre?.chipColors;
+  const idx = (guessIndex ?? 0) + 1;
+  const devHigh = devNumeral(idx);
 
   return (
     <article
-      className="guess-card-anim rounded-2xl border border-border bg-surface p-3 shadow-sm sm:p-4"
-      style={animate ? undefined : { animation: "none" }}
+      className={`bw-guess-card${animate ? " is-latest" : ""}`}
       aria-label={
         guessIndex != null ? `Guess ${guessIndex + 1}: ${movie.title}` : movie.title
       }
     >
-      <div className="flex gap-3 sm:gap-4">
-        <div className="relative aspect-[2/3] w-24 shrink-0 overflow-hidden rounded-lg border border-border bg-surface-muted sm:w-28">
+      <span className="corner tl" aria-hidden="true">★</span>
+      <span className="corner tr" aria-hidden="true">★</span>
+      <span className="corner bl" aria-hidden="true">★</span>
+      <span className="corner br" aria-hidden="true">★</span>
+
+      <header className="bw-guess-header">
+        <div className="bw-guess-poster">
           {movie.posterUrl ? (
             <Image
               src={movie.posterUrl}
               alt=""
               fill
-              sizes="112px"
+              sizes="56px"
               unoptimized
               className="object-cover"
             />
           ) : null}
         </div>
-
-        <div className="min-w-0 flex-1">
-          <div className="flex items-start justify-between gap-2">
-            <h3 className="font-display text-lg font-semibold leading-tight text-foreground sm:text-xl">
-              {movie.title}
-              <span className="ml-1.5 text-sm font-medium text-muted">
-                ({movie.year})
-              </span>
-            </h3>
-            {guessIndex != null && (
-              <span className="shrink-0 text-xs tabular-nums text-muted">
-                Guess {guessIndex + 1}
-              </span>
-            )}
-          </div>
-
+        <div className="bw-guess-meta">
+          <h3 className="bw-guess-title">
+            {movie.title}
+            <span className="bw-guess-year">({movie.year})</span>
+          </h3>
           {movie.genres.length > 0 && (
-            <div className="mt-2 flex flex-wrap gap-1.5">
+            <div className="bw-guess-genres">
               {movie.genres.map((g, i) => (
                 <GenrePill
                   key={g}
@@ -313,27 +241,23 @@ export function GuessCard({ movie, tiles, guessIndex, animate = false }: Props) 
               ))}
             </div>
           )}
-
-          <div className="mt-3 grid grid-cols-3 grid-rows-2 gap-1.5 sm:gap-2">
-            <AttrBox tile={year} />
-            <AttrBox tile={boxOffice} />
-            <BannerBox
-              tile={banner}
-              logoUrl={tmdbLogoUrl(movie.bannerLogoPath)}
-            />
-            <AttrBox tile={imdb} />
-            <AttrBox tile={music} />
-          </div>
         </div>
+      </header>
+
+      <div className="bw-guess-tiles">
+        {TILE_ORDER.map((key) => (
+          <Tile key={key} tile={tileByKey(tiles, key)} devHigh={devHigh} />
+        ))}
       </div>
 
-      <div className="mt-3 grid gap-1.5 sm:grid-cols-2 sm:gap-2">
+      <div className="bw-guess-people">
         <PeopleRow
           label="Director"
           names={movie.director}
           color={director?.color ?? "gray"}
           chipColors={director?.chipColors}
           peopleImages={movie.peopleImages}
+          rowDevHigh={devHigh}
         />
         <PeopleRow
           label="Lead cast"
@@ -341,6 +265,7 @@ export function GuessCard({ movie, tiles, guessIndex, animate = false }: Props) 
           color={cast?.color ?? "gray"}
           chipColors={cast?.chipColors}
           peopleImages={movie.peopleImages}
+          rowDevHigh={devHigh}
         />
       </div>
     </article>
