@@ -1,5 +1,6 @@
 import type { TileState } from "@/lib/types";
 import type { GuessedMovieBrief } from "@/components/GuessCard";
+import type { DemoGuessCardProps } from "@/frontend/components/home/DemoGuessCard";
 
 // Real TMDB paths pulled from the live movies table (via the TMDB
 // import pipeline). Dangal is used as the "partial match" row: some
@@ -63,3 +64,41 @@ export const DEMO_WIN_TILES: TileState[] = [
   { key: "genre", label: "Genre", color: "green", value: "Drama, Comedy", chipColors: ["green", "green"] },
   { key: "imdb", label: "IMDb", color: "green", value: "8.0" },
 ];
+
+// Bollywood-redesign bilingual demo cards (used by HowItWorks via DemoGuessCard).
+// Mirror the end-to-end.html mockup's partial + win demo blocks.
+export const DEMO_PARTIAL_BW: DemoGuessCardProps = {
+  title: "Lagaan",
+  year: 2001,
+  director: "A. Gowariker",
+  posterLabel: "LAGAAN",
+  posterBg: "#8b2b2b",
+  tiles: [
+    { label: "Director", value: "A. Gowariker", color: "mustard", devIndex: "१" },
+    { label: "Cast", value: "A. Khan", color: "teal", devIndex: "२" },
+    { label: "Year ↓", value: "2001", color: "red", devIndex: "३" },
+    { label: "Box office ↑", value: "₹65 cr", color: "mustard", devIndex: "४" },
+    { label: "Music", value: "A.R. Rahman", color: "teal", devIndex: "५" },
+    { label: "Banner", value: "Aamir Khan Pr.", color: "red", devIndex: "६" },
+    { label: "Genre", value: "Drama · Sport", color: "mustard", devIndex: "७" },
+    { label: "IMDb ↓", value: "8.1", color: "red", devIndex: "८" },
+  ],
+};
+
+export const DEMO_WIN_BW: DemoGuessCardProps = {
+  title: "Dil Chahta Hai",
+  year: 2001,
+  director: "Farhan Akhtar",
+  posterLabel: "DIL CHAHTA HAI",
+  posterBg: "#2a6b4a",
+  tiles: [
+    { label: "Director", value: "F. Akhtar", color: "teal", devIndex: "१" },
+    { label: "Cast", value: "A. Khan", color: "teal", devIndex: "२" },
+    { label: "Year", value: "2001", color: "teal", devIndex: "३" },
+    { label: "Box office", value: "₹28 cr", color: "teal", devIndex: "४" },
+    { label: "Music", value: "Shankar-Ehsaan-Loy", color: "teal", devIndex: "५" },
+    { label: "Banner", value: "Excel Entertainment", color: "teal", devIndex: "६" },
+    { label: "Genre", value: "Drama · Romance", color: "teal", devIndex: "७" },
+    { label: "IMDb", value: "8.1", color: "teal", devIndex: "८" },
+  ],
+};
