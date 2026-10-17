@@ -1,11 +1,12 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { SiteHeader } from "@/components/SiteHeader";
 import { ModeCard } from "@/components/ModeCard";
 import { HowToPlaySheet } from "@/components/HowToPlaySheet";
 import { HowItWorks } from "@/components/home/HowItWorks";
 import { GameAttributes } from "@/components/home/GameAttributes";
 import { FaqAccordion } from "@/components/home/FaqAccordion";
+import { BollywoodHero } from "@/frontend/components/home/BollywoodHero";
+import { StarRail } from "@/frontend/components/motifs/StarRail";
 import { DIFFICULTIES, type Difficulty } from "@/lib/difficulty";
 import { istDateKey, istDisplayDate } from "@/lib/dateIst";
 import { hasSupabaseConfigured } from "@/lib/supabase/env";
@@ -77,30 +78,60 @@ export default async function Home({
 
   const todayLabel = istDisplayDate();
   const streakState = await loadStreakState();
+  const anyStreak =
+    streakState.easy.streak > 0 ||
+    streakState.medium.streak > 0 ||
+    streakState.hard.streak > 0;
 
   return (
-    <div className="flex min-h-screen flex-col">
-      <SiteHeader />
+    <div className="bw-home-root bw-surface-ink">
+      <div className="bw-grain-ink" aria-hidden="true" />
 
-      <main className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-8 px-5 pb-16 pt-4 sm:px-8 sm:pt-8">
-        <section className="flex flex-col gap-3">
-          <p className="text-xs font-medium uppercase tracking-[0.14em] text-muted">
-            {todayLabel} · IST
-          </p>
-          <h1 className="font-display text-[32px] font-semibold leading-tight tracking-tight text-foreground sm:text-5xl">
-            Guess today&rsquo;s mystery{" "}
-            <span style={{ color: "var(--accent)" }}>Bollywood</span> film.
-          </h1>
-          <p className="max-w-md text-base leading-6 text-muted">
-            Ten guesses. Eight colored tiles each. A poster that un-blurs with every try.
-            Pick a difficulty to begin.
-          </p>
-        </section>
+      <header className="bw-util-bar">
+        <span className="brand-mini">बॉलीवुड स्पॉटल</span>
+        {anyStreak && (
+          <div className="bw-util-streak">
+            <span className="label">Streak</span>
+            <span className="streak-chip">
+              <span className="star">★</span>
+              {streakState.easy.streak}
+            </span>
+          </div>
+        )}
+      </header>
 
-        <section
-          aria-label="Difficulty modes"
-          className="grid gap-4 sm:grid-cols-3"
-        >
+      <StarRail side="left" />
+      <StarRail side="right" />
+
+      <main className="bw-hero-wrap">
+        <BollywoodHero />
+        <div className="bw-date-pill">{todayLabel} · IST</div>
+        <h1 className="bw-tagline" lang="hi">
+          आज की फ़िल्म पहचानिए — दस कोशिशों में
+          <span className="bw-tagline-en" lang="en">
+            Guess today&rsquo;s film in 10 tries
+          </span>
+        </h1>
+        <a href="/easy" className="bw-pill-mustard">
+          <span className="arrow" aria-hidden="true">▶</span>
+          PLAY <small>खेलें</small>
+        </a>
+        <nav className="bw-diff-row" aria-label="Jump to difficulty">
+          <Link href="/easy">Easy</Link>
+          <Link href="/medium">Medium</Link>
+          <Link href="/hard">Hard</Link>
+        </nav>
+      </main>
+
+      <section aria-label="Difficulty modes" className="bw-section">
+        <div className="bw-section-head">
+          <span className="eyebrow-stars">★ CHOOSE YOUR MATCHBOX ★</span>
+          <h2>
+            Three ways to play
+            <span className="hi">तीन मुश्किलें · पसंद आपकी</span>
+          </h2>
+        </div>
+        <div className="bw-mode-grid">
           {DIFFICULTIES.map((d) => {
             const s = streakState[d];
             return (
@@ -112,54 +143,41 @@ export default async function Home({
               />
             );
           })}
-        </section>
+        </div>
+      </section>
 
-        <section className="flex items-center justify-between gap-4 rounded-xl border border-border bg-surface-muted/60 px-4 py-3 text-sm">
-          <div className="flex flex-col">
-            <span className="font-medium text-foreground">New puzzle at midnight IST</span>
-            <span className="text-xs text-muted">
-              Streaks reset after one missed day.
-            </span>
+      <section className="bw-section" style={{ paddingTop: 0, display: "flex", flexDirection: "column", gap: 14 }}>
+        <div className="bw-info-strip">
+          <div className="copy">
+            <div className="t">New puzzle at midnight IST</div>
+            <div className="s">Streaks reset after one missed day.</div>
           </div>
-          <HowToPlaySheet />
-        </section>
-
-        <section
-          aria-label="Past puzzles"
-          className="flex items-center justify-between gap-4 rounded-xl border border-border bg-surface px-4 py-3 text-sm"
-        >
-          <div className="flex flex-col">
-            <span className="font-medium text-foreground">Catch up on past puzzles</span>
-            <span className="text-xs text-muted">
-              Practice mode — no streak impact, unlimited replays.
-            </span>
+          <HowToPlaySheet triggerClassName="bw-pill-outline-ink" />
+        </div>
+        <div className="bw-info-strip">
+          <div className="copy">
+            <div className="t">Catch up on past puzzles</div>
+            <div className="s">Practice mode — no streak impact, unlimited replays.</div>
           </div>
-          <Link
-            href="/archive"
-            className="inline-flex h-10 shrink-0 items-center rounded-full border border-border bg-surface-muted/60 px-4 text-xs font-semibold text-foreground hover:bg-surface-muted"
-          >
-            Browse archive →
+          <Link href="/archive" className="bw-pill-outline-ink">
+            Archive →
           </Link>
-        </section>
+        </div>
+      </section>
 
-        <HowItWorks />
-        <GameAttributes />
-        <FaqAccordion />
+      <HowItWorks />
+      <GameAttributes />
+      <FaqAccordion />
 
-        <section className="flex flex-col items-center gap-3 border-t border-border pt-10 text-center sm:pt-14">
-          <a
-            href="/easy"
-            className="inline-flex h-12 items-center justify-center rounded-full bg-accent px-8 text-base font-semibold text-accent-ink shadow-sm transition-transform hover:-translate-y-0.5"
-          >
-            ▶ Play today&rsquo;s film
-          </a>
-          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted">
-            Free · One film a day
-          </p>
-        </section>
-      </main>
+      <section className="bw-section bw-final-cta" aria-label="Play today">
+        <a href="/easy" className="bw-pill-mustard">
+          <span className="arrow" aria-hidden="true">▶</span>
+          PLAY TODAY&rsquo;S FILM <small>खेलें</small>
+        </a>
+        <p className="bw-eyebrow">★ FREE · ONE FILM A DAY · NO ACCOUNT ★</p>
+      </section>
 
-      <footer className="mx-auto flex w-full max-w-3xl flex-col items-center gap-2 border-t border-border px-5 py-8 text-center text-xs text-muted sm:px-8">
+      <footer className="bw-foot">
         <p>
           A game by{" "}
           <a
@@ -167,24 +185,15 @@ export default async function Home({
             target="_blank"
             rel="noopener noreferrer"
             aria-label="Om Golesar on LinkedIn"
-            className="text-muted no-underline hover:text-foreground"
           >
             Om Golesar
           </a>
           . Questions? Reach me at{" "}
-          <a
-            href="mailto:omgolesar99@gmail.com"
-            className="text-muted no-underline hover:text-foreground"
-          >
-            omgolesar99@gmail.com
-          </a>
-          .
+          <a href="mailto:omgolesar99@gmail.com">omgolesar99@gmail.com</a>.
         </p>
-        <p>Movie data from TMDB. v1 preview.</p>
+        <p>Movie data from TMDB. v1 preview · Bollywood edition.</p>
         <p>
-          <a href="/admin" className="underline underline-offset-4 decoration-border hover:text-foreground">
-            Curator access
-          </a>
+          <a href="/admin">Curator access</a>
         </p>
       </footer>
     </div>
