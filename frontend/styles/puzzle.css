@@ -1430,3 +1430,36 @@
   text-underline-offset: 3px;
 }
 .bw-result-screen.lost .bw-result-home { color: var(--paper-mute); }
+
+/* === Puzzle body layout === */
+.bw-puzzle-body {
+  position: relative;
+  z-index: 1;
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 24px clamp(16px, 4vw, 24px) 60px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+.bw-guess-input-wrap {
+  display: flex;
+  flex-direction: column;
+}
+.bw-guesses-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-top: 8px;
+}
+.bw-guesses-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 120px;
+  border: 1.5px dashed rgba(26, 22, 18, 0.2);
+  border-radius: 14px;
+  font-family: var(--font-anek-devanagari), system-ui, sans-serif;
+  font-size: 13px;
+  color: var(--paper-dim);
+}
