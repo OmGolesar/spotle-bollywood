@@ -1,7 +1,11 @@
 import Link from "next/link";
 import { ThemeToggle } from "./ThemeToggle";
+import { ProfileDropdown } from "./auth/ProfileDropdown";
+import { getCurrentUser } from "@/lib/auth/server";
 
-export function SiteHeader() {
+export async function SiteHeader() {
+  const user = await getCurrentUser();
+
   return (
     <header className="flex items-center justify-between px-5 py-4 sm:px-8 sm:py-6">
       <a
@@ -25,6 +29,27 @@ export function SiteHeader() {
         >
           Archive
         </Link>
+
+        {user ? (
+          <ProfileDropdown user={user} />
+        ) : (
+          <>
+            <Link
+              href="/login"
+              className="hidden h-10 items-center rounded-full border border-border bg-surface px-3 text-xs font-semibold text-foreground hover:bg-surface-muted sm:inline-flex"
+            >
+              Login
+            </Link>
+            <Link
+              href="/signup"
+              className="h-10 items-center rounded-full px-3 text-xs font-semibold hover:opacity-90 sm:inline-flex"
+              style={{ background: "var(--accent)", color: "var(--accent-ink)" }}
+            >
+              Sign Up
+            </Link>
+          </>
+        )}
+
         <ThemeToggle />
       </div>
     </header>

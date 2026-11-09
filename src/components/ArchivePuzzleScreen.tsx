@@ -63,6 +63,7 @@ export function ArchivePuzzleScreen({ date, difficulty }: Props) {
   const [submitting, setSubmitting] = useState(false);
   const [giveUpBusy, setGiveUpBusy] = useState(false);
   const [confirmGiveUp, setConfirmGiveUp] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const latestGuessIdxRef = useRef<number>(-1);
 
   const loadInitial = useCallback(async () => {
@@ -77,6 +78,18 @@ export function ArchivePuzzleScreen({ date, difficulty }: Props) {
         setError("no_puzzle");
         setLoading(false);
         return;
+      }
+
+      // Check auth status for signup prompt
+      try {
+        const { createClient } = await import("@/lib/auth/client");
+        const supabase = createClient();
+        const {
+          data: { user },
+        } = await supabase.auth.getUser();
+        setIsAuthenticated(!!user);
+      } catch {
+        setIsAuthenticated(false);
       }
       if (res.status === 503) {
         setError("backend_not_configured");
@@ -406,6 +419,7 @@ export function ArchivePuzzleScreen({ date, difficulty }: Props) {
           answer={answer}
           guesses={guesses}
           streakAfter={0}
+          isAuthenticated={isAuthenticated}
           onClose={() => setResultOpen(false)}
         />
       )}

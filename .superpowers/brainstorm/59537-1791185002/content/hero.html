@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Hero mockup — Spotle Bollywood</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anek+Devanagari:wght@400;500;600;700&family=Yatra+One&family=Baloo+Bhai+2:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#2B2250;
+    --ink-deep:#1C1639;
+    --paper:#F5EDD9;
+    --red:#D63024;
+    --mustard:#F2B01E;
+    --pink:#E8328A;
+    --royal:#2E52A6;
+    --teal:#0E7E7E;
+    --charcoal:#1A1612;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{
+    font-family:'Anek Devanagari',system-ui,sans-serif;
+    background:var(--ink-deep);
+    color:var(--paper);
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+    position:relative;
+    overflow-x:hidden;
+  }
+  /* grain overlay */
+  body::before{
+    content:'';
+    position:fixed;inset:0;pointer-events:none;z-index:1;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='300' height='300'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.95  0 0 0 0 0.88  0 0 0 0 0.70  0 0 0 0.08 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+    mix-blend-mode:overlay;
+    opacity:.55;
+  }
+  /* radial vignette toward center-top */
+  body::after{
+    content:'';
+    position:fixed;inset:0;pointer-events:none;z-index:0;
+    background:radial-gradient(ellipse at 50% 30%, rgba(232,50,138,0.14), transparent 55%),
+               radial-gradient(ellipse at 50% 85%, rgba(43,34,80,0.9), var(--ink-deep) 70%);
+  }
+  main{
+    position:relative;z-index:2;
+    flex:1;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    padding:40px 24px;
+    text-align:center;
+  }
+  /* top utility bar */
+  .util{
+    position:absolute;top:0;left:0;right:0;
+    display:flex;align-items:center;justify-content:space-between;
+    padding:18px 28px;
+    font-size:12px;letter-spacing:.14em;text-transform:uppercase;
+    color:#C9BFA5;
+    z-index:3;
+  }
+  .util .brand-mini{font-family:'Yatra One',serif;letter-spacing:.08em;color:var(--mustard);text-transform:none;font-size:14px}
+  .util .streak{display:flex;align-items:center;gap:8px}
+  .streak-chip{background:var(--red);color:var(--paper);padding:4px 10px;border-radius:999px;font-weight:700;font-size:11px;letter-spacing:.1em}
+  /* logo */
+  .logo-wrap{
+    width:min(560px,78vw);
+    margin-bottom:28px;
+    filter:drop-shadow(0 20px 40px rgba(0,0,0,.5));
+  }
+  .logo-wrap img{width:100%;height:auto;display:block}
+  /* date pill */
+  .date{
+    font-family:'Baloo Bhai 2',system-ui;
+    font-weight:500;
+    font-size:14px;letter-spacing:.18em;text-transform:uppercase;
+    color:#E8DBB0;
+    display:inline-flex;align-items:center;gap:14px;
+    padding:8px 18px;
+    border:1px solid rgba(242,176,30,.35);
+    border-radius:999px;
+    margin-bottom:14px;
+  }
+  .date::before,.date::after{content:'★';color:var(--mustard);font-size:11px}
+  /* tagline bilingual */
+  .tagline{
+    font-family:'Yatra One',serif;
+    font-size:clamp(22px,3.4vw,32px);
+    line-height:1.3;
+    color:var(--paper);
+    margin-bottom:10px;
+    max-width:620px;
+  }
+  .tagline .en{display:block;font-family:'Anek Devanagari';font-weight:500;font-size:.6em;letter-spacing:.08em;color:#C9BFA5;text-transform:uppercase;margin-top:6px}
+  /* play CTA */
+  .play{
+    margin-top:28px;
+    display:inline-flex;align-items:center;gap:14px;
+    font-family:'Yatra One',serif;
+    font-size:28px;letter-spacing:.04em;
+    color:var(--charcoal);
+    background:var(--mustard);
+    padding:16px 44px 16px 36px;
+    border-radius:999px;
+    text-decoration:none;
+    box-shadow:0 0 0 4px rgba(242,176,30,.18), 0 18px 40px rgba(242,176,30,.35);
+    cursor:pointer;border:none;
+    transition:transform .15s ease, box-shadow .15s ease;
+  }
+  .play:hover{transform:translateY(-2px);box-shadow:0 0 0 6px rgba(242,176,30,.22), 0 24px 50px rgba(242,176,30,.45)}
+  .play .arrow{display:inline-flex;width:28px;height:28px;align-items:center;justify-content:center;background:var(--red);color:var(--paper);border-radius:999px;font-size:14px}
+  .play small{font-family:'Anek Devanagari';font-size:12px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:rgba(26,22,18,.65);margin-left:6px}
+  /* difficulty row (secondary, below CTA) */
+  .diff{
+    margin-top:34px;
+    display:flex;gap:10px;align-items:center;justify-content:center;
+    font-family:'Anek Devanagari';font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:#C9BFA5;
+  }
+  .diff a{color:var(--paper);text-decoration:none;padding:6px 12px;border:1px solid rgba(245,237,217,.25);border-radius:999px;transition:all .15s}
+  .diff a:hover{background:rgba(245,237,217,.08);border-color:rgba(242,176,30,.6)}
+  .diff .active{background:var(--red);border-color:var(--red)}
+  /* bottom footer line */
+  .bottom{
+    position:relative;z-index:2;
+    text-align:center;
+    padding:22px 28px;
+    font-family:'Anek Devanagari';
+    font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:#857C65;
+    display:flex;justify-content:center;gap:22px;flex-wrap:wrap;
+  }
+  .bottom a{color:#C9BFA5;text-decoration:none}
+  .bottom a:hover{color:var(--mustard)}
+  .bottom .sep{color:#4A4267}
+  /* decorative side stars */
+  .star-rail{position:absolute;top:50%;transform:translateY(-50%);opacity:.5;color:var(--mustard);font-size:14px;letter-spacing:12px;z-index:2}
+  .star-rail.left{left:22px}
+  .star-rail.right{right:22px}
+  @media (max-width:600px){
+    .util{padding:14px 16px;font-size:10px}
+    .star-rail{display:none}
+    .play{font-size:22px;padding:14px 32px}
+  }
+</style>
+</head>
+<body>
+  <div class="util">
+    <span class="brand-mini">बॉलीवुड स्पॉटल</span>
+    <div class="streak"><span>Streak</span><span class="streak-chip">★ 4</span></div>
+  </div>
+
+  <div class="star-rail left" aria-hidden>★★★★★★★</div>
+  <div class="star-rail right" aria-hidden>★★★★★★★</div>
+
+  <main>
+    <div class="logo-wrap">
+      <img src="/files/title-logo.png" alt="Bollywood Spotle">
+    </div>
+
+    <div class="date">Saturday · 3 October 2026</div>
+
+    <h1 class="tagline">
+      आज की फ़िल्म पहचानिए — दस कोशिशों में
+      <span class="en">Guess today's film in 10 tries</span>
+    </h1>
+
+    <button class="play" onclick="toggleSelect(this)">
+      <span class="arrow">▶</span>
+      PLAY <small>खेलें</small>
+    </button>
+
+    <div class="diff">
+      <span>Difficulty:</span>
+      <a href="#" class="active">Easy</a>
+      <a href="#">Medium</a>
+      <a href="#">Hard</a>
+    </div>
+  </main>
+
+  <div class="bottom">
+    <a href="#">How to play</a><span class="sep">·</span>
+    <a href="#">Archive</a><span class="sep">·</span>
+    <a href="#">Credits</a><span class="sep">·</span>
+    <span>v1.1 — Bollywood Edition</span>
+  </div>
+</body>
+</html>

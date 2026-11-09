@@ -10,6 +10,7 @@ import { buildShareText, emojiGrid, share } from "@/lib/share";
 import type { PuzzleOutcome, TileState } from "@/lib/types";
 import { TOTAL_GUESSES } from "@/lib/types";
 import { Countdown } from "./Countdown";
+import { SignupPrompt } from "./auth/SignupPrompt";
 
 export type ResultAnswer = {
   id: string;
@@ -33,6 +34,7 @@ type Props = {
   answer: ResultAnswer;
   guesses: GuessRowClient[];
   streakAfter: number;
+  isAuthenticated: boolean;
   onClose?: () => void;
 };
 
@@ -42,6 +44,7 @@ export function ResultScreen({
   answer: mystery,
   guesses,
   streakAfter,
+  isAuthenticated,
   onClose,
 }: Props) {
   const meta = DIFFICULTY_META[difficulty];
@@ -192,6 +195,9 @@ export function ResultScreen({
               : "Share result"}
           </button>
         </section>
+
+        {/* Signup prompt for anonymous users */}
+        {!isAuthenticated && <SignupPrompt />}
 
         {/* Cross-sell */}
         <section className="flex flex-col gap-2">
