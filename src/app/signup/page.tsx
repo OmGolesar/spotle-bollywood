@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SignupForm } from "@/components/auth/SignupForm";
