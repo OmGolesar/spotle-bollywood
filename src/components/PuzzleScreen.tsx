@@ -60,6 +60,7 @@ export function PuzzleScreen({ difficulty }: Props) {
   const [answer, setAnswer] = useState<ResultAnswer | null>(null);
   const [resultOpen, setResultOpen] = useState(false);
   const [streakAfter, setStreakAfter] = useState<number>(0);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const latestGuessIdxRef = useRef<number>(-1);
 
   const loadInitial = useCallback(async () => {
@@ -85,6 +86,18 @@ export function PuzzleScreen({ difficulty }: Props) {
       latestGuessIdxRef.current = body.existingGuesses.length - 1;
       if (body.outcome !== "in_progress") {
         await loadFinish();
+      }
+
+      // Check auth status for signup prompt
+      try {
+        const { createClient } = await import("@/lib/auth/client");
+        const supabase = createClient();
+        const {
+          data: { user },
+        } = await supabase.auth.getUser();
+        setIsAuthenticated(!!user);
+      } catch {
+        setIsAuthenticated(false);
       }
     } catch (e) {
       setError(e instanceof Error ? e.message : "load_failed");
@@ -453,6 +466,7 @@ export function PuzzleScreen({ difficulty }: Props) {
           answer={answer}
           guesses={guesses}
           streakAfter={streakAfter}
+          isAuthenticated={isAuthenticated}
           onClose={() => setResultOpen(false)}
         />
       )}

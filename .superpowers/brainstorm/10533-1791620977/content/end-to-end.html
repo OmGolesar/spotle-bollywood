@@ -1,0 +1,993 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>End-to-end mockup — Spotle Bollywood</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anek+Devanagari:wght@400;500;600;700&family=Yatra+One&family=Baloo+Bhai+2:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#2B2250;
+    --ink-deep:#1C1639;
+    --paper:#F5EDD9;
+    --paper-dim:#857C65;
+    --paper-mute:#C9BFA5;
+    --red:#D63024;
+    --mustard:#F2B01E;
+    --pink:#E8328A;
+    --royal:#2E52A6;
+    --teal:#0E7E7E;
+    --charcoal:#1A1612;
+    --paper-line:rgba(26,22,18,.14);
+    --paper-line-strong:rgba(26,22,18,.4);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    font-family:'Anek Devanagari',system-ui,sans-serif;
+    background:var(--ink-deep);
+    color:var(--paper);
+    -webkit-font-smoothing:antialiased;
+  }
+
+  /* ================= MOCKUP SHELL (jump nav) ================= */
+  .mock-nav{
+    position:sticky;top:0;z-index:50;
+    display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:4px;
+    padding:10px 16px;
+    background:rgba(14,10,30,.9);
+    backdrop-filter:blur(14px);
+    border-bottom:1px solid rgba(242,176,30,.2);
+    font-family:'Anek Devanagari';font-weight:600;
+    font-size:11px;letter-spacing:.14em;text-transform:uppercase;
+  }
+  .mock-nav a{
+    color:var(--paper-mute);text-decoration:none;
+    padding:7px 14px;border-radius:999px;
+    transition:all .15s;
+  }
+  .mock-nav a:hover{color:var(--mustard);background:rgba(242,176,30,.1)}
+  .mock-nav .brand{color:var(--mustard);font-family:'Yatra One',serif;letter-spacing:.04em;text-transform:none;font-size:14px;margin-right:12px}
+
+  .mock-label{
+    position:relative;
+    padding:30px 24px 10px;
+    text-align:center;
+    font-family:'Anek Devanagari';font-weight:700;
+    font-size:11px;letter-spacing:.3em;text-transform:uppercase;
+    color:rgba(245,237,217,.55);
+  }
+  .mock-label::before,.mock-label::after{
+    content:'';display:inline-block;height:1px;width:60px;
+    background:rgba(245,237,217,.2);vertical-align:middle;margin:0 14px;
+  }
+
+  /* ================= SHARED PRIMITIVES ================= */
+  .surface-ink{background:var(--ink-deep);color:var(--paper);position:relative}
+  .surface-ink::before{
+    content:'';position:absolute;inset:0;pointer-events:none;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='300' height='300'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.95  0 0 0 0 0.88  0 0 0 0 0.70  0 0 0 0.08 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+    mix-blend-mode:overlay;opacity:.5;
+  }
+  .surface-paper{background:var(--paper);color:var(--charcoal);position:relative}
+  .surface-paper::before{
+    content:'';position:absolute;inset:0;pointer-events:none;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='300' height='300'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.3  0 0 0 0 0.2  0 0 0 0 0.1  0 0 0 0.4 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+    mix-blend-mode:multiply;opacity:.06;
+  }
+
+  .eyebrow{
+    font-family:'Anek Devanagari';font-weight:600;
+    font-size:11px;letter-spacing:.26em;text-transform:uppercase;
+  }
+  .pill-mustard{
+    display:inline-flex;align-items:center;gap:12px;
+    font-family:'Yatra One',serif;font-size:22px;letter-spacing:.04em;
+    color:var(--charcoal);background:var(--mustard);
+    padding:13px 32px 13px 24px;border-radius:999px;
+    text-decoration:none;cursor:pointer;border:none;
+    box-shadow:0 0 0 4px rgba(242,176,30,.18), 0 18px 40px rgba(242,176,30,.3);
+    transition:transform .15s, box-shadow .15s;
+  }
+  .pill-mustard:hover{transform:translateY(-2px);box-shadow:0 0 0 6px rgba(242,176,30,.22), 0 24px 50px rgba(242,176,30,.42)}
+  .pill-mustard .arrow{
+    display:inline-flex;width:26px;height:26px;align-items:center;justify-content:center;
+    background:var(--red);color:var(--paper);border-radius:999px;font-size:11px;padding-left:2px;
+  }
+  .pill-mustard small{
+    font-family:'Anek Devanagari';font-weight:600;font-size:11px;letter-spacing:.18em;
+    text-transform:uppercase;color:rgba(26,22,18,.6);margin-left:2px;
+  }
+  .pill-outline-ink{
+    display:inline-flex;align-items:center;gap:6px;
+    color:var(--paper);text-decoration:none;cursor:pointer;background:transparent;
+    padding:9px 18px;border:1px solid rgba(245,237,217,.25);border-radius:999px;
+    font-family:'Anek Devanagari';font-weight:600;font-size:12px;letter-spacing:.14em;text-transform:uppercase;
+    transition:all .15s;
+  }
+  .pill-outline-ink:hover{background:rgba(245,237,217,.08);border-color:rgba(242,176,30,.6)}
+  .pill-outline-paper{
+    display:inline-flex;align-items:center;gap:6px;
+    color:var(--charcoal);text-decoration:none;cursor:pointer;background:transparent;
+    padding:9px 18px;border:1px solid var(--paper-line-strong);border-radius:999px;
+    font-family:'Anek Devanagari';font-weight:600;font-size:12px;letter-spacing:.14em;text-transform:uppercase;
+    transition:all .15s;
+  }
+  .pill-outline-paper:hover{background:rgba(26,22,18,.06);border-color:var(--red)}
+
+  /* ★ star-border frame */
+  .poster-frame{
+    position:relative;padding:14px;
+    background:var(--paper);
+    border:3px solid var(--charcoal);
+    box-shadow:0 24px 48px rgba(0,0,0,.3);
+  }
+  .poster-frame::before,.poster-frame::after,
+  .poster-frame > .corner-tl,.poster-frame > .corner-tr,
+  .poster-frame > .corner-bl,.poster-frame > .corner-br{
+    content:'★';position:absolute;color:var(--red);
+    font-size:16px;line-height:1;
+    width:22px;height:22px;background:var(--paper);
+    display:flex;align-items:center;justify-content:center;
+    border:2px solid var(--charcoal);
+  }
+  .poster-frame::before{top:-14px;left:-14px}
+  .poster-frame::after{top:-14px;right:-14px}
+  .poster-frame > .corner-bl{bottom:-14px;left:-14px}
+  .poster-frame > .corner-br{bottom:-14px;right:-14px}
+
+  /* ================= LANDING / HERO ================= */
+  .hero-wrap{
+    position:relative;min-height:100vh;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    gap:clamp(20px,2.5vh,30px);
+    padding:84px clamp(20px,4vw,48px) 70px;
+    text-align:center;
+  }
+  .hero-wrap::after{
+    content:'';position:absolute;inset:0;pointer-events:none;z-index:0;
+    background:
+      radial-gradient(ellipse 60% 40% at 50% 32%, rgba(232,50,138,0.14), transparent 70%),
+      radial-gradient(ellipse 80% 60% at 50% 90%, rgba(28,22,57,0.95), var(--ink-deep) 70%);
+  }
+  .hero-wrap > *{position:relative;z-index:1}
+
+  .util-bar{
+    position:absolute;top:0;left:0;right:0;height:68px;
+    display:flex;align-items:center;justify-content:space-between;
+    padding:0 clamp(20px,3vw,40px);z-index:3;
+  }
+  .brand-mini{font-family:'Yatra One',serif;font-size:clamp(16px,1.4vw,20px);color:var(--mustard);text-shadow:0 1px 0 rgba(0,0,0,.4)}
+  .streak-chip{
+    display:inline-flex;align-items:center;gap:4px;
+    background:var(--red);color:var(--paper);
+    padding:5px 12px;border-radius:999px;
+    font-family:'Baloo Bhai 2',system-ui;font-weight:700;
+    font-size:12px;letter-spacing:.08em;
+    box-shadow:0 2px 8px rgba(214,48,36,.4);
+  }
+  .streak-chip .star{color:var(--mustard);font-size:10px}
+  .streak-label{font-family:'Anek Devanagari';font-weight:500;font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--paper-mute);margin-right:8px}
+
+  .star-rail{position:absolute;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:16px;color:var(--mustard);font-size:11px;opacity:.5;z-index:1;pointer-events:none}
+  .star-rail.left{left:clamp(20px,3vw,40px)}
+  .star-rail.right{right:clamp(20px,3vw,40px)}
+
+  .logo-wrap{
+    position:relative;
+    height:min(50vh,440px);
+    aspect-ratio:1134 / 1340;
+    max-width:min(85vw,400px);
+    filter:drop-shadow(0 24px 48px rgba(0,0,0,.55));
+  }
+  .logo-wrap .slide{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;opacity:0;transition:opacity 900ms ease-in-out}
+  .logo-wrap .slide.is-active{opacity:1}
+
+  .dots{display:flex;gap:7px;justify-content:center}
+  .dots .dot{width:6px;height:6px;border-radius:999px;background:rgba(245,237,217,.25);transition:all .3s}
+  .dots .dot.is-active{background:var(--mustard);transform:scale(1.4)}
+
+  .hero-meta{display:flex;flex-direction:column;align-items:center;gap:clamp(14px,1.8vh,20px);max-width:640px}
+  .date-pill{
+    font-family:'Baloo Bhai 2',system-ui;font-weight:500;
+    font-size:12px;letter-spacing:.22em;text-transform:uppercase;
+    color:#E8DBB0;display:inline-flex;align-items:center;gap:12px;
+    padding:7px 18px 6px;border:1px solid rgba(242,176,30,.4);border-radius:999px;
+  }
+  .date-pill::before,.date-pill::after{content:'★';color:var(--mustard);font-size:10px}
+  .tagline{font-family:'Yatra One',serif;font-size:clamp(22px,2.6vw,30px);line-height:1.25;color:var(--paper)}
+  .tagline-en{display:block;font-family:'Anek Devanagari';font-weight:500;font-size:12px;letter-spacing:.22em;text-transform:uppercase;color:var(--paper-mute);margin-top:8px}
+
+  .diff-row{display:flex;gap:8px;align-items:center;justify-content:center;font-family:'Anek Devanagari';font-weight:500;font-size:11px;letter-spacing:.18em;text-transform:uppercase}
+  .diff-row a{color:var(--paper);text-decoration:none;padding:5px 12px;border:1px solid rgba(245,237,217,.22);border-radius:999px;transition:all .15s}
+  .diff-row a:hover{background:rgba(245,237,217,.08);border-color:rgba(242,176,30,.6)}
+  .diff-row .active{background:var(--red);border-color:var(--red)}
+
+  /* ================= LANDING SECTIONS (continued, on ink) ================= */
+  .section{position:relative;z-index:1;padding:64px clamp(20px,4vw,40px);max-width:900px;margin:0 auto}
+  .section-head{text-align:center;display:flex;flex-direction:column;align-items:center;gap:14px;margin-bottom:36px}
+  .section-head .eyebrow-stars{display:inline-flex;align-items:center;gap:10px;color:var(--mustard);font-size:11px}
+  .section-head h2{font-family:'Yatra One',serif;font-size:clamp(28px,3.5vw,40px);line-height:1.15}
+  .section-head h2 .hi{display:block;font-family:'Anek Devanagari';font-weight:500;font-size:.5em;letter-spacing:.2em;text-transform:uppercase;color:var(--paper-mute);margin-top:8px}
+
+  /* Mode cards */
+  .mode-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  @media (max-width:720px){.mode-grid{grid-template-columns:1fr}}
+  .mode-card{
+    position:relative;
+    display:flex;flex-direction:column;gap:16px;
+    padding:22px;
+    background:rgba(245,237,217,.04);
+    border:1px solid rgba(245,237,217,.14);
+    border-radius:16px;
+    transition:all .2s;cursor:pointer;text-decoration:none;color:var(--paper);
+  }
+  .mode-card:hover{transform:translateY(-3px);border-color:rgba(242,176,30,.5);background:rgba(245,237,217,.07)}
+  .mode-card.hard{border-color:rgba(232,50,138,.3)}
+  .mode-card.hard:hover{border-color:var(--pink)}
+  .mode-badge{
+    position:absolute;top:-10px;right:18px;
+    background:var(--ink-deep);border:1px solid rgba(232,50,138,.5);
+    padding:3px 10px;border-radius:999px;
+    font-family:'Anek Devanagari';font-weight:700;font-size:10px;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--pink);
+  }
+  .mode-top{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
+  .mode-title{font-family:'Yatra One',serif;font-size:22px;color:var(--paper)}
+  .mode-title.hard{color:var(--pink)}
+  .mode-pt{display:inline-flex;align-items:center;gap:4px;background:rgba(14,126,126,.2);color:var(--teal);padding:3px 9px;border-radius:999px;font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase}
+  .mode-blurb{font-size:13px;color:var(--paper-mute);line-height:1.55;flex:1}
+  .mode-foot{display:flex;align-items:center;justify-content:space-between;gap:8px}
+  .mode-streak-label{font-size:10px;color:var(--paper-mute);text-transform:uppercase;letter-spacing:.14em;font-weight:600}
+  .mode-streak-num{font-family:'Yatra One',serif;font-size:22px;color:var(--paper)}
+  .mode-streak-num span{font-family:'Anek Devanagari';font-size:12px;color:var(--paper-mute);font-weight:500;margin-left:3px}
+  .mode-cta{display:inline-flex;align-items:center;gap:6px;background:var(--mustard);color:var(--charcoal);padding:9px 16px;border-radius:999px;font-family:'Yatra One',serif;font-size:14px;letter-spacing:.04em;box-shadow:0 4px 14px rgba(242,176,30,.3)}
+  .mode-pool{font-size:10px;color:var(--paper-dim);letter-spacing:.1em;text-transform:uppercase;font-weight:600}
+
+  /* Info strips */
+  .info-strip{
+    display:flex;align-items:center;justify-content:space-between;gap:16px;
+    padding:14px 20px;border:1px solid rgba(245,237,217,.14);border-radius:14px;
+    background:rgba(245,237,217,.04);
+  }
+  .info-strip .copy{display:flex;flex-direction:column;gap:2px}
+  .info-strip .copy .t{font-family:'Yatra One',serif;font-size:15px;color:var(--paper)}
+  .info-strip .copy .s{font-size:11px;color:var(--paper-mute);letter-spacing:.08em}
+
+  /* How it works - step cards */
+  .step-stack{display:flex;flex-direction:column;gap:20px}
+  .step-card{
+    padding:24px;border:1px solid rgba(245,237,217,.14);border-radius:16px;
+    background:rgba(245,237,217,.04);
+    display:flex;flex-direction:column;gap:16px;
+  }
+  .step-head{display:flex;align-items:flex-start;gap:16px}
+  .step-head .num{font-family:'Yatra One',serif;font-size:38px;color:var(--mustard);line-height:1;min-width:52px}
+  .step-head .body h3{font-family:'Yatra One',serif;font-size:20px;color:var(--paper);margin-bottom:6px}
+  .step-head .body p{font-size:14px;color:var(--paper-mute);line-height:1.6}
+  .step-head .body p .tag{display:inline-block;padding:1px 7px;border-radius:4px;font-size:11px;font-weight:700;color:var(--paper);margin:0 2px}
+
+  /* search demo */
+  .search-demo{
+    display:flex;align-items:center;gap:12px;padding:12px 16px;
+    background:var(--ink);border:1px solid rgba(245,237,217,.12);border-radius:10px;
+    font-family:'Anek Devanagari';font-weight:500;
+  }
+  .search-demo .icon{color:var(--mustard)}
+  .search-demo .q{color:var(--paper);font-family:'Yatra One',serif;font-size:16px}
+
+  /* demo guess card inside how-it-works */
+  .demo-guess{background:var(--paper);color:var(--charcoal);border-radius:14px;padding:16px;position:relative}
+  .demo-guess-head{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+  .demo-poster{width:52px;height:78px;border-radius:6px;background:#8b2b2b;overflow:hidden;flex-shrink:0;display:flex;align-items:center;justify-content:center;color:var(--paper);font-size:9px;text-align:center;line-height:1.2}
+  .demo-info{flex:1}
+  .demo-info .t{font-family:'Yatra One',serif;font-size:17px;line-height:1.1}
+  .demo-info .s{font-size:12px;color:var(--paper-dim);margin-top:3px;font-weight:500}
+  .demo-tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+  @media (max-width:600px){.demo-tiles{grid-template-columns:repeat(2,1fr)}}
+  .demo-tile{
+    position:relative;padding:9px 10px 9px;border-radius:7px;color:var(--paper);
+    display:flex;flex-direction:column;gap:2px;
+    border:2px solid var(--charcoal);
+    overflow:hidden;
+  }
+  .demo-tile .label{font-family:'Anek Devanagari';font-weight:700;font-size:9px;letter-spacing:.14em;text-transform:uppercase;opacity:.85}
+  .demo-tile .val{font-family:'Yatra One',serif;font-size:12px;line-height:1.1}
+  .demo-tile.teal{background:var(--teal)}
+  .demo-tile.mustard{background:var(--mustard);color:var(--charcoal)}
+  .demo-tile.red{background:var(--red)}
+  .demo-tile .hi{position:absolute;top:3px;right:5px;font-family:'Yatra One',serif;font-size:11px;opacity:.35}
+
+  /* attributes grid */
+  .attr-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+  @media (max-width:720px){.attr-grid{grid-template-columns:repeat(2,1fr)}}
+  .attr-card{
+    position:relative;padding:16px 14px;
+    border:1px solid rgba(245,237,217,.14);border-radius:12px;
+    background:rgba(245,237,217,.04);
+  }
+  .attr-card .n{position:absolute;top:10px;right:12px;font-family:'Yatra One',serif;font-size:12px;color:var(--paper-dim)}
+  .attr-card .label{font-family:'Yatra One',serif;font-size:17px;color:var(--mustard);margin-bottom:4px}
+  .attr-card .desc{font-size:12px;color:var(--paper-mute);line-height:1.5}
+
+  /* FAQ */
+  .faq{display:flex;flex-direction:column;gap:8px}
+  details.faq-item{
+    border:1px solid rgba(245,237,217,.14);border-radius:12px;
+    background:rgba(245,237,217,.04);
+    transition:all .15s;
+  }
+  details.faq-item[open]{background:rgba(245,237,217,.07);border-color:rgba(242,176,30,.3)}
+  details.faq-item summary{
+    cursor:pointer;list-style:none;
+    display:flex;align-items:center;justify-content:space-between;gap:16px;
+    padding:14px 18px;
+    font-family:'Yatra One',serif;font-size:15px;color:var(--paper);
+  }
+  details.faq-item summary::-webkit-details-marker{display:none}
+  details.faq-item summary .plus{color:var(--mustard);font-size:22px;font-weight:300;transition:transform .2s}
+  details.faq-item[open] summary .plus{transform:rotate(45deg)}
+  details.faq-item p{padding:0 18px 18px;font-size:13px;color:var(--paper-mute);line-height:1.65}
+
+  /* bottom CTA */
+  .final-cta{text-align:center;padding:60px 20px 40px;border-top:1px solid rgba(245,237,217,.14);display:flex;flex-direction:column;align-items:center;gap:14px}
+  .final-cta .caption{font-family:'Anek Devanagari';font-weight:600;font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--paper-mute)}
+
+  /* footer */
+  .foot{
+    text-align:center;padding:28px 20px;
+    font-size:12px;color:var(--paper-dim);line-height:1.8;
+    border-top:1px solid rgba(245,237,217,.08);
+  }
+  .foot a{color:var(--paper-mute);text-decoration:underline;text-decoration-color:rgba(245,237,217,.2);text-underline-offset:3px}
+  .foot a:hover{color:var(--mustard)}
+
+  /* ================= PUZZLE SCREEN (cream paper) ================= */
+  .puzzle{min-height:100vh;background:var(--paper);color:var(--charcoal);position:relative}
+  .puzzle::before{content:'';position:absolute;inset:0;pointer-events:none;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='300' height='300'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.3  0 0 0 0 0.2  0 0 0 0 0.1  0 0 0 0.4 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");mix-blend-mode:multiply;opacity:.06}
+
+  .puzzle-header{
+    position:sticky;top:38px;z-index:5;
+    display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:12px;
+    padding:14px 20px;
+    background:rgba(245,237,217,.92);backdrop-filter:blur(10px);
+    border-bottom:2px solid var(--charcoal);
+  }
+  .puzzle-header .left,.puzzle-header .right{display:flex;align-items:center}
+  .puzzle-header .right{justify-content:flex-end}
+  .puzzle-header .center{text-align:center}
+  .puzzle-header .back{display:inline-flex;align-items:center;gap:4px;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--paper-dim);text-decoration:none;font-weight:600}
+  .puzzle-header .guess-count{font-family:'Yatra One',serif;font-size:16px;color:var(--charcoal);margin-top:3px}
+  .puzzle-header .guess-count .cur{color:var(--red)}
+  .puzzle-header .guess-count .total{color:var(--paper-dim);font-size:13px;font-weight:500;margin-left:2px}
+  .hint-btn{display:inline-flex;align-items:center;gap:7px;padding:9px 14px;border:1.5px solid var(--charcoal);background:var(--paper);border-radius:999px;font-family:'Anek Devanagari';font-weight:600;font-size:12px;letter-spacing:.08em;color:var(--charcoal);cursor:pointer}
+  .hint-btn .count{background:var(--mustard);color:var(--charcoal);padding:1px 7px;border-radius:999px;font-size:10px;font-weight:700}
+  .giveup-btn{display:inline-flex;align-items:center;gap:6px;padding:9px 14px;border:1.5px solid var(--paper-line-strong);background:transparent;border-radius:999px;font-family:'Anek Devanagari';font-weight:600;font-size:12px;letter-spacing:.08em;color:var(--paper-dim);cursor:pointer}
+  .giveup-btn:hover{color:var(--red);border-color:var(--red)}
+
+  .puzzle-body{position:relative;z-index:1;max-width:720px;margin:0 auto;padding:28px 20px 60px}
+
+  .mystery-poster{
+    width:140px;aspect-ratio:2/3;margin:0 auto 20px;
+    background:#c7a5a0;border-radius:10px;border:2px solid var(--charcoal);
+    display:flex;align-items:center;justify-content:center;
+    font-family:'Yatra One',serif;color:var(--paper-mute);font-size:12px;letter-spacing:.1em;text-align:center;
+    position:relative;overflow:hidden;
+    box-shadow:0 10px 30px rgba(26,22,18,.2);
+  }
+  .mystery-poster::after{content:'';position:absolute;inset:0;backdrop-filter:blur(14px);background:rgba(0,0,0,.1)}
+  .mystery-poster span{position:relative;z-index:1}
+
+  .autocomplete-wrap{position:relative;margin-bottom:14px}
+  .autocomplete{
+    width:100%;padding:16px 20px;
+    background:var(--paper);
+    border:2px solid var(--charcoal);
+    border-radius:12px;
+    font-family:'Anek Devanagari';font-weight:500;font-size:15px;color:var(--charcoal);
+    outline:none;
+  }
+  .autocomplete::placeholder{color:var(--paper-dim)}
+  .autocomplete:focus{box-shadow:0 0 0 3px rgba(242,176,30,.5)}
+  .hint-text{font-size:12px;color:var(--paper-dim);margin-top:8px;font-style:italic}
+
+  /* stacked guess cards */
+  .guesses{display:flex;flex-direction:column;gap:14px;margin-top:24px}
+  .guess-row{
+    background:var(--paper);
+    border:2px solid var(--charcoal);
+    border-radius:14px;padding:14px 14px 12px;
+    position:relative;
+  }
+  .guess-row .head{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+  .guess-row .head .idx{
+    display:inline-flex;align-items:center;justify-content:center;
+    width:28px;height:28px;background:var(--red);color:var(--paper);
+    border-radius:999px;font-family:'Yatra One',serif;font-size:14px;
+  }
+  .guess-row .head .poster{width:40px;height:60px;background:#555;border-radius:4px;flex-shrink:0;display:flex;align-items:center;justify-content:center;color:#eee;font-size:7px;text-align:center;padding:3px}
+  .guess-row .head .movie{flex:1}
+  .guess-row .head .movie .t{font-family:'Yatra One',serif;font-size:17px;color:var(--charcoal)}
+  .guess-row .head .movie .s{font-size:11px;color:var(--paper-dim);margin-top:2px;font-weight:500}
+  .guess-row .tiles{display:grid;grid-template-columns:repeat(8,1fr);gap:5px}
+  @media (max-width:720px){.guess-row .tiles{grid-template-columns:repeat(4,1fr)}}
+  .tile{
+    position:relative;padding:8px 7px 6px;border-radius:6px;color:var(--paper);
+    border:1.5px solid var(--charcoal);min-height:52px;
+    display:flex;flex-direction:column;justify-content:space-between;
+  }
+  .tile .lab{font-family:'Anek Devanagari';font-weight:700;font-size:8px;letter-spacing:.14em;text-transform:uppercase;opacity:.85}
+  .tile .v{font-family:'Yatra One',serif;font-size:11px;line-height:1.15;overflow:hidden;text-overflow:ellipsis}
+  .tile.teal{background:var(--teal)}
+  .tile.mustard{background:var(--mustard);color:var(--charcoal)}
+  .tile.red{background:var(--red)}
+  .tile .hi{position:absolute;top:4px;right:5px;font-family:'Yatra One',serif;font-size:10px;opacity:.35;line-height:1}
+  .tile .arrow{position:absolute;top:4px;right:6px;font-size:11px;opacity:.9}
+
+  /* ================= RESULT SCREEN ================= */
+  .result{
+    min-height:100vh;position:relative;overflow:hidden;
+    background:var(--paper);color:var(--charcoal);
+    padding:40px 20px 60px;
+    display:flex;flex-direction:column;align-items:center;gap:28px;
+  }
+  .result::before{content:'';position:absolute;inset:0;pointer-events:none;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='300' height='300'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.3  0 0 0 0 0.2  0 0 0 0 0.1  0 0 0 0.4 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");mix-blend-mode:multiply;opacity:.06}
+  .sunburst{
+    position:absolute;top:60px;left:50%;transform:translateX(-50%);
+    width:min(600px,120vw);aspect-ratio:1;pointer-events:none;z-index:0;
+    background:conic-gradient(from 0deg, transparent 0 10deg, rgba(242,176,30,.22) 10deg 22.5deg, transparent 22.5deg 45deg, rgba(242,176,30,.22) 45deg 57.5deg, transparent 57.5deg 90deg, rgba(242,176,30,.22) 90deg 102.5deg, transparent 102.5deg 135deg, rgba(242,176,30,.22) 135deg 147.5deg, transparent 147.5deg 180deg, rgba(242,176,30,.22) 180deg 192.5deg, transparent 192.5deg 225deg, rgba(242,176,30,.22) 225deg 237.5deg, transparent 237.5deg 270deg, rgba(242,176,30,.22) 270deg 282.5deg, transparent 282.5deg 315deg, rgba(242,176,30,.22) 315deg 327.5deg, transparent 327.5deg);
+    mask:radial-gradient(circle, black 20%, transparent 65%);
+  }
+  .result > *{position:relative;z-index:1}
+  .result .mode-eyebrow{display:inline-flex;align-items:center;gap:10px;color:var(--red);font-family:'Anek Devanagari';font-weight:700;font-size:11px;letter-spacing:.26em;text-transform:uppercase}
+  .result .mode-eyebrow::before,.result .mode-eyebrow::after{content:'★';color:var(--mustard);font-size:10px}
+  .result h1{font-family:'Yatra One',serif;font-size:clamp(42px,6vw,64px);line-height:1;color:var(--charcoal);text-align:center}
+  .result h1 .en{display:block;font-size:.42em;color:var(--paper-dim);margin-top:6px;font-family:'Anek Devanagari';font-weight:600;letter-spacing:.08em}
+  .result .solved-sub{font-size:14px;color:var(--paper-dim);font-weight:500}
+
+  .result-poster{
+    width:200px;aspect-ratio:2/3;background:#8b2b2b;border-radius:8px;
+    display:flex;align-items:center;justify-content:center;color:var(--paper);font-family:'Yatra One',serif;font-size:14px;text-align:center;padding:14px;
+  }
+  .result-title{text-align:center}
+  .result-title .t{font-family:'Yatra One',serif;font-size:28px;color:var(--charcoal)}
+  .result-title .meta{font-size:13px;color:var(--paper-dim);margin-top:4px;font-weight:500}
+
+  .result-card{width:100%;max-width:500px;background:rgba(26,22,18,.04);border:1.5px solid var(--paper-line);border-radius:14px;padding:16px 18px}
+  .result-card .head{display:flex;justify-content:space-between;font-size:10px;color:var(--paper-dim);text-transform:uppercase;letter-spacing:.16em;font-weight:600;margin-bottom:10px}
+  .emoji-grid{font-family:'Baloo Bhai 2',monospace;font-size:22px;text-align:center;line-height:1.35;letter-spacing:3px;color:var(--charcoal)}
+
+  .trivia{width:100%;max-width:500px;background:rgba(43,34,80,.06);border-radius:14px;padding:16px 18px}
+  .trivia .head{font-size:10px;color:var(--paper-dim);text-transform:uppercase;letter-spacing:.16em;font-weight:600;margin-bottom:8px}
+  .trivia p{font-size:13px;color:var(--charcoal);line-height:1.65}
+
+  .streak-share{width:100%;max-width:500px;background:var(--paper);border:1.5px solid var(--paper-line);border-radius:14px;padding:18px;display:flex;flex-direction:column;gap:14px}
+  .ss-top{display:flex;justify-content:space-between;align-items:flex-start}
+  .ss-top .lab{font-size:10px;color:var(--paper-dim);text-transform:uppercase;letter-spacing:.16em;font-weight:600}
+  .ss-top .num{font-family:'Yatra One',serif;font-size:28px;color:var(--charcoal);margin-top:2px}
+  .ss-top .num span{font-family:'Anek Devanagari';font-size:12px;color:var(--paper-dim);font-weight:500;margin-left:4px}
+  .ss-top .count{font-family:'Baloo Bhai 2',monospace;font-size:16px;color:var(--red);margin-top:2px;font-weight:700}
+  .share-cta{display:inline-flex;align-items:center;justify-content:center;gap:8px;background:var(--red);color:var(--paper);padding:14px;border-radius:999px;font-family:'Yatra One',serif;font-size:17px;border:none;cursor:pointer;box-shadow:0 10px 24px rgba(214,48,36,.3)}
+
+  .cross-sell{width:100%;max-width:500px;display:flex;flex-direction:column;gap:10px}
+  .cross-sell .lab{font-size:10px;color:var(--paper-dim);text-transform:uppercase;letter-spacing:.16em;font-weight:600;text-align:center}
+  .cross-sell .row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .cross-sell .row a{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:var(--paper);border:1.5px solid var(--paper-line);border-radius:12px;font-family:'Yatra One',serif;font-size:15px;color:var(--charcoal);text-decoration:none}
+  .cross-sell .row a:hover{border-color:var(--red)}
+  .cross-sell .archive{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:12px;border:1.5px solid var(--paper-line);border-radius:999px;color:var(--charcoal);text-decoration:none;font-family:'Anek Devanagari';font-weight:600;font-size:12px;letter-spacing:.14em;text-transform:uppercase}
+
+  /* ================= MODALS ================= */
+  .modal-wrap{min-height:100vh;background:var(--ink-deep);display:flex;align-items:center;justify-content:center;padding:40px 20px;position:relative}
+  .modal-wrap::before{content:'';position:absolute;inset:0;pointer-events:none;background:rgba(0,0,0,.4);backdrop-filter:blur(8px)}
+  .modal{
+    position:relative;z-index:1;
+    width:100%;max-width:520px;
+    background:var(--paper);color:var(--charcoal);
+    border-radius:20px;padding:28px;
+    border:3px solid var(--charcoal);
+    box-shadow:0 30px 80px rgba(0,0,0,.5);
+  }
+  .modal.star::before,.modal.star::after,
+  .modal.star > .c-tl,.modal.star > .c-tr,
+  .modal.star > .c-bl,.modal.star > .c-br{
+    content:'★';position:absolute;color:var(--red);font-size:16px;
+    width:24px;height:24px;background:var(--paper);
+    display:flex;align-items:center;justify-content:center;
+    border:2px solid var(--charcoal);border-radius:4px;
+  }
+  .modal.star::before{top:-14px;left:-14px}
+  .modal.star::after{top:-14px;right:-14px}
+  .modal.star > .c-bl{bottom:-14px;left:-14px}
+  .modal.star > .c-br{bottom:-14px;right:-14px}
+
+  .modal-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px}
+  .modal-top h2{font-family:'Yatra One',serif;font-size:28px;color:var(--charcoal)}
+  .modal-top h2 .en{display:block;font-size:.42em;color:var(--paper-dim);font-family:'Anek Devanagari';font-weight:600;letter-spacing:.14em;text-transform:uppercase;margin-top:4px}
+  .modal-close{width:32px;height:32px;border-radius:999px;background:transparent;border:1.5px solid var(--paper-line-strong);color:var(--charcoal);cursor:pointer;font-size:14px}
+  .modal p{font-size:13px;color:var(--charcoal);line-height:1.65;margin-bottom:14px}
+  .modal p strong{color:var(--red)}
+  .tile-legend{display:flex;flex-direction:column;gap:10px;margin:14px 0}
+  .tile-legend li{display:flex;align-items:center;gap:12px;list-style:none}
+  .tile-legend .sw{width:36px;height:36px;border-radius:7px;border:2px solid var(--charcoal);display:flex;align-items:center;justify-content:center;font-family:'Yatra One',serif;font-size:17px;color:var(--paper);flex-shrink:0}
+  .tile-legend .sw.teal{background:var(--teal)}
+  .tile-legend .sw.mustard{background:var(--mustard);color:var(--charcoal)}
+  .tile-legend .sw.red{background:var(--red)}
+  .tile-legend .txt{font-size:13px;color:var(--charcoal);line-height:1.5}
+  .tile-legend .txt b{font-family:'Yatra One',serif;font-weight:400;font-size:14px}
+
+  .modal-foot{font-size:11px;color:var(--paper-dim);margin-top:16px;letter-spacing:.1em;text-transform:uppercase;font-weight:600}
+
+  .modal-cta-row{display:flex;gap:10px;margin-top:20px}
+  .modal-cta-row button{flex:1;padding:14px;border-radius:999px;font-family:'Anek Devanagari';font-weight:600;font-size:13px;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;border:none}
+  .modal-cta-row .keep{background:transparent;border:1.5px solid var(--paper-line-strong);color:var(--charcoal)}
+  .modal-cta-row .confirm{background:var(--charcoal);color:var(--paper)}
+
+</style>
+</head>
+<body>
+
+<nav class="mock-nav">
+  <span class="brand">बॉलीवुड स्पॉटल</span>
+  <a href="#landing">Landing</a>
+  <a href="#puzzle">Puzzle</a>
+  <a href="#result">Result</a>
+  <a href="#howtoplay">How to play</a>
+  <a href="#giveup">Give up</a>
+</nav>
+
+<!-- ============================= LANDING ============================= -->
+<section id="landing" class="surface-ink">
+  <div class="mock-label">01 · Landing — the single-viewport hero + full editorial scroll</div>
+
+  <!-- HERO -->
+  <div class="hero-wrap">
+    <header class="util-bar">
+      <span class="brand-mini">बॉलीवुड स्पॉटल</span>
+      <div style="display:flex;align-items:center">
+        <span class="streak-label">Streak</span>
+        <span class="streak-chip"><span class="star">★</span>4</span>
+      </div>
+    </header>
+
+    <aside class="star-rail left" aria-hidden><span>★</span><span>★</span><span>★</span><span>★</span><span>★</span><span>★</span><span>★</span></aside>
+    <aside class="star-rail right" aria-hidden><span>★</span><span>★</span><span>★</span><span>★</span><span>★</span><span>★</span><span>★</span></aside>
+
+    <div class="logo-wrap" id="logoWrap"></div>
+    <div class="dots" id="dots"></div>
+
+    <div class="hero-meta">
+      <div class="date-pill">Saturday · 10 October 2026 · IST</div>
+      <h1 class="tagline">आज की फ़िल्म पहचानिए — दस कोशिशों में<span class="tagline-en">Guess today's Bollywood film in 10 tries</span></h1>
+      <button class="pill-mustard"><span class="arrow">▶</span>PLAY <small>खेलें</small></button>
+      <div class="diff-row">
+        <a href="#" class="active">Easy</a>
+        <a href="#">Medium</a>
+        <a href="#">Hard</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODE CARDS -->
+  <div class="section">
+    <div class="section-head">
+      <span class="eyebrow-stars">★ CHOOSE YOUR MATCHBOX ★</span>
+      <h2>Three ways to play<span class="hi">तीन मुश्किलें · पसंद आपकी</span></h2>
+    </div>
+    <div class="mode-grid">
+      <a href="#" class="mode-card">
+        <div class="mode-top">
+          <div class="mode-title">Easy</div>
+          <span class="mode-pt">✓ played</span>
+        </div>
+        <p class="mode-blurb">500 modern blockbusters. Great if you watch mainstream Hindi cinema casually.</p>
+        <div class="mode-foot">
+          <div><div class="mode-streak-label">Streak</div><div class="mode-streak-num">4<span>days</span></div></div>
+          <span class="mode-cta">Replay →</span>
+        </div>
+        <div class="mode-pool">Pool · 500 films</div>
+      </a>
+      <a href="#" class="mode-card">
+        <div class="mode-top">
+          <div class="mode-title">Medium</div>
+        </div>
+        <p class="mode-blurb">1,500 well-known hits across decades — the "I know my Bollywood" tier.</p>
+        <div class="mode-foot">
+          <div><div class="mode-streak-label">Streak</div><div class="mode-streak-num">2<span>days</span></div></div>
+          <span class="mode-cta">Play →</span>
+        </div>
+        <div class="mode-pool">Pool · 1,500 films</div>
+      </a>
+      <a href="#" class="mode-card hard">
+        <span class="mode-badge">🎬⭐ Hard</span>
+        <div class="mode-top">
+          <div class="mode-title hard">Hard</div>
+        </div>
+        <p class="mode-blurb">All 3,000+ films — parallel, cult, deep-cut. Streaks here are the real brag.</p>
+        <div class="mode-foot">
+          <div><div class="mode-streak-label">Streak</div><div class="mode-streak-num">0<span>days</span></div></div>
+          <span class="mode-cta">Play →</span>
+        </div>
+        <div class="mode-pool">Pool · 3,000+ films</div>
+      </a>
+    </div>
+  </div>
+
+  <!-- INFO STRIPS -->
+  <div class="section" style="padding-top:0;display:flex;flex-direction:column;gap:14px">
+    <div class="info-strip">
+      <div class="copy">
+        <div class="t">New puzzle at midnight IST</div>
+        <div class="s">Streaks reset after one missed day.</div>
+      </div>
+      <a href="#howtoplay" class="pill-outline-ink">How to play</a>
+    </div>
+    <div class="info-strip">
+      <div class="copy">
+        <div class="t">Catch up on past puzzles</div>
+        <div class="s">Practice mode — no streak impact, unlimited replays.</div>
+      </div>
+      <a href="#" class="pill-outline-ink">Archive →</a>
+    </div>
+  </div>
+
+  <!-- HOW IT WORKS -->
+  <div class="section">
+    <div class="section-head">
+      <span class="eyebrow-stars">★ ★ ★</span>
+      <h2>How it works<span class="hi">खेल कैसे चलता है</span></h2>
+    </div>
+    <div class="step-stack">
+      <div class="step-card">
+        <div class="step-head">
+          <div class="num">01</div>
+          <div class="body">
+            <h3>Pick any Hindi film</h3>
+            <p>Search the catalogue and pick a title from the dropdown — Easy covers 500 modern blockbusters, Medium 1,500 well-known hits, Hard the full 3,000+ including parallel and cult cinema. Each guess reveals eight comparison tiles.</p>
+          </div>
+        </div>
+        <div class="search-demo"><span class="icon">🔍</span><span class="q">Lagaan</span></div>
+      </div>
+
+      <div class="step-card">
+        <div class="step-head">
+          <div class="num">02</div>
+          <div class="body">
+            <h3>Read the clues</h3>
+            <p>Each tile shows how close your guess is. <span class="tag" style="background:var(--teal)">TEAL</span> is exact, <span class="tag" style="background:var(--mustard);color:var(--charcoal)">MUSTARD</span> is close, <span class="tag" style="background:var(--red)">RED</span> is no match. Arrows on year, box office and IMDb say whether the answer is higher or lower.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- demo guess card (partial) -->
+      <div class="demo-guess">
+        <div class="demo-guess-head">
+          <div class="demo-poster">LAGAAN</div>
+          <div class="demo-info">
+            <div class="t">Lagaan</div>
+            <div class="s">2001 · Ashutosh Gowariker</div>
+          </div>
+        </div>
+        <div class="demo-tiles">
+          <div class="demo-tile mustard"><span class="hi">१</span><div class="label">Director</div><div class="val">A. Gowariker</div></div>
+          <div class="demo-tile teal"><span class="hi">२</span><div class="label">Cast</div><div class="val">A. Khan</div></div>
+          <div class="demo-tile red"><span class="hi">३</span><div class="label">Year ↓</div><div class="val">2001</div></div>
+          <div class="demo-tile mustard"><span class="hi">४</span><div class="label">Box office ↑</div><div class="val">₹65 cr</div></div>
+          <div class="demo-tile teal"><span class="hi">५</span><div class="label">Music</div><div class="val">A.R. Rahman</div></div>
+          <div class="demo-tile red"><span class="hi">६</span><div class="label">Banner</div><div class="val">Aamir Khan Pr.</div></div>
+          <div class="demo-tile mustard"><span class="hi">७</span><div class="label">Genre</div><div class="val">Drama · Sport</div></div>
+          <div class="demo-tile red"><span class="hi">८</span><div class="label">IMDb ↓</div><div class="val">8.1</div></div>
+        </div>
+      </div>
+
+      <div class="step-card">
+        <div class="step-head">
+          <div class="num">03</div>
+          <div class="body">
+            <h3>Zero in on the answer</h3>
+            <p>Use what each tile tells you to narrow down the next guess. Ten tries, total — and two hints unlocked after guesses 3 and 6 if you're stuck. When you nail the film every tile turns teal.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- demo guess card (won) -->
+      <div class="demo-guess">
+        <div class="demo-guess-head">
+          <div class="demo-poster" style="background:#2a6b4a">DIL CHAHTA HAI</div>
+          <div class="demo-info">
+            <div class="t">Dil Chahta Hai</div>
+            <div class="s">2001 · Farhan Akhtar</div>
+          </div>
+        </div>
+        <div class="demo-tiles">
+          <div class="demo-tile teal"><span class="hi">१</span><div class="label">Director</div><div class="val">F. Akhtar</div></div>
+          <div class="demo-tile teal"><span class="hi">२</span><div class="label">Cast</div><div class="val">A. Khan</div></div>
+          <div class="demo-tile teal"><span class="hi">३</span><div class="label">Year</div><div class="val">2001</div></div>
+          <div class="demo-tile teal"><span class="hi">४</span><div class="label">Box office</div><div class="val">₹28 cr</div></div>
+          <div class="demo-tile teal"><span class="hi">५</span><div class="label">Music</div><div class="val">Shankar-Ehsaan-Loy</div></div>
+          <div class="demo-tile teal"><span class="hi">६</span><div class="label">Banner</div><div class="val">Excel Entertainment</div></div>
+          <div class="demo-tile teal"><span class="hi">७</span><div class="label">Genre</div><div class="val">Drama · Romance</div></div>
+          <div class="demo-tile teal"><span class="hi">८</span><div class="label">IMDb</div><div class="val">8.1</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ATTRIBUTES -->
+  <div class="section">
+    <div class="section-head">
+      <span class="eyebrow-stars">★ WHAT THE EIGHT TILES MEAN ★</span>
+      <h2>Every tile tells a story<span class="hi">आठ संकेत · एक फ़िल्म</span></h2>
+    </div>
+    <div class="attr-grid">
+      <div class="attr-card"><div class="n">01</div><div class="label">Director</div><div class="desc">Who helmed the film.</div></div>
+      <div class="attr-card"><div class="n">02</div><div class="label">Lead cast</div><div class="desc">Top three billed actors.</div></div>
+      <div class="attr-card"><div class="n">03</div><div class="label">Year</div><div class="desc">Theatrical release year.</div></div>
+      <div class="attr-card"><div class="n">04</div><div class="label">Box office</div><div class="desc">Lifetime India gross in ₹ crore.</div></div>
+      <div class="attr-card"><div class="n">05</div><div class="label">Music</div><div class="desc">Composer or music director.</div></div>
+      <div class="attr-card"><div class="n">06</div><div class="label">Banner</div><div class="desc">Primary production company.</div></div>
+      <div class="attr-card"><div class="n">07</div><div class="label">Genre</div><div class="desc">Up to two primary genres.</div></div>
+      <div class="attr-card"><div class="n">08</div><div class="label">IMDb score</div><div class="desc">Audience rating out of 10.</div></div>
+    </div>
+  </div>
+
+  <!-- FAQ -->
+  <div class="section">
+    <div class="section-head">
+      <span class="eyebrow-stars">★ QUESTIONS FROM THE AUDIENCE ★</span>
+      <h2>FAQ<span class="hi">आपके सवाल</span></h2>
+    </div>
+    <div class="faq">
+      <details class="faq-item" open><summary>What is Spotle Bollywood?<span class="plus">+</span></summary><p>A daily puzzle where you guess one mystery Hindi film in ten tries. Each guess reveals eight comparison tiles and gradually un-blurs the poster.</p></details>
+      <details class="faq-item"><summary>When does the daily film reset?<span class="plus">+</span></summary><p>At midnight IST. Everyone playing on the same calendar day in India plays the same film.</p></details>
+      <details class="faq-item"><summary>What films can show up?<span class="plus">+</span></summary><p>You can guess any film in our 3,000+ Hindi film catalogue regardless of difficulty. Difficulty controls which film is picked as today's mystery — Easy picks modern blockbusters, Medium well-known hits across decades, Hard adds parallel, cult and deep-cut cinema.</p></details>
+      <details class="faq-item"><summary>Why isn't my film showing up in the search?<span class="plus">+</span></summary><p>The catalogue is 3,000+ films but not exhaustive — some older or less-reviewed films are missing. If a title you expected isn't appearing, drop me a line via the footer and I'll check whether it should be added.</p></details>
+      <details class="faq-item"><summary>Can I play yesterday's puzzle?<span class="plus">+</span></summary><p>Not yet — the archive is coming soon. For now each day's puzzle is one-shot.</p></details>
+      <details class="faq-item"><summary>How do hints work?<span class="plus">+</span></summary><p>You get two hints per play, unlocked after your third and sixth guess. Each hint reveals one of: tagline, filmography, or a cast member — you pick which.</p></details>
+      <details class="faq-item"><summary>What counts as a close match?<span class="plus">+</span></summary><p>Close (mustard) depends on the attribute. Year is within 5 years. Box office is within 50% of the answer's gross. IMDb is within 0.5 points — teal means both films display the exact same rating. Director and music turn mustard when the two people are frequent collaborators (same cluster across films).</p></details>
+      <details class="faq-item"><summary>What does the box-office figure represent?<span class="plus">+</span></summary><p>Worldwide gross from TMDB, converted to an approximate crore equivalent for the display. It's not the same as India-only collections — this metric is used so the game can score large and small releases on the same scale.</p></details>
+      <details class="faq-item"><summary>What are the three difficulty modes?<span class="plus">+</span></summary><p>Easy covers 500 modern blockbusters. Medium covers 1,500 well-known hits across decades. Hard adds parallel, cult and deep-cut cinema from the full catalogue — streaks there are the real brag.</p></details>
+      <details class="faq-item"><summary>Does the site track me?<span class="plus">+</span></summary><p>No login required for playing. A single cookie stores your streaks and today's progress. No analytics, no third-party trackers.</p></details>
+    </div>
+  </div>
+
+  <!-- FINAL CTA -->
+  <div class="section" style="padding-top:0">
+    <div class="final-cta">
+      <button class="pill-mustard"><span class="arrow">▶</span>PLAY TODAY'S FILM <small>खेलें</small></button>
+      <p class="caption">★ FREE · ONE FILM A DAY · NO ACCOUNT ★</p>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="foot">
+    <p>A game by <a href="https://www.linkedin.com/in/om-golesar-173ab12aa/">Om Golesar</a>. Questions? Reach me at <a href="mailto:omgolesar99@gmail.com">omgolesar99@gmail.com</a>.</p>
+    <p>Movie data from TMDB. v1 preview · Bollywood edition.</p>
+    <p><a href="#">Curator access</a></p>
+  </footer>
+</section>
+
+
+<!-- ============================= PUZZLE SCREEN ============================= -->
+<section id="puzzle" class="puzzle">
+  <div class="mock-label" style="color:var(--paper-dim);background:var(--paper)">02 · Puzzle screen — mid-game (3 guesses in, blurred poster)</div>
+
+  <div class="puzzle-header">
+    <div class="left">
+      <button class="hint-btn">💡 Hints <span class="count">1</span></button>
+    </div>
+    <div class="center">
+      <a href="#landing" class="back">← Easy · आसान</a>
+      <div class="guess-count">Guess <span class="cur">4</span><span class="total">of 10</span></div>
+    </div>
+    <div class="right">
+      <button class="giveup-btn">⚑ Give up</button>
+    </div>
+  </div>
+
+  <div class="puzzle-body">
+    <div class="mystery-poster"><span>MYSTERY<br>POSTER<br>(blurred)</span></div>
+
+    <div class="autocomplete-wrap">
+      <input class="autocomplete" placeholder="Guess a Hindi film…">
+      <p class="hint-text">★ Pick any film. Each guess reveals comparison tiles and un-blurs the poster.</p>
+    </div>
+
+    <div class="guesses">
+
+      <!-- Guess 3 (most recent, bigger emphasis) -->
+      <div class="guess-row">
+        <div class="head">
+          <span class="idx">३</span>
+          <div class="poster">3 IDIOTS</div>
+          <div class="movie">
+            <div class="t">3 Idiots</div>
+            <div class="s">2009 · Rajkumar Hirani</div>
+          </div>
+        </div>
+        <div class="tiles">
+          <div class="tile mustard"><div class="lab">Director</div><div class="v">R. Hirani</div><span class="hi">३</span></div>
+          <div class="tile teal"><div class="lab">Cast</div><div class="v">A. Khan</div><span class="hi">३</span></div>
+          <div class="tile mustard"><div class="lab">Year</div><div class="v">2009</div><span class="arrow">↓</span></div>
+          <div class="tile red"><div class="lab">Box office</div><div class="v">₹460 cr</div><span class="arrow">↓</span></div>
+          <div class="tile red"><div class="lab">Music</div><div class="v">Shantanu M.</div><span class="hi">३</span></div>
+          <div class="tile mustard"><div class="lab">Banner</div><div class="v">Vinod Chopra</div><span class="hi">३</span></div>
+          <div class="tile teal"><div class="lab">Genre</div><div class="v">Drama</div><span class="hi">३</span></div>
+          <div class="tile mustard"><div class="lab">IMDb</div><div class="v">8.4</div><span class="arrow">↓</span></div>
+        </div>
+      </div>
+
+      <!-- Guess 2 -->
+      <div class="guess-row">
+        <div class="head">
+          <span class="idx">२</span>
+          <div class="poster">RANG DE BASANTI</div>
+          <div class="movie">
+            <div class="t">Rang De Basanti</div>
+            <div class="s">2006 · Rakeysh Mehra</div>
+          </div>
+        </div>
+        <div class="tiles">
+          <div class="tile red"><div class="lab">Director</div><div class="v">R.O. Mehra</div><span class="hi">२</span></div>
+          <div class="tile teal"><div class="lab">Cast</div><div class="v">A. Khan</div><span class="hi">२</span></div>
+          <div class="tile mustard"><div class="lab">Year</div><div class="v">2006</div><span class="arrow">↑</span></div>
+          <div class="tile mustard"><div class="lab">Box office</div><div class="v">₹100 cr</div><span class="arrow">↑</span></div>
+          <div class="tile teal"><div class="lab">Music</div><div class="v">A.R. Rahman</div><span class="hi">२</span></div>
+          <div class="tile red"><div class="lab">Banner</div><div class="v">UTV</div><span class="hi">२</span></div>
+          <div class="tile teal"><div class="lab">Genre</div><div class="v">Drama</div><span class="hi">२</span></div>
+          <div class="tile teal"><div class="lab">IMDb</div><div class="v">8.1</div><span class="hi">२</span></div>
+        </div>
+      </div>
+
+      <!-- Guess 1 -->
+      <div class="guess-row">
+        <div class="head">
+          <span class="idx">१</span>
+          <div class="poster">LAGAAN</div>
+          <div class="movie">
+            <div class="t">Lagaan</div>
+            <div class="s">2001 · Ashutosh Gowariker</div>
+          </div>
+        </div>
+        <div class="tiles">
+          <div class="tile red"><div class="lab">Director</div><div class="v">A. Gowariker</div><span class="hi">१</span></div>
+          <div class="tile teal"><div class="lab">Cast</div><div class="v">A. Khan</div><span class="hi">१</span></div>
+          <div class="tile red"><div class="lab">Year</div><div class="v">2001</div><span class="arrow">↑</span></div>
+          <div class="tile mustard"><div class="lab">Box office</div><div class="v">₹65 cr</div><span class="arrow">↑</span></div>
+          <div class="tile teal"><div class="lab">Music</div><div class="v">A.R. Rahman</div><span class="hi">१</span></div>
+          <div class="tile red"><div class="lab">Banner</div><div class="v">Aamir Khan Pr.</div><span class="hi">१</span></div>
+          <div class="tile mustard"><div class="lab">Genre</div><div class="v">Drama · Sport</div><span class="hi">१</span></div>
+          <div class="tile red"><div class="lab">IMDb</div><div class="v">8.1</div><span class="arrow">↑</span></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+
+<!-- ============================= RESULT SCREEN ============================= -->
+<section id="result" class="result">
+  <div class="mock-label" style="color:var(--paper-dim);background:var(--paper);width:100%;padding:30px 24px 0">03 · Result screen — WIN variant</div>
+  <div class="sunburst"></div>
+
+  <div class="mode-eyebrow">EASY · आसान</div>
+  <h1>शाबाश!<span class="en">Solved in 4 guesses</span></h1>
+
+  <div class="result-poster">DIL CHAHTA HAI<br>2001</div>
+  <div class="result-title">
+    <div class="t">Dil Chahta Hai</div>
+    <div class="meta">Farhan Akhtar · 2001</div>
+  </div>
+
+  <div class="result-card">
+    <div class="head"><span>Your grid · आपका ग्रिड</span><span>10 Oct 2026</span></div>
+    <pre class="emoji-grid">🟥🟩🟥🟨🟩🟥🟨🟥
+🟥🟩🟨🟨🟩🟥🟩🟩
+🟨🟩🟨🟥🟥🟨🟩🟨
+🟩🟩🟩🟩🟩🟩🟩🟩</pre>
+  </div>
+
+  <div class="trivia">
+    <div class="head">★ Trivia · रोचक तथ्य</div>
+    <p>Farhan Akhtar's directorial debut — originally cast with Hrithik Roshan for the Akash role before Aamir Khan came on. The Goa trip sequence set the template for the "boys' road trip" subgenre in Hindi cinema.</p>
+  </div>
+
+  <a href="#" class="pill-outline-paper">Where to watch →</a>
+
+  <div class="streak-share">
+    <div class="ss-top">
+      <div>
+        <div class="lab">Easy streak</div>
+        <div class="num">5<span>days</span></div>
+      </div>
+      <div style="text-align:right">
+        <div class="lab">Next puzzle</div>
+        <div class="count">11:28:14</div>
+      </div>
+    </div>
+    <button class="share-cta">★ Share your result</button>
+  </div>
+
+  <div class="cross-sell">
+    <div class="lab">Try another mode</div>
+    <div class="row">
+      <a href="#">Medium <span>→</span></a>
+      <a href="#">Hard 🎬⭐ <span>→</span></a>
+    </div>
+    <a href="#" class="archive">Play past puzzles →</a>
+  </div>
+</section>
+
+
+<!-- ============================= HOW TO PLAY MODAL ============================= -->
+<section id="howtoplay" class="modal-wrap">
+  <div class="mock-label" style="position:absolute;top:0;left:0;right:0;z-index:2">04 · How-to-play sheet (shown over any screen)</div>
+
+  <div class="modal star">
+    <span class="c-bl"></span><span class="c-br"></span>
+    <div class="modal-top">
+      <h2>How to play<span class="en">कैसे खेलें</span></h2>
+      <button class="modal-close">✕</button>
+    </div>
+    <p>Guess today's mystery Hindi film in <strong>10 tries</strong>. Each guess reveals 8 color-coded tiles comparing your pick to the answer — director, cast, year, box office, music, banner, genre, IMDb score.</p>
+    <ul class="tile-legend">
+      <li><span class="sw teal">✓</span><span class="txt"><b>Teal</b> — this attribute matches today's film exactly.</span></li>
+      <li><span class="sw mustard">~</span><span class="txt"><b>Mustard</b> — partial match. Close, but not quite.</span></li>
+      <li><span class="sw red">✕</span><span class="txt"><b>Red</b> — no overlap.</span></li>
+    </ul>
+    <p>The poster un-blurs with every guess. Use up to <strong>2 hints</strong> per play (unlocked after guess 3 and guess 6). Three difficulty modes refresh daily at midnight IST.</p>
+    <p class="modal-foot">Movie data from TMDB</p>
+  </div>
+</section>
+
+
+<!-- ============================= GIVE UP MODAL ============================= -->
+<section id="giveup" class="modal-wrap" style="min-height:70vh">
+  <div class="mock-label" style="position:absolute;top:0;left:0;right:0;z-index:2">05 · Give-up confirmation sheet</div>
+
+  <div class="modal star" style="max-width:420px">
+    <span class="c-bl"></span><span class="c-br"></span>
+    <h2 style="margin-bottom:8px">Give up this puzzle?<span class="en">छोड़ देंगे?</span></h2>
+    <p style="margin-top:12px">You'll see today's answer and your <strong>Easy streak will reset</strong>. The next puzzle unlocks at midnight IST.</p>
+    <div class="modal-cta-row">
+      <button class="keep">Keep guessing</button>
+      <button class="confirm">Give up</button>
+    </div>
+  </div>
+</section>
+
+
+<script>
+  // Rotating posters in the hero
+  const posters = ['title-logo.png','poster-01-retro.png','poster-02-halftone.png','poster-03-rose.png','poster-04-matchbox.png','poster-05-devanagari.png'];
+  const wrap = document.getElementById('logoWrap');
+  const dotsRow = document.getElementById('dots');
+  posters.forEach((name, i) => {
+    const img = document.createElement('img');
+    img.className = 'slide' + (i === 0 ? ' is-active' : '');
+    img.src = '/files/' + encodeURIComponent(name);
+    img.alt = 'Spotle Bollywood poster ' + (i + 1);
+    img.loading = i === 0 ? 'eager' : 'lazy';
+    wrap.appendChild(img);
+    const dot = document.createElement('span');
+    dot.className = 'dot' + (i === 0 ? ' is-active' : '');
+    dotsRow.appendChild(dot);
+  });
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (!reduce && posters.length > 1) {
+    let idx = 0;
+    const slides = wrap.querySelectorAll('.slide');
+    const dots = dotsRow.querySelectorAll('.dot');
+    setInterval(() => {
+      slides[idx].classList.remove('is-active');
+      dots[idx].classList.remove('is-active');
+      idx = (idx + 1) % slides.length;
+      slides[idx].classList.add('is-active');
+      dots[idx].classList.add('is-active');
+    }, 5000);
+  }
+</script>
+</body>
+</html>
